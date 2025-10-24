@@ -3,145 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador de Carta de Recomendación</title>
+    <title>Generador Profesional de Carta de Recomendación</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        label, input, textarea, button { display: block; margin-bottom: 10px; width: 100%; box-sizing: border-box; }
-        textarea { height: 150px; }
-        .input-group { margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
-        .date-input { width: 49%; display: inline-block; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 850px; margin: 0 auto; padding: 25px; background-color: #f4f4f9; }
+        h1 { color: #2c3e50; text-align: center; margin-bottom: 25px; }
+        .input-group { background-color: #ffffff; padding: 20px; margin-bottom: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+        h2 { color: #34495e; border-bottom: 2px solid #3498db; padding-bottom: 5px; margin-bottom: 15px; }
+        label { display: block; margin-top: 10px; font-weight: bold; color: #555; }
+        input[type="text"], input[type="date"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .date-container { display: flex; justify-content: space-between; gap: 10px; }
+        .date-container input { width: 100%; }
+        textarea { height: 120px; resize: vertical; }
+        button {
+            background-color: #2ecc71;
+            color: white;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        button:hover { background-color: #27ae60; }
     </style>
 </head>
 <body>
 
-    <h1>Generador de Carta de Recomendación</h1>
+    <h1>📝 Generador de Carta de Recomendación Laboral</h1>
 
     <div class="input-group">
-        <h2>Datos del Empleado</h2>
-        <label for="nombre">Nombre Completo del Empleado:</label>
-        <input type="text" id="nombre" value="[Nombre del Empleado]">
-
-        <label for="puesto">Puesto Desempeñado:</label>
-        <input type="text" id="puesto" value="[Puesto]">
-
-        <label for="fechaInicio" class="date-input">Fecha de Inicio Laboral:</label>
-        <input type="date" id="fechaInicio" class="date-input">
-
-        <label for="fechaFin" class="date-input">Fecha de Término Laboral:</label>
-        <input type="date" id="fechaFin" class="date-input">
-    </div>
-
-    <div class="input-group">
-        <h2>Información de la Carta</h2>
-        <label for="cuerpoCarta">Cuerpo del Contenido (Editable):</label>
-        <textarea id="cuerpoCarta">[Cuerpo de la carta con cualidades y desempeño... Ejemplo: El Sr./Sra. [Nombre] demostró ser una persona responsable, honesta y comprometida durante su tiempo como [Puesto]...]</textarea>
-    </div>
-
-    <div class="input-group">
-        <h2>Logos y Firmas (Archivos)</h2>
-        <label for="logoInput">Insertar Logo (Imagen):</label>
+        <h2>📂 Logo de la Empresa</h2>
+        <label for="logoInput">Insertar Logo (Aparecerá en la esquina superior izquierda del PDF):</label>
         <input type="file" id="logoInput" accept="image/*">
-
-        <label for="firmaInput">Insertar Firma (Imagen):</label>
-        <input type="file" id="firmaInput" accept="image/*">
     </div>
 
-    <button onclick="generarPDF()">Descargar Carta en PDF</button>
+    <div class="input-group">
+        <h2>👤 Datos del Empleado</h2>
+        <label for="fechaEmision">Fecha de Emisión de la Carta:</label>
+        <input type="date" id="fechaEmision" value="2025-10-24">
+        
+        <label for="nombreEmpleado">Nombre Completo del Empleado:</label>
+        <input type="text" id="nombreEmpleado" value="Antonio Galván Guardado">
 
-    <script>
-        // Inicializa jsPDF
-        const { jsPDF } = window.jspdf;
+        <label for="puestoDesempenado">Puesto Desempeñado:</label>
+        <input type="text" id="puestoDesempenado" value="Ayudante General">
+        
+        <div class="date-container">
+            <div>
+                <label for="fechaInicio">Fecha de Inicio Laboral:</label>
+                <input type="date" id="fechaInicio" value="2024-08-10">
+            </div>
+            <div>
+                <label for="fechaFin">Fecha de Término Laboral:</label>
+                <input type="date" id="fechaFin" value="2025-09-12">
+            </div>
+        </div>
+    </div>
 
-        // Función principal para generar el PDF
-        async function generarPDF() {
-            const doc = new jsPDF();
-            const nombre = document.getElementById('nombre').value;
-            const puesto = document.getElementById('puesto').value;
-            const inicio = document.getElementById('fechaInicio').value;
-            const fin = document.getElementById('fechaFin').value;
-            const cuerpo = document.getElementById('cuerpoCarta').value;
-
-            // Función para leer archivos (logo/firma) y convertirlos a Base64
-            const fileToBase64 = (file) => new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
-
-            // Leer logo y firma
-            const logoFile = document.getElementById('logoInput').files[0];
-            const firmaFile = document.getElementById('firmaInput').files[0];
-            let logoBase64 = null;
-            let firmaBase64 = null;
-
-            if (logoFile) {
-                logoBase64 = await fileToBase64(logoFile);
-            }
-            if (firmaFile) {
-                firmaBase64 = await fileToBase64(firmaFile);
-            }
-
-            // --- Contenido del PDF ---
-            let y = 10;
-            const margin = 20;
-            const lineHeight = 7;
-
-            // 1. Insertar Logo (si existe)
-            if (logoBase64) {
-                // Agregar logo en la esquina superior derecha (ajusta las coordenadas y el tamaño según tu logo)
-                doc.addImage(logoBase64, 'PNG', 150, 10, 50, 20); 
-                y += 25; // Mueve el cursor hacia abajo
-            }
-
-            // 2. Título
-            doc.setFontSize(16);
-            doc.text("Carta de Recomendación Laboral", margin, y);
-            y += 2 * lineHeight;
-
-            // 3. Destinatario y Fecha
-            doc.setFontSize(12);
-            doc.text(`A quien corresponda,`, margin, y);
-            y += lineHeight;
-            doc.text(`[Ciudad], ${new Date().toLocaleDateString('es-ES')}`, 150, y);
-            y += 2 * lineHeight;
-
-            // 4. Párrafo de la Carta (con datos interpolados)
-            doc.setFontSize(11);
-            // Configurar para texto multilinea y saltos de línea automáticos
-            const textoCarta = `Por medio de la presente, yo [Tu Nombre/Cargo], Director(a) de [Nombre de la Empresa], extiendo esta carta para certificar que el(la) Sr(a). ${nombre} laboró en nuestra empresa como ${puesto} desde el ${inicio} hasta el ${fin}.
-            \n${cuerpo}
-            \nRecomiendo ampliamente a ${nombre} para cualquier puesto o actividad que requiera sus habilidades, ya que es una persona de gran valor.
-            \nPara cualquier información adicional, pueden contactarme.`;
-            
-            const splitText = doc.splitTextToSize(textoCarta, 170); // 170 es el ancho máximo para el texto
-            doc.text(splitText, margin, y);
-            y += splitText.length * lineHeight + lineHeight; // Actualiza 'y' basado en las líneas generadas
-
-            // 5. Despedida
-            doc.text("Atentamente,", margin, y);
-            y += 2 * lineHeight;
-
-            // 6. Firma (si existe)
-            if (firmaBase64) {
-                // Agregar firma debajo de 'Atentamente,'
-                doc.addImage(firmaBase64, 'PNG', margin, y, 50, 20);
-                y += 20; // Mueve el cursor hacia abajo
-            } else {
-                 y += 2 * lineHeight; // Espacio para la firma manual
-            }
-            
-            // 7. Datos de la Persona que Recomienda
-            doc.text("[Tu Nombre Completo]", margin, y);
-            y += lineHeight;
-            doc.text("[Tu Cargo]", margin, y);
-            y += lineHeight;
-            doc.text("[Tu Teléfono/Email]", margin, y);
-
-            // Descarga el PDF
-            doc.save(`Carta_Recomendacion_${nombre.replace(/\s/g, '_')}.pdf`);
-        }
-    </script>
-</body>
-</html>
+    <div class="input-group">
+        <h2>📝 Contenido de la Carta</h2>
+        <label for="nombreEmpresa">Nombre de la Empresa Constructora (Encabezado y Firma):</label>
+        <input type="text" id="nombreEmpresa" value="GRUPO VELAS CONSTRUCTORA">
+        
+        <label for="cuerpoPersonalidad">Párrafo de Personalidad y Habilidades:</label>
+        <textarea id="cuerpoPersonalidad">Durante el tiempo que trabajó con nosotros, [nombre] demostró ser una persona responsable, proactiva y comprometida con su trabajo. Su disposición para aprender y colaborar fue excelente, adaptándose de forma eficaz a las exigencias de los diferentes proyectos. Su desempeño siempre fue satisfactorio y su actitud de trabajo en equipo fue un gran aporte.</textarea>
+        
+        <label for="tareas">Tareas Princip
