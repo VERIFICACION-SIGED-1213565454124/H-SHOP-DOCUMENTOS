@@ -130,7 +130,7 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             let y = 10;
             const lineHeight = 6;
             const pageWidth = doc.internal.pageSize.getWidth();
-            const textWidth = 170; // Ancho máximo del texto
+            const textWidth = 170; // Ancho máximo del texto para justificar
 
             // --- 1. Recolección de Datos ---
             const fechaEmision = document.getElementById('fechaEmision').value;
@@ -172,13 +172,13 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             }
             y = Math.max(y, 35); // Asegura que el contenido comience al menos después del espacio del logo
 
-            // --- 3. Encabezado de la Empresa ---
+            // --- 3. Encabezado de la Empresa (CENTRO) ---
             doc.setFontSize(14);
             doc.setFont(undefined, 'bold');
-            doc.text(empresa, pageWidth / 2, y, { align: 'center' });
+            doc.text(empresa, pageWidth / 2, y, { align: 'center' }); // CENTRADO
             y += lineHeight * 1.5;
 
-            // --- 4. Fecha de Emisión ---
+            // --- 4. Fecha de Emisión (Derecha) ---
             doc.setFontSize(11);
             doc.setFont(undefined, 'normal');
             doc.text(f_emision, pageWidth - margin, y, { align: 'right' });
@@ -193,12 +193,12 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             doc.setFont(undefined, 'normal');
             const presentacion = `Por medio de la presente, me permito recomendar ampliamente al Sr. ${nombreEmpleado} quien se desempeñó como ${puesto} en ${empresa} desde el ${f_inicio} hasta el ${f_fin}.`;
             let splitText = doc.splitTextToSize(presentacion, textWidth);
-            doc.text(splitText, margin, y, { align: 'justify' }); // Texto Justificado
+            doc.text(splitText, margin, y, { align: 'justify' }); // JUSTIFICADO
             y += splitText.length * lineHeight + lineHeight;
 
             // --- 7. Párrafo de Personalidad ---
             splitText = doc.splitTextToSize(personalidad, textWidth);
-            doc.text(splitText, margin, y, { align: 'justify' }); // Texto Justificado
+            doc.text(splitText, margin, y, { align: 'justify' }); // JUSTIFICADO
             y += splitText.length * lineHeight + lineHeight;
             
             // --- 8. Título de Tareas ---
@@ -212,21 +212,21 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             listaTareas.forEach(tarea => {
                 const tareaFormato = `• ${tarea.trim()}`;
                 splitText = doc.splitTextToSize(tareaFormato, textWidth - 10); 
-                doc.text(splitText, margin + 5, y, { align: 'justify' });
+                doc.text(splitText, margin + 5, y, { align: 'justify' }); // JUSTIFICADO
                 y += splitText.length * lineHeight;
             });
             y += lineHeight;
 
             // --- 10. Párrafo de Recomendación y Cierre ---
             splitText = doc.splitTextToSize(cierre, textWidth);
-            doc.text(splitText, margin, y, { align: 'justify' }); // Texto Justificado
+            doc.text(splitText, margin, y, { align: 'justify' }); // JUSTIFICADO
             y += splitText.length * lineHeight * 2;
 
-            // --- 11. Despedida (Alineado al Centro) ---
-            doc.text("Atentamente,", pageWidth / 2, y, { align: 'center' });
+            // --- 11. Despedida (CENTRO) ---
+            doc.text("Atentamente,", pageWidth / 2, y, { align: 'center' }); // CENTRADO
             y += lineHeight * 2;
 
-            // --- 12. Firma (Alineado al Centro) ---
+            // --- 12. Firma (CENTRO) ---
             if (firmaBase64) {
                 const imgWidth = 50; 
                 const xFirma = (pageWidth / 2) - (imgWidth / 2);
@@ -236,14 +236,14 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
                  y += 20; // Espacio para la firma
             }
 
-            // --- 13. Datos del Firmante (Alineado al Centro) ---
+            // --- 13. Datos del Firmante (CENTRO) ---
             doc.setFont(undefined, 'bold');
-            doc.text(nombreFirmante, pageWidth / 2, y, { align: 'center' });
+            doc.text(nombreFirmante, pageWidth / 2, y, { align: 'center' }); // CENTRADO
             y += lineHeight;
             doc.setFont(undefined, 'normal');
-            doc.text(cargoFirmante, pageWidth / 2, y, { align: 'center' });
+            doc.text(cargoFirmante, pageWidth / 2, y, { align: 'center' }); // CENTRADO
             y += lineHeight;
-            doc.text(telefonoFirmante, pageWidth / 2, y, { align: 'center' });
+            doc.text(telefonoFirmante, pageWidth / 2, y, { align: 'center' }); // CENTRADO
 
 
             // --- 14. Descarga del PDF ---
