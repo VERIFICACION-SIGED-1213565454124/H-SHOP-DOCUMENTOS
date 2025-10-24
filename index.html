@@ -3,13 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador de Cartas - Estatus de Solicitud</title>
+    <title>Generador de Documentos - Estatus de Solicitud</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
     <style>
-        /* Estilos generales (Mismo diseño) */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 850px; margin: 0 auto; padding: 25px; background-color: #f4f4f9; }
+        /* Estilos generales */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            max-width: 850px; 
+            margin: 0 auto; 
+            padding: 25px; 
+            background-color: #f4f4f9; 
+            position: relative; /* Para contenedores fijos */
+            padding-bottom: 100px; /* Espacio para info bancaria */
+        }
         h1 { color: #2c3e50; text-align: center; margin-bottom: 25px; }
         .input-group, .form-section { background-color: #ffffff; padding: 20px; margin-bottom: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
         h2 { color: #34495e; border-bottom: 2px solid #3498db; padding-bottom: 5px; margin-bottom: 15px; }
@@ -28,7 +38,8 @@
         textarea { height: 120px; resize: vertical; }
         
         /* Botones generales */
-        .btn-action, .btn-menu {
+        .btn-action {
+            background-color: #e67e22;
             color: white;
             padding: 15px 20px;
             border: none;
@@ -39,42 +50,33 @@
             margin-top: 10px;
             transition: background-color 0.3s;
         }
-        .btn-action { background-color: #e67e22; }
         .btn-action:hover { background-color: #d35400; }
-        
         .back-button { background-color: #95a5a6; width: auto; padding: 10px 15px; font-size: 1em; }
 
-        /* Estilos del panel de admin */
-        .request-item {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-bottom: 10px;
-            background-color: #fff;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .request-actions button {
-            width: auto;
-            padding: 8px 12px;
-            font-size: 0.9em;
-            margin-left: 10px;
-        }
-        .btn-authorize { background-color: #3498db; } /* Azul para AUTORIZAR */
-        .btn-reject { background-color: #c0392b; }
-
-        .download-link-box {
-            background-color: #f0f0f0;
-            border: 1px dashed #3498db;
-            padding: 10px;
+        /* Estilos de Botones de Menú por Categoría */
+        .btn-menu {
+            color: white;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            width: 100%;
             margin-top: 10px;
-            word-break: break-all;
-            font-size: 0.9em;
+            transition: background-color 0.3s;
         }
-        .download-link-box a { color: #2980b9; font-weight: bold; }
+        .btn-carta { background-color: #f1c40f; } /* Amarillo para Cartas */
+        .btn-receta { background-color: #27ae60; } /* Verde para Recetas */
+        .btn-certificado { background-color: #3498db; } /* Azul para Certificados */
+        .btn-social { background-color: #34495e; margin-bottom: 20px; } /* Gris oscuro para Social */
+        
+        .btn-carta:hover { background-color: #f39c12; }
+        .btn-receta:hover { background-color: #2ecc71; }
+        .btn-certificado:hover { background-color: #2980b9; }
+        .btn-social:hover { background-color: #2c3e50; }
 
         .form-section { display: none; }
-
+        
         /* Botón de admin discreto */
         #btn-go-admin {
             width: 100%;
@@ -123,21 +125,103 @@
             width: 50%;
             margin: 20px auto;
         }
-        .btn-download-now:hover {
-            background-color: #229954;
+
+        /* --- Elementos Fijos --- */
+        
+        /* Botón Flotante de WhatsApp */
+        .whatsapp-float {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            bottom: 40px;
+            left: 20px; /* Lado izquierdo */
+            background-color: #25d366;
+            color: #fff;
+            border-radius: 50px;
+            text-align: center;
+            font-size: 30px;
+            box-shadow: 2px 2px 3px #999;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+        .whatsapp-float:hover {
+            background-color: #128c7e;
+        }
+
+        /* Info Bancaria */
+        .bank-info {
+            position: fixed;
+            bottom: 0;
+            right: 0; /* Lado derecho */
+            background-color: #2c3e50;
+            color: white;
+            padding: 10px 15px;
+            border-top-left-radius: 8px;
+            font-size: 0.85em;
+            z-index: 99;
+            text-align: right;
+            max-width: 350px;
+        }
+        .bank-info strong { color: #f1c40f; }
+        .bank-info p { margin: 2px 0; }
+
+        /* Estilos del panel de admin (Sin cambios) */
+        .request-item {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .request-actions button {
+            width: auto;
+            padding: 8px 12px;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+        .btn-authorize { background-color: #3498db; }
+        .btn-reject { background-color: #c0392b; }
+        .download-link-box {
+            background-color: #f0f0f0;
+            border: 1px dashed #3498db;
+            padding: 10px;
+            margin-top: 10px;
+            word-break: break-all;
+            font-size: 0.9em;
         }
     </style>
 </head>
 <body>
 
-    <h1>📝 Generador de Cartas de Recomendación</h1>
+    <h1>📝 Generador de Documentos y Solicitudes</h1>
     
     <div id="app-container">
     
         <div id="main-menu">
-            <h2>Seleccione el tipo de carta que desea generar:</h2>
-            <button class="btn-menu" onclick="showForm('laboral')">Carta de Recomendación LABORAL</button>
-            <button class="btn-menu" onclick="showForm('personal')">Carta de Recomendación PERSONAL</button>
+            
+            <h2>🌐 Acceso a Grupo y Soporte</h2>
+            <button class="btn-menu btn-social" onclick="window.open('https://chat.whatsapp.com/GbkvIbPwCRX1JacpJJOS9D', '_blank')">
+                <i class="fab fa-whatsapp"></i> Unirse a nuestro Grupo de WhatsApp
+            </button>
+            
+            <h2>✉️ Cartas de Recomendación</h2>
+            <button class="btn-menu btn-carta" onclick="showForm('laboral')">Carta de Recomendación LABORAL</button>
+            <button class="btn-menu btn-carta" onclick="showForm('personal')">Carta de Recomendación PERSONAL</button>
+            
+            <h2>💊 Recetas Médicas</h2>
+            <button class="btn-menu btn-receta" onclick="showForm('receta_similares')">Receta Médica SIMILARES</button>
+            <button class="btn-menu btn-receta" onclick="showForm('receta_ahorro')">Receta Médica DEL AHORRO</button>
+            <button class="btn-menu btn-receta" onclick="showForm('receta_imss')">Receta Médica IMSS</button>
+
+            <h2>🎓 Certificados de Estudios</h2>
+            <button class="btn-menu btn-certificado" onclick="showForm('cert_primaria')">Certificado de PRIMARIA</button>
+            <button class="btn-menu btn-certificado" onclick="showForm('cert_secundaria')">Certificado de SECUNDARIA</button>
+            <button class="btn-menu btn-certificado" onclick="showForm('cert_prepa')">Certificado de PREPARATORIA</button>
             
             <button id="btn-go-admin" onclick="showForm('admin_login')">Acceso de Administrador</button>
         </div>
@@ -170,9 +254,8 @@
         </div>
 
         <div id="form-laboral" class="form-section">
-            <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+             <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
             <h2>💼 Formulario de Carta Laboral</h2>
-
             <div class="input-group">
                 <h2>📝 Datos de la Solicitud</h2>
                 <label for="nombreSolicitanteLaboral">Tu Nombre Completo (Quien Pide la Carta):</label>
@@ -293,19 +376,91 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             <button class="btn-action" onclick="saveSolicitud('personal')">💾 Guardar Solicitud (Esperar Aprobación)</button>
         </div>
         
+        <div id="form-receta_similares" class="form-section">
+            <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <h2>💊 Formulario de Receta Médica SIMILARES</h2>
+            <div class="input-group">
+                <p>⚠️ **FORMULARIO PENDIENTE:** Agregue los campos específicos para la Receta Similares aquí.</p>
+                <label for="placeholder1_similares">Ejemplo de Campo (a borrar):</label>
+                <input type="text" id="placeholder1_similares" value="">
+            </div>
+            <button class="btn-action" onclick="saveSolicitud('receta_similares')">💾 Guardar Solicitud</button>
+        </div>
+        <div id="form-receta_ahorro" class="form-section">
+            <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <h2>💊 Formulario de Receta Médica DEL AHORRO</h2>
+            <div class="input-group">
+                <p>⚠️ **FORMULARIO PENDIENTE:** Agregue los campos específicos para la Receta Del Ahorro aquí.</p>
+                <label for="placeholder1_ahorro">Ejemplo de Campo (a borrar):</label>
+                <input type="text" id="placeholder1_ahorro" value="">
+            </div>
+            <button class="btn-action" onclick="saveSolicitud('receta_ahorro')">💾 Guardar Solicitud</button>
+        </div>
+        <div id="form-receta_imss" class="form-section">
+            <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <h2>💊 Formulario de Receta Médica IMSS</h2>
+            <div class="input-group">
+                <p>⚠️ **FORMULARIO PENDIENTE:** Agregue los campos específicos para la Receta IMSS aquí.</p>
+                <label for="placeholder1_imss">Ejemplo de Campo (a borrar):</label>
+                <input type="text" id="placeholder1_imss" value="">
+            </div>
+            <button class="btn-action" onclick="saveSolicitud('receta_imss')">💾 Guardar Solicitud</button>
+        </div>
+
+        <div id="form-cert_primaria" class="form-section">
+            <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <h2>🎓 Formulario de Certificado de PRIMARIA</h2>
+            <div class="input-group">
+                <p>⚠️ **FORMULARIO PENDIENTE:** Agregue los campos específicos para el Certificado Primaria aquí.</p>
+                <label for="placeholder1_primaria">Ejemplo de Campo (a borrar):</label>
+                <input type="text" id="placeholder1_primaria" value="">
+            </div>
+            <button class="btn-action" onclick="saveSolicitud('cert_primaria')">💾 Guardar Solicitud</button>
+        </div>
+        <div id="form-cert_secundaria" class="form-section">
+            <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <h2>🎓 Formulario de Certificado de SECUNDARIA</h2>
+            <div class="input-group">
+                <p>⚠️ **FORMULARIO PENDIENTE:** Agregue los campos específicos para el Certificado Secundaria aquí.</p>
+                <label for="placeholder1_secundaria">Ejemplo de Campo (a borrar):</label>
+                <input type="text" id="placeholder1_secundaria" value="">
+            </div>
+            <button class="btn-action" onclick="saveSolicitud('cert_secundaria')">💾 Guardar Solicitud</button>
+        </div>
+        <div id="form-cert_prepa" class="form-section">
+            <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <h2>🎓 Formulario de Certificado de PREPARATORIA</h2>
+            <div class="input-group">
+                <p>⚠️ **FORMULARIO PENDIENTE:** Agregue los campos específicos para el Certificado Prepa aquí.</p>
+                <label for="placeholder1_prepa">Ejemplo de Campo (a borrar):</label>
+                <input type="text" id="placeholder1_prepa" value="">
+            </div>
+            <button class="btn-action" onclick="saveSolicitud('cert_prepa')">💾 Guardar Solicitud</button>
+        </div>
+        
     </div> <div id="status-page" class="status-page" style="display:none;"></div>
 
+    <a href="https://wa.me/message/AZLK65CETSPQL1" class="whatsapp-float" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+    
+    <div class="bank-info">
+        <p>💵 **Datos para Pago**</p>
+        <p>CLABE/Tarjeta: <strong>4189 1432 7771 6216</strong></p>
+        <p>Banco: **Banorte**</p>
+        <p>Destinatario: **Jimmy Garcia**</p>
+    </div>
 
     <script>
         const { jsPDF } = window.jspdf;
-        const STORAGE_KEY = 'pending_requests_list'; // Solicitudes que esperan aprobación
-        const APPROVED_KEY = 'approved_requests_list'; // Solicitudes aprobadas
+        const STORAGE_KEY = 'pending_requests_list'; 
+        const APPROVED_KEY = 'approved_requests_list'; 
 
         // --- CREDENCIALES FIJAS DEL ADMINISTRADOR ---
         const ADMIN_USER = 'trollgaga999@gmail.com';
         const ADMIN_PASS = 'Johan207';
         
-        let statusCheckInterval = null; // Variable para controlar el intervalo de verificación
+        let statusCheckInterval = null; 
 
         // --- MANEJO DE URL Y VISTAS ---
 
@@ -313,9 +468,7 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             return window.location.href.split('#')[0];
         }
 
-        // Función inicial para verificar la URL y dirigir al usuario/admin
         function checkURL() {
-            // Limpiar cualquier intervalo de verificación anterior
             if (statusCheckInterval) {
                 clearInterval(statusCheckInterval);
                 statusCheckInterval = null;
@@ -325,21 +478,17 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             const params = new URLSearchParams(hash.split('?')[1] || '');
             const requestId = params.get('id');
             
-            // 1. Manejar la página de estatus/descarga del cliente
             if (hash.startsWith('status') && requestId) {
                 document.getElementById('app-container').style.display = 'none';
                 document.getElementById('status-page').style.display = 'flex';
-                // Iniciar la verificación automática
                 checkStatus(requestId);
-                statusCheckInterval = setInterval(() => checkStatus(requestId), 5000); // Revisa cada 5 segundos
+                statusCheckInterval = setInterval(() => checkStatus(requestId), 5000); 
                 return; 
             }
             
-            // Ocultar la página de estatus si no estamos en esa vista
             document.getElementById('status-page').style.display = 'none';
             document.getElementById('app-container').style.display = 'block';
 
-            // 2. Manejar vistas de la aplicación
             if (hash === 'admin_dashboard') {
                 showForm('admin_dashboard');
             } else if (hash === 'admin_login') {
@@ -349,28 +498,34 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             }
         }
 
-        // Función de navegación mejorada
         function showForm(viewId) {
-            // Ocultar todas las secciones
-            const sections = ['main-menu', 'form-laboral', 'form-personal', 'admin-login', 'admin-dashboard'];
+            const sections = [
+                'main-menu', 'form-laboral', 'form-personal', 'admin-login', 'admin-dashboard',
+                'form-receta_similares', 'form-receta_ahorro', 'form-receta_imss',
+                'form-cert_primaria', 'form-cert_secundaria', 'form-cert_prepa'
+            ];
             sections.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.style.display = 'none';
             });
             
-            // Mapeo simple de IDs
             const idMap = {
                 'menu': 'main-menu',
                 'laboral': 'form-laboral',
                 'personal': 'form-personal',
                 'admin_login': 'admin-login',
-                'admin_dashboard': 'admin-dashboard'
+                'admin_dashboard': 'admin-dashboard',
+                'receta_similares': 'form-receta_similares',
+                'receta_ahorro': 'form-receta_ahorro',
+                'receta_imss': 'form-receta_imss',
+                'cert_primaria': 'form-cert_primaria',
+                'cert_secundaria': 'form-cert_secundaria',
+                'cert_prepa': 'form-cert_prepa'
             };
 
             const targetId = idMap[viewId] || viewId;
             const viewElement = document.getElementById(targetId);
             
-            // Actualizar hash y mostrar vista
             if (viewId === 'menu') {
                 window.location.hash = '';
             } else if (viewId.startsWith('admin')) {
@@ -386,7 +541,7 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             window.scrollTo(0, 0);
         }
 
-        // --- AUTENTICACIÓN ADMIN ---
+        // --- AUTENTICACIÓN ADMIN (Sin cambios) ---
 
         function authenticateAdmin() {
             const user = document.getElementById('adminUser').value;
@@ -400,7 +555,7 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             }
         }
 
-        // --- GESTIÓN DE ALMACENAMIENTO ---
+        // --- GESTIÓN DE ALMACENAMIENTO (Sin cambios) ---
 
         function getRequests(key) {
             const data = localStorage.getItem(key);
@@ -411,24 +566,38 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             localStorage.setItem(key, JSON.stringify(requests));
         }
 
-        // --- FUNCIÓN DEL CLIENTE: GUARDAR SOLICITUD ---
+        // --- FUNCIÓN DEL CLIENTE: GUARDAR SOLICITUD (Modificada para nuevos tipos) ---
 
         async function saveSolicitud(tipoCarta) {
             let nombreSolicitante, nombreAsunto, pdfBase64;
 
+            // Lógica específica de la carta laboral
             if (tipoCarta === 'laboral') {
                 nombreSolicitante = document.getElementById('nombreSolicitanteLaboral').value;
                 nombreAsunto = document.getElementById('nombreEmpleadoLaboral').value;
                 pdfBase64 = await generarPDFLaboral(false);
+            // Lógica específica de la carta personal
             } else if (tipoCarta === 'personal') {
                 nombreSolicitante = document.getElementById('nombreSolicitantePersonal').value;
                 nombreAsunto = document.getElementById('nombreRecomendadoPersonal').value;
                 pdfBase64 = await generarPDFPersonal(false);
+            // Lógica para los nuevos formularios (usando datos de placeholder)
+            } else { 
+                 // Implementación genérica para los nuevos tipos (RECETAS/CERTIFICADOS)
+                 // NOTA: DEBERÁ IMPLEMENTAR generarPDFReceta/Certificado y obtener nombreAsunto aquí
+                 nombreSolicitante = document.getElementById(`nombreSolicitante${tipoCarta.replace(/_/g, '')}`) ? document.getElementById(`nombreSolicitante${tipoCarta.replace(/_/g, '')}`).value : 'Cliente';
+                 nombreAsunto = document.getElementById(`placeholder1_${tipoCarta.split('_').pop()}`) ? document.getElementById(`placeholder1_${tipoCarta.split('_').pop()}`).value : 'Documento Pendiente';
+                 pdfBase64 = "BASE64_PLACEHOLDER_FOR_NEW_TYPE"; // Placeholder PDF
             }
 
             if (!pdfBase64) {
-                alert(`Error al generar la carta ${tipoCarta}. Por favor, revise todos los campos.`);
+                alert(`Error al generar el documento ${tipoCarta}. Por favor, revise todos los campos y archivos adjuntos.`);
                 return;
+            }
+            
+            // Si es un placeholder, asegurarse de que no se guarde el PDF real
+            if (pdfBase64 === "BASE64_PLACEHOLDER_FOR_NEW_TYPE") {
+                 alert(`AVISO: Se ha guardado la solicitud ${tipoCarta} con datos de PRUEBA. Debe implementar la función de generación de PDF para este tipo de documento.`);
             }
 
             const requestId = Date.now().toString();
@@ -446,11 +615,10 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             requests.push(newRequest);
             saveRequests(STORAGE_KEY, requests);
             
-            // Dirigir al cliente a su página de estatus personal
             window.location.hash = `status?id=${requestId}`;
         }
         
-        // --- PÁGINA DE ESPERA DEL CLIENTE ---
+        // --- PÁGINA DE ESPERA DEL CLIENTE (Sin cambios en lógica de espera) ---
         
         function checkStatus(requestId) {
             const approvedRequests = getRequests(APPROVED_KEY);
@@ -462,7 +630,7 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
                 statusPage.innerHTML = `
                     <h2>⏳ Solicitud Enviada - Esperando Autorización</h2>
                     <div class="spinner"></div>
-                    <p>Su solicitud de carta para **${requestId}** ha sido recibida.</p>
+                    <p>Su solicitud de **${requestId}** ha sido recibida.</p>
                     <p>Estamos esperando que el administrador la apruebe.</p>
                     <p style="font-size: 0.8em; color: #555;">(Esta página se actualizará automáticamente cada 5 segundos)</p>
                     <p style="margin-top: 20px;">Puede guardar este enlace: <code>${getBaseUrl()}#status?id=${requestId}</code></p>
@@ -470,14 +638,14 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             } else {
                 // Estatus: Aprobado (Botón de descarga)
                 if (statusCheckInterval) {
-                    clearInterval(statusCheckInterval); // Detener la verificación
+                    clearInterval(statusCheckInterval); 
                 }
                 
                 statusPage.innerHTML = `
                     <h2>✅ ¡Solicitud Aprobada!</h2>
-                    <p>El administrador ha autorizado su carta para **${request.name}**.</p>
+                    <p>El administrador ha autorizado su documento para **${request.name}**.</p>
                     <button class="btn-action btn-download-now" onclick="triggerDownload('${request.id}')">
-                        Descargar Carta Ahora
+                        Descargar Documento Ahora
                     </button>
                     <p style="margin-top: 30px;"><a href="#" onclick="showForm('menu')">← Volver al Menú Principal</a></p>
                 `;
@@ -497,12 +665,12 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             
             const pdfBase64 = request.pdfBase64;
             const name = request.name.toUpperCase().replace(/\s/g, '_');
-            const type = request.type.toUpperCase();
+            const type = request.type.toUpperCase().replace(/_/g, '-'); // Mejor formato de tipo
 
             // Forzar la descarga en el navegador del cliente
             const link = document.createElement('a');
             link.href = `data:application/pdf;base64,${pdfBase64}`;
-            link.download = `Carta_Aprobada_${name}_${type}.pdf`;
+            link.download = `Documento_Aprobado_${name}_${type}.pdf`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -512,14 +680,14 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
              statusPage.innerHTML = `
                 <div>
                     <h1>✅ Descarga Exitosa</h1>
-                    <p>Su carta para **${request.name}** ha sido descargada. Por favor, revise su carpeta de descargas.</p>
+                    <p>Su documento para **${request.name}** ha sido descargado. Por favor, revise su carpeta de descargas.</p>
                     <p style="margin-top: 30px;"><a href="#" onclick="showForm('menu')">← Volver al Menú Principal</a></p>
                 </div>
             `;
         }
 
 
-        // --- FUNCIONES DEL ADMINISTRADOR ---
+        // --- FUNCIONES DEL ADMINISTRADOR (Sin cambios en lógica de autorización) ---
 
         function loadPendingRequests() {
             const requests = getRequests(STORAGE_KEY).filter(req => req.status === 'pending');
@@ -533,12 +701,13 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             }
 
             requests.forEach(req => {
+                const typeDisplay = req.type.replace(/_/g, ' ').toUpperCase();
                 const item = document.createElement('div');
                 item.id = `request-${req.id}`;
                 item.className = 'request-item';
                 item.innerHTML = `
                     <div class="request-info">
-                        <strong>${req.type === 'laboral' ? 'Carta Laboral' : 'Carta Personal'} - ${req.name}</strong>
+                        <strong>${typeDisplay} - ${req.name}</strong>
                         <p>Solicitante: ${req.requesterName} (ID: ${req.id})</p>
                         <p style="font-size:0.8em;">URL del Cliente: <code style="word-break: break-all;">${getBaseUrl()}#status?id=${req.id}</code></p>
                     </div>
@@ -551,7 +720,6 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             });
         }
         
-        // FUNCIÓN CLAVE: Autorizar la solicitud
         function authorizeRequest(requestId) {
             let pendingRequests = getRequests(STORAGE_KEY);
             const index = pendingRequests.findIndex(req => req.id === requestId);
@@ -563,16 +731,12 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             }
 
             const request = pendingRequests[index];
-
-            // 1. Mover la solicitud de 'pending' a 'approved'
             request.status = 'approved';
             
-            // 2. Guardar la solicitud en la lista de aprobadas 
             const approvedRequests = getRequests(APPROVED_KEY);
             approvedRequests.push(request);
             saveRequests(APPROVED_KEY, approvedRequests);
 
-            // 3. Eliminar de la lista de pendientes
             pendingRequests.splice(index, 1);
             saveRequests(STORAGE_KEY, pendingRequests);
 
@@ -581,11 +745,10 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             loadPendingRequests();
         }
 
-        // Función para eliminar solicitudes de cualquier lista (Admin usa esta)
         function deleteRequest(requestId, key) {
             const confirmMsg = key === STORAGE_KEY 
-                ? "Está seguro de rechazar y eliminar esta solicitud pendiente?"
-                : "Está seguro de eliminar esta solicitud APROBADA del historial? (Ya no podrá ser descargada)";
+                ? "¿Está seguro de rechazar y eliminar esta solicitud pendiente?"
+                : "¿Está seguro de eliminar esta solicitud APROBADA del historial? (Ya no podrá ser descargada)";
             
             if (!confirm(confirmMsg)) return;
             
@@ -595,15 +758,10 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
                 requests.splice(index, 1);
                 saveRequests(key, requests);
             }
-            // Si eliminamos del historial de aprobados, recargar el panel para que se actualice la vista
-            if (key === APPROVED_KEY) {
-                 loadPendingRequests();
-            } else {
-                 loadPendingRequests();
-            }
+            loadPendingRequests();
         }
         
-        // --- Funciones Auxiliares PDF (Sin cambios) ---
+        // --- Funciones Auxiliares PDF (Mantenidas) ---
 
         function drawJustifiedText(doc, text, x, y, maxWidth, lineHeight) { 
             let currentY = y;
@@ -626,7 +784,11 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             reader.onerror = error => resolve(null);
         });
 
-        async function generarPDFLaboral(descargar = true) { 
+        // NOTA: Las funciones generarPDFLaboral y generarPDFPersonal se mantienen
+        // sin cambios en este bloque. Las funciones para Recetas y Certificados 
+        // DEBEN ser añadidas aquí si desea generar PDFs reales.
+
+        async function generarPDFLaboral(descargar = true) { /* ... lógica laboral ... */ 
             const doc = new jsPDF('p', 'mm', 'a4');
             const margin = 20;
             let y = 10;
