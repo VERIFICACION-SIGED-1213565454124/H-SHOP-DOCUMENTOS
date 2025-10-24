@@ -8,7 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <style>
-        /* Estilos de la página (Sin cambios) */
+        /* Estilos de la página */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 850px; margin: 0 auto; padding: 25px; background-color: #f4f4f9; }
         h1 { color: #2c3e50; text-align: center; margin-bottom: 25px; }
         .input-group { background-color: #ffffff; padding: 20px; margin-bottom: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
@@ -113,20 +113,22 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
     <script>
         const { jsPDF } = window.jspdf;
 
-        // Función auxiliar para convertir archivo de imagen a Base64
+        // Función auxiliar para convertir archivo de imagen a Base64 con manejo de errores
         const fileToBase64 = (file) => new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = () => resolve(reader.result);
-            reader.onerror = error => reject(error);
+            reader.onerror = error => {
+                console.error("Error al cargar la imagen:", error);
+                resolve(null); // Resuelve con null si hay error para no detener el script
+            };
         });
 
-        // **FUNCIÓN CLAVE: Justificación manual**
+        // **FUNCIÓN CLAVE: Justificación manual** (Mantiene la corrección de la versión anterior)
         function drawJustifiedText(doc, text, x, y, maxWidth, lineHeight) {
             let currentY = y;
             const splitText = doc.splitTextToSize(text, maxWidth);
             
-            // Recorre cada línea del texto dividido
             splitText.forEach((line, index) => {
                 if (index < splitText.length - 1) {
                     // Para todas las líneas excepto la última, aplica justificación
@@ -166,13 +168,11 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             const cargoFirmante = document.getElementById('cargoFirmante').value;
             const telefonoFirmante = document.getElementById('telefonoFirmante').value;
             
+            // Procesamiento de archivos con manejo de errores
             const logoFile = document.getElementById('logoInput').files[0];
             const firmaFile = document.getElementById('firmaInput').files[0];
-            let logoBase64 = null;
-            let firmaBase64 = null;
-
-            if (logoFile) { logoBase64 = await fileToBase64(logoFile); }
-            if (firmaFile) { firmaBase64 = await fileToBase64(firmaFile); }
+            const logoBase64 = logoFile ? await fileToBase64(logoFile) : null;
+            const firmaBase64 = firmaFile ? await fileToBase64(firmaFile) : null;
             
             const f_emision = new Date(fechaEmision).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
             const f_inicio = new Date(inicio).toLocaleDateString('es-ES');
@@ -201,14 +201,14 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             doc.text("A quien corresponda:", margin, y);
             y += lineHeight * 1.5;
             
-            // --- 6. Primer Párrafo (Presentación) - JUSTIFICADO CON FUNCIÓN MANUAL ---
+            // --- 6. Primer Párrafo (Presentación) - JUSTIFICADO ---
             doc.setFontSize(11);
             doc.setFont(undefined, 'normal');
             const presentacion = `Por medio de la presente, me permito recomendar ampliamente al Sr. ${nombreEmpleado} quien se desempeñó como ${puesto} en ${empresa} desde el ${f_inicio} hasta el ${f_fin}.`;
             y = drawJustifiedText(doc, presentacion, margin, y, textWidth, lineHeight);
             y += lineHeight;
 
-            // --- 7. Párrafo de Personalidad - JUSTIFICADO CON FUNCIÓN MANUAL ---
+            // --- 7. Párrafo de Personalidad - JUSTIFICADO ---
             y = drawJustifiedText(doc, personalidad, margin, y, textWidth, lineHeight);
             y += lineHeight;
             
@@ -217,15 +217,46 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             doc.text("Sus principales tareas incluyeron:", margin, y);
             y += lineHeight;
 
-            // --- 9. Tareas (Lista de puntos) - JUSTIFICADO CON FUNCIÓN MANUAL ---
+            // --- 9. Tareas (Lista de puntos) - JUSTIFICADO ---
             doc.setFont(undefined, 'normal');
             const listaTareas = tareas.split('\n').filter(t => t.trim() !== '');
             listaTareas.forEach(tarea => {
                 const tareaFormato = `• ${tarea.trim()}`;
-                // Las listas usan un ancho ligeramente menor y margen ajustado
                 y = drawJustifiedText(doc, tareaFormato, margin + 5, y, textWidth - 10, lineHeight);
             });
             y += lineHeight;
 
-            // --- 10. Párrafo de Recomendación y Cierre - JUSTIFICADO CON FUNCIÓN MANUAL ---
-            y = drawJustifiedText(doc, cierre,
+            // --- 10. Párrafo de Recomendación y Cierre - JUSTIFICADO ---
+            y = drawJustifiedText(doc, cierre, margin, y, textWidth, lineHeight);
+            y += lineHeight; 
+            
+            // --- 11. Despedida (CENTRO) ---
+            doc.text("Atentamente,", pageWidth / 2, y, { align: 'center' }); // CENTRADO
+            y += lineHeight * 2;
+
+            // --- 12. Firma (CENTRO) ---
+            if (firmaBase64) {
+                const imgWidth = 50; 
+                const xFirma = (pageWidth / 2) - (imgWidth / 2);
+                doc.addImage(firmaBase64, 'PNG', xFirma, y, imgWidth, 20);
+                y += 25; 
+            } else {
+                 y += 20; // Espacio para la firma
+            }
+
+            // --- 13. Datos del Firmante (CENTRO) ---
+            doc.setFont(undefined, 'bold');
+            doc.text(nombreFirmante, pageWidth / 2, y, { align: 'center' }); // CENTRADO
+            y += lineHeight;
+            doc.setFont(undefined, 'normal');
+            doc.text(cargoFirmante, pageWidth / 2, y, { align: 'center' }); // CENTRADO
+            y += lineHeight;
+            doc.text(telefonoFirmante, pageWidth / 2, y, { align: 'center' }); // CENTRADO
+
+
+            // --- 14. Descarga del PDF ---
+            doc.save(`Carta_Recomendacion_${nombreEmpleado.replace(/\s/g, '_')}.pdf`);
+        }
+    </script>
+</body>
+</html>
