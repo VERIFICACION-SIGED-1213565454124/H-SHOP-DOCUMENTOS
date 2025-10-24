@@ -8,7 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <style>
-        /* Estilos de la página */
+        /* Estilos de la página (Sin cambios) */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 850px; margin: 0 auto; padding: 25px; background-color: #f4f4f9; }
         h1 { color: #2c3e50; text-align: center; margin-bottom: 25px; }
         .input-group { background-color: #ffffff; padding: 20px; margin-bottom: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
@@ -59,19 +59,19 @@
         <input type="date" id="fechaEmision" value="2025-10-24">
         
         <label for="nombreEmpleado">Nombre Completo del Empleado:</label>
-        <input type="text" id="nombreEmpleado" value="JAIME LEONARDO GARCIA MENDEZ">
+        <input type="text" id="nombreEmpleado" value="Antonio Galván Guardado">
 
         <label for="puestoDesempenado">Puesto Desempeñado:</label>
-        <input type="text" id="puestoDesempenado" value="ANALISTA DE MANTENIMIENTO">
+        <input type="text" id="puestoDesempenado" value="Ayudante General">
         
         <div class="date-container">
             <div>
                 <label for="fechaInicio">Fecha de Inicio Laboral:</label>
-                <input type="date" id="fechaInicio" value="2024-09-08">
+                <input type="date" id="fechaInicio" value="2024-08-10">
             </div>
             <div>
                 <label for="fechaFin">Fecha de Término Laboral:</label>
-                <input type="date" id="fechaFin" value="2025-11-09">
+                <input type="date" id="fechaFin" value="2025-09-12">
             </div>
         </div>
     </div>
@@ -79,7 +79,7 @@
     <div class="input-group">
         <h2>📝 Contenido de la Carta</h2>
         <label for="nombreEmpresa">Nombre de la Empresa (Encabezado y Cuerpo):</label>
-        <input type="text" id="nombreEmpresa" value="LARMEX">
+        <input type="text" id="nombreEmpresa" value="GRUPO VELAS CONSTRUCTORA">
         
         <label for="cuerpoPersonalidad">Párrafo de Personalidad y Habilidades (Use **[nombre]** para el nombre del empleado):</label>
         <textarea id="cuerpoPersonalidad">Durante el tiempo que trabajó con nosotros, [nombre] demostró ser una persona responsable, proactiva y comprometida con su trabajo. Su disposición para aprender y colaborar fue excelente, adaptándose de forma eficaz a las exigencias de los diferentes proyectos. Su desempeño siempre fue satisfactorio y su actitud de trabajo en equipo fue un gran aporte.</textarea>
@@ -99,7 +99,7 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
     <div class="input-group">
         <h2>✍️ Datos del Firmante</h2>
         <label for="nombreFirmante">Nombre Completo del Firmante:</label>
-        <input type="text" id="nombreFirmante" value="JOSE GARCIA CHAIDEZ">
+        <input type="text" id="nombreFirmante" value="[Nombre del Director/Gerente]">
 
         <label for="cargoFirmante">Cargo del Firmante:</label>
         <input type="text" id="cargoFirmante" value="Director de Recursos Humanos">
@@ -111,7 +111,6 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
     <button onclick="generarPDF()">✅ Generar y Descargar Carta en PDF</button>
 
     <script>
-        // Inicializa jsPDF
         const { jsPDF } = window.jspdf;
 
         // Función auxiliar para convertir archivo de imagen a Base64
@@ -122,15 +121,33 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             reader.onerror = error => reject(error);
         });
 
+        // **FUNCIÓN CLAVE: Justificación manual**
+        function drawJustifiedText(doc, text, x, y, maxWidth, lineHeight) {
+            let currentY = y;
+            const splitText = doc.splitTextToSize(text, maxWidth);
+            
+            // Recorre cada línea del texto dividido
+            splitText.forEach((line, index) => {
+                if (index < splitText.length - 1) {
+                    // Para todas las líneas excepto la última, aplica justificación
+                    doc.text(line, x, currentY, { align: 'justify' });
+                } else {
+                    // La última línea de un párrafo no se justifica, se alinea a la izquierda
+                    doc.text(line, x, currentY);
+                }
+                currentY += lineHeight;
+            });
+            return currentY; // Devuelve la nueva posición 'y'
+        }
+
         // Función principal para generar el PDF
         async function generarPDF() {
-            // Configuración del documento (tamaño A4, unidades en mm)
             const doc = new jsPDF('p', 'mm', 'a4');
             const margin = 20;
             let y = 10;
             const lineHeight = 6;
             const pageWidth = doc.internal.pageSize.getWidth();
-            const textWidth = 170; // Ancho máximo del texto para justificar
+            const textWidth = 170; 
 
             // --- 1. Recolección de Datos ---
             const fechaEmision = document.getElementById('fechaEmision').value;
@@ -141,7 +158,6 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             const fin = document.getElementById('fechaFin').value;
             const empresa = document.getElementById('nombreEmpresa').value.toUpperCase();
             
-            // Reemplazo de marcadores de posición y obtención de textos
             const personalidad = document.getElementById('cuerpoPersonalidad').value.replace(/\[nombre\]/g, primerNombreEmpleado);
             const tareas = document.getElementById('tareas').value.trim();
             const cierre = document.getElementById('cuerpoCierre').value.replace(/\[nombre\]/g, primerNombreEmpleado);
@@ -150,7 +166,6 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             const cargoFirmante = document.getElementById('cargoFirmante').value;
             const telefonoFirmante = document.getElementById('telefonoFirmante').value;
             
-            // Archivos
             const logoFile = document.getElementById('logoInput').files[0];
             const firmaFile = document.getElementById('firmaInput').files[0];
             let logoBase64 = null;
@@ -159,18 +174,16 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             if (logoFile) { logoBase64 = await fileToBase64(logoFile); }
             if (firmaFile) { firmaBase64 = await fileToBase64(firmaFile); }
             
-            // Formatear las fechas
             const f_emision = new Date(fechaEmision).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
             const f_inicio = new Date(inicio).toLocaleDateString('es-ES');
             const f_fin = new Date(fin).toLocaleDateString('es-ES');
 
             // --- 2. Inserción del Logo (Superior Izquierda) ---
             if (logoBase64) {
-                // Posición (x=20mm, y=10mm) y tamaño (width=50mm, height=20mm)
                 doc.addImage(logoBase64, 'PNG', margin, y, 50, 20); 
                 y += 15; 
             }
-            y = Math.max(y, 35); // Asegura que el contenido comience al menos después del espacio del logo
+            y = Math.max(y, 35); 
 
             // --- 3. Encabezado de la Empresa (CENTRO) ---
             doc.setFontSize(14);
@@ -188,69 +201,31 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             doc.text("A quien corresponda:", margin, y);
             y += lineHeight * 1.5;
             
-            // --- 6. Primer Párrafo (Presentación) - CORREGIDO PARA JUSTIFICAR
+            // --- 6. Primer Párrafo (Presentación) - JUSTIFICADO CON FUNCIÓN MANUAL ---
             doc.setFontSize(11);
             doc.setFont(undefined, 'normal');
-            // Nota: Se usa un string único para asegurar que jsPDF lo justifique correctamente.
             const presentacion = `Por medio de la presente, me permito recomendar ampliamente al Sr. ${nombreEmpleado} quien se desempeñó como ${puesto} en ${empresa} desde el ${f_inicio} hasta el ${f_fin}.`;
-            let splitText = doc.splitTextToSize(presentacion, textWidth);
-            doc.text(splitText, margin, y, { align: 'justify' }); // JUSTIFICADO
-            y += splitText.length * lineHeight + lineHeight;
+            y = drawJustifiedText(doc, presentacion, margin, y, textWidth, lineHeight);
+            y += lineHeight;
 
-            // --- 7. Párrafo de Personalidad - CORREGIDO PARA JUSTIFICAR
-            splitText = doc.splitTextToSize(personalidad, textWidth);
-            doc.text(splitText, margin, y, { align: 'justify' }); // JUSTIFICADO
-            y += splitText.length * lineHeight + lineHeight;
+            // --- 7. Párrafo de Personalidad - JUSTIFICADO CON FUNCIÓN MANUAL ---
+            y = drawJustifiedText(doc, personalidad, margin, y, textWidth, lineHeight);
+            y += lineHeight;
             
             // --- 8. Título de Tareas ---
             doc.setFont(undefined, 'bold');
             doc.text("Sus principales tareas incluyeron:", margin, y);
             y += lineHeight;
 
-            // --- 9. Tareas (Lista de puntos) - CORREGIDO PARA JUSTIFICAR
+            // --- 9. Tareas (Lista de puntos) - JUSTIFICADO CON FUNCIÓN MANUAL ---
             doc.setFont(undefined, 'normal');
             const listaTareas = tareas.split('\n').filter(t => t.trim() !== '');
             listaTareas.forEach(tarea => {
                 const tareaFormato = `• ${tarea.trim()}`;
-                // Se reduce el ancho un poco más para evitar problemas en listas
-                splitText = doc.splitTextToSize(tareaFormato, textWidth - 10); 
-                doc.text(splitText, margin + 5, y, { align: 'justify' }); // JUSTIFICADO
-                y += splitText.length * lineHeight;
+                // Las listas usan un ancho ligeramente menor y margen ajustado
+                y = drawJustifiedText(doc, tareaFormato, margin + 5, y, textWidth - 10, lineHeight);
             });
             y += lineHeight;
 
-            // --- 10. Párrafo de Recomendación y Cierre - CORREGIDO PARA JUSTIFICAR
-            splitText = doc.splitTextToSize(cierre, textWidth);
-            doc.text(splitText, margin, y, { align: 'justify' }); // JUSTIFICADO
-            y += splitText.length * lineHeight * 2;
-
-            // --- 11. Despedida (CENTRO) ---
-            doc.text("Atentamente,", pageWidth / 2, y, { align: 'center' }); // CENTRADO
-            y += lineHeight * 2;
-
-            // --- 12. Firma (CENTRO) ---
-            if (firmaBase64) {
-                const imgWidth = 50; 
-                const xFirma = (pageWidth / 2) - (imgWidth / 2);
-                doc.addImage(firmaBase64, 'PNG', xFirma, y, imgWidth, 20);
-                y += 25; 
-            } else {
-                 y += 20; // Espacio para la firma
-            }
-
-            // --- 13. Datos del Firmante (CENTRO) ---
-            doc.setFont(undefined, 'bold');
-            doc.text(nombreFirmante, pageWidth / 2, y, { align: 'center' }); // CENTRADO
-            y += lineHeight;
-            doc.setFont(undefined, 'normal');
-            doc.text(cargoFirmante, pageWidth / 2, y, { align: 'center' }); // CENTRADO
-            y += lineHeight;
-            doc.text(telefonoFirmante, pageWidth / 2, y, { align: 'center' }); // CENTRADO
-
-
-            // --- 14. Descarga del PDF ---
-            doc.save(`Carta_Recomendacion_${nombreEmpleado.replace(/\s/g, '_')}.pdf`);
-        }
-    </script>
-</body>
-</html>
+            // --- 10. Párrafo de Recomendación y Cierre - JUSTIFICADO CON FUNCIÓN MANUAL ---
+            y = drawJustifiedText(doc, cierre,
