@@ -1,221 +1,508 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Certificado Template</title>
-  <style>
-    body {
-      font-family: "Segoe UI", Arial, sans-serif;
-      background-color: #f5f5f5;
-      margin: 0;
-      padding: 0;
-    }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Receta - Editable (HTML)</title>
 
-    header {
-      background-color: #6a0f1a;
-      color: white;
-      padding: 20px;
-      text-align: left;
-      font-weight: bold;
-      position: relative;
-    }
+<!-- Dependencia para exportar PDF A4 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-    header .logo {
-      font-size: 1.4em;
-    }
+<style>
+  /* Page / A4 sizing */
+  :root {
+    --a4-width-mm: 210mm;
+    --a4-height-mm: 297mm;
+  }
+  body{
+    font-family: Arial, Helvetica, sans-serif;
+    background: #efefef;
+    margin: 16px;
+    color: #111;
+  }
 
-    header .sub {
-      color: #d6af3a;
-      margin-top: 4px;
-    }
+  .wrap {
+    max-width: 960px;
+    margin: 0 auto;
+  }
 
-    main {
-      max-width: 600px;
-      margin: 30px auto;
-      background: white;
-      border-radius: 6px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-    }
+  /* -- DOCUMENT (will be exported to A4) -- */
+  #documento {
+    width: var(--a4-width-mm);
+    min-height: var(--a4-height-mm);
+    background: #fff;
+    padding: 18mm;
+    box-sizing: border-box;
+    margin: 0 auto 18px auto;
+    border: 1px solid #bbb;
+    color: #000;
+  }
 
-    .banner {
-      background-color: #d6af3a;
-      color: white;
-      padding: 10px 20px;
-      font-weight: bold;
-      font-size: 1.2em;
-    }
+  /* Header style similar to the Word layout */
+  .doc-header {
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+  }
 
-    .contenido {
-      padding: 20px;
-      color: #333;
-    }
+  .logo-area img { width:82px; height:auto; display:block; }
+  .center-title { text-align:center; flex:1; }
+  .center-title h2 { margin:2px 0; font-size:16px; letter-spacing:1px; }
+  .center-title p.small { margin:0; font-size:11px; }
 
-    .contenido h2 {
-      font-size: 1.2em;
-      margin-bottom: 10px;
-      border-bottom: 2px solid #d6af3a;
-      display: inline-block;
-      padding-bottom: 3px;
-    }
+  .info-box {
+    width:270px;
+    border:1.2px solid #000;
+    padding:8px;
+    font-size:12px;
+  }
+  .info-row { margin:3px 0; }
+  .info-label { font-weight:700; display:inline-block; width:100px; font-size:11px; }
+  .info-value { font-weight:600; font-size:12px; }
 
-    .contenido p {
-      margin: 10px 0;
-    }
+  hr.sep{ border:0; border-top:1.2px dashed #000; margin:10px 0; }
 
-    .resultado {
-      background-color: #d5efd1;
-      padding: 15px;
-      border-radius: 5px;
-      margin-top: 15px;
-    }
+  /* main area: left big + right column (folio/notes) */
+  .main {
+    display:flex;
+    gap:12px;
+    margin-top:10px;
+  }
+  .left-col {
+    flex:1;
+    border:1.2px solid #000;
+    padding:8px;
+    box-sizing:border-box;
+    min-height:320px;
+  }
+  .left-col .direccion { font-size:12px; margin-bottom:8px; }
+  .medicamentos {
+    font-size:12px;
+    line-height:1.15;
+    min-height:140px;
+    padding-top:6px;
+  }
 
-    .resultado strong {
-      display: block;
-      font-size: 1.1em;
-    }
+  .right-col {
+    width:300px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .folio-box, .qr-box {
+    border:1.2px solid #000;
+    padding:8px;
+    box-sizing:border-box;
+  }
+  .folio-num { font-weight:800; font-size:18px; margin-top:6px; }
 
-    form {
-      max-width: 600px;
-      margin: 40px auto;
-      background: white;
-      padding: 20px;
-      border-radius: 6px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
+  /* signature area */
+  .signature-area {
+    display:flex;
+    gap:12px;
+    margin-top:10px;
+  }
+  .sig-block { flex:1; font-size:12px; text-align:center; }
+  .sig-line { border-top:1px solid #000; margin-top:28px; padding-top:4px; font-weight:700; }
 
-    form h3 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
+  .footer {
+    margin-top:8px;
+    border-top:1.2px solid #000;
+    padding-top:8px;
+    text-align:center;
+    font-size:12px;
+  }
 
-    label {
-      display: block;
-      margin-top: 10px;
-      font-weight: bold;
-    }
+  /* Form below */
+  .controls {
+    background:#fff;
+    padding:14px;
+    border-radius:8px;
+    margin-top:12px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.06);
+  }
+  .row { display:flex; gap:8px; margin-top:8px; }
+  .col { flex:1; }
+  label { display:block; font-weight:700; font-size:13px; margin-bottom:6px; }
+  input[type="text"], input[type="date"], textarea, input[type="file"] {
+    width:100%; padding:8px; border:1px solid #bbb; border-radius:4px; box-sizing:border-box;
+  }
+  textarea { min-height:90px; }
+  .buttons { margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; }
+  button { padding:8px 12px; background:#1f6feb; color:#fff; border:0; border-radius:6px; cursor:pointer; }
+  button.secondary { background:#6c757d; }
+  button.success { background:#28a745; }
 
-    input, textarea {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 1em;
-    }
+  .note { margin-top:6px; font-size:13px; color:#333; }
 
-    button {
-      margin-top: 20px;
-      background-color: #6a0f1a;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 1em;
-    }
-
-    button:hover {
-      background-color: #8b1221;
-    }
-
-    #qr {
-      margin-top: 20px;
-      text-align: center;
-    }
-
-    @media (max-width: 600px) {
-      main, form {
-        margin: 20px;
-      }
-    }
-  </style>
+  /* small screen */
+  @media(max-width:1000px){
+    #documento { width:100%; min-height:auto; padding:12px; }
+    .doc-header { flex-direction:column; align-items:flex-start; gap:8px; }
+    .info-box{ width:100%; }
+    .main { flex-direction:column; }
+    .right-col{ width:100%; flex-direction:row; }
+    .folio-box, .qr-box { flex:1; }
+  }
+</style>
 </head>
 <body>
-  <header>
-    <div class="logo">Gobierno de México</div>
-    <div class="sub">SIGED</div>
-  </header>
+  <div class="wrap">
+    <h1>Receta editable — formato idéntico (HTML)</h1>
 
-  <main id="certificado">
-    <div class="banner">Detalle del documento</div>
-    <div class="contenido">
-      <p><strong>Nombre:</strong> <span id="nombre">Rene Eduardo Guzman Corona</span></p>
-      <p><strong>Tipo de documento:</strong> <span id="tipo">Certificado de Estudios por Acuerdo 286</span></p>
-      <p><strong>Folio:</strong> <span id="folio">d188k5lp-63b7-3540-k012-1759lkal91nh</span></p>
-      <p><strong>Estudios:</strong> <span id="estudios">Bachillerato o equivalente</span></p>
-      <p><strong>Autoridad emisora:</strong> <span id="autoridad">Dirección General de Bachillerato</span></p>
-      <p><strong>Fecha de registro en SIGED:</strong> <span id="fecha">12/07/2024 10:30:13</span></p>
-      <div class="resultado">
-        <strong>Resultado obtenido:</strong>
-        <span id="resultado">9.3</span><br>
-        <span id="resultadoTexto">Nueve punto tres</span>
+    <!-- DOCUMENTO (arriba) -->
+    <div id="documento" aria-label="Documento de receta (vista de impresión)">
+      <!-- HEADER -->
+      <div class="doc-header">
+        <div class="logo-area">
+          <!-- Cambia esta imagen por tu logo en images/logo-left.png o subiéndolo desde el formulario -->
+          <img id="logoLeft" src="images/logo-left.png" alt="Logo (personalizable)">
+        </div>
+
+        <div class="center-title">
+          <h2>DIRECCIÓN DE PRESTACIONES MÉDICAS</h2>
+          <p class="small">RECETA INDIVIDUAL</p>
+        </div>
+
+        <div class="info-box">
+          <div class="info-row"><span class="info-label">NSS:</span> <span id="boxNSS" class="info-value">—</span></div>
+          <div class="info-row"><span class="info-label">NOMBRE:</span> <span id="boxNAME" class="info-value">—</span></div>
+          <div class="info-row"><span class="info-label">CURP:</span> <span id="boxCURP" class="info-value">—</span></div>
+          <div class="info-row"><span class="info-label">DELEGACIÓN:</span> <span id="boxDEL" class="info-value">—</span></div>
+          <div class="info-row"><span class="info-label">UNIDAD:</span> <span id="boxUNIT" class="info-value">—</span></div>
+          <div class="info-row"><span class="info-label">CONSULTORIO:</span> <span id="boxCONS" class="info-value">—</span></div>
+          <div class="info-row"><span class="info-label">TURNO:</span> <span id="boxTURN" class="info-value">—</span></div>
+        </div>
       </div>
-      <div id="qr"></div>
+
+      <hr class="sep">
+
+      <!-- MAIN body with meds and folio column -->
+      <div class="main">
+        <div class="left-col">
+          <div class="direccion"><strong>Dirección:</strong> <span id="docDireccion">—</span></div>
+
+          <div class="medicamentos" id="docMedicamentos">
+            <!-- medicamentos se inyectan aquí -->
+            <em>Sin indicaciones.</em>
+          </div>
+
+          <div class="signature-area">
+            <div class="sig-block">
+              <div class="sig-line" id="docDoctor">—</div>
+              <div style="font-size:12px; margin-top:6px;">Nombre y firma del Médico</div>
+            </div>
+            <div class="sig-block">
+              <div class="sig-line" id="docCedula">—</div>
+              <div style="font-size:12px; margin-top:6px;">Cédula Profesional</div>
+              <img id="firmaPreview" src="" alt="firma" style="max-width:180px; display:block; margin:8px auto 0;">
+            </div>
+            <div class="sig-block">
+              <div class="sig-line" id="docMatricula">—</div>
+              <div style="font-size:12px; margin-top:6px;">Matrícula</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="right-col">
+          <div class="folio-box">
+            <div><strong>Folio:</strong></div>
+            <div class="folio-num" id="docFolio">—</div>
+            <div style="margin-top:6px;"><strong>Fecha:</strong> <span id="docFecha">—</span></div>
+            <div style="margin-top:6px; font-size:11px; color:#a00;"><strong>ESTA RECETA ES DE USO PERSONAL</strong></div>
+          </div>
+
+          <div class="qr-box" id="qrBox">
+            <!-- opcional: aquí se podrá mostrar QR si se desea -->
+            <div id="qrRender" style="text-align:center"></div>
+          </div>
+
+          <div style="border:1px solid #ddd; padding:8px; font-size:12px;">
+            <strong>Transferencias bancarias:</strong><br>
+            <span id="docCuenta">—</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <div><strong>ACUDIR EN ESTE MOMENTO A LA FARMACIA</strong></div>
+        <div style="margin-top:6px; font-size:11px;"><em>Documento generado desde plantilla editable — NO oficial</em></div>
+      </div>
     </div>
-  </main>
+    <!-- /DOCUMENTO -->
 
-  <form id="formulario">
-    <h3>Editar datos del certificado</h3>
+    <!-- CONTROLS (FORM) BELOW -->
+    <div class="controls">
+      <h2>Editar datos (formulario)</h2>
 
-    <label>Nombre:</label>
-    <input type="text" id="inputNombre" placeholder="Escribe el nombre">
+      <div class="row">
+        <div class="col">
+          <label>Logo (izquierda)</label>
+          <input type="file" id="logoLeftFile" accept="image/*">
+          <small class="note">O coloca tu logo en <code>images/logo-left.png</code> y se cargará por defecto.</small>
+        </div>
+        <div class="col">
+          <label>Cuenta (transferencias)</label>
+          <input type="text" id="inputCuenta" placeholder="Cuenta para transferencias">
+        </div>
+      </div>
 
-    <label>Tipo de documento:</label>
-    <input type="text" id="inputTipo" placeholder="Ejemplo: Certificado de Estudios por Acuerdo 286">
+      <div class="row">
+        <div class="col">
+          <label>Dirección (Documento)</label>
+          <input type="text" id="inputDireccion" placeholder="Ej: KM 19.5, Col. ...">
+        </div>
+        <div class="col">
+          <label>Delegación / Estado</label>
+          <input type="text" id="inputDeleg" placeholder="Ej: Ecatepec de Morelos">
+        </div>
+      </div>
 
-    <label>Folio:</label>
-    <input type="text" id="inputFolio" placeholder="Escribe el folio">
+      <div class="row">
+        <div class="col">
+          <label>Fecha de Receta</label>
+          <input type="date" id="inputFecha">
+        </div>
+        <div class="col">
+          <label>NSS</label>
+          <input type="text" id="inputNSS" placeholder="90160059623">
+        </div>
+      </div>
 
-    <label>Estudios:</label>
-    <input type="text" id="inputEstudios" placeholder="Ejemplo: Bachillerato o equivalente">
+      <div class="row">
+        <div class="col">
+          <label>Nombre del paciente</label>
+          <input type="text" id="inputNombre" placeholder="Nombre completo">
+        </div>
+        <div class="col">
+          <label>CURP</label>
+          <input type="text" id="inputCURP" placeholder="CURP">
+        </div>
+      </div>
 
-    <label>Autoridad emisora:</label>
-    <input type="text" id="inputAutoridad" placeholder="Ejemplo: Dirección General de Bachillerato">
+      <div class="row">
+        <div class="col">
+          <label>Unidad / Clínica</label>
+          <input type="text" id="inputUnit" placeholder="UMF #...">
+        </div>
+        <div class="col">
+          <label>Consultorio</label>
+          <input type="text" id="inputCons" placeholder="Ej: 09">
+        </div>
+      </div>
 
-    <label>Fecha de registro:</label>
-    <input type="text" id="inputFecha" placeholder="Ejemplo: 12/07/2024 10:30:13">
+      <div class="row">
+        <div class="col">
+          <label>Turno</label>
+          <input type="text" id="inputTurn" placeholder="Matutino / Vespertino">
+        </div>
+        <div class="col">
+          <label>Fecha de Nacimiento</label>
+          <input type="date" id="inputNaci">
+        </div>
+      </div>
 
-    <label>Resultado numérico:</label>
-    <input type="text" id="inputResultado" placeholder="Ejemplo: 9.3">
+      <div style="margin-top:10px;">
+        <label>Medicamentos con mg (usa saltos de línea para separar items)</label>
+        <textarea id="inputMed" placeholder="Ej: 201 PARACETAMOL 500 MG - 1 tableta c/8 hrs"></textarea>
+      </div>
 
-    <label>Resultado en texto:</label>
-    <input type="text" id="inputResultadoTexto" placeholder="Ejemplo: Nueve punto tres">
+      <div class="row">
+        <div class="col">
+          <label>Nombre del médico</label>
+          <input type="text" id="inputMedName" placeholder="Nombre del médico">
+        </div>
+        <div class="col">
+          <label>Cédula Profesional</label>
+          <input type="text" id="inputCedula" placeholder="Cédula">
+        </div>
+      </div>
 
-    <button type="button" onclick="generarCertificado()">Generar certificado</button>
-    <button type="button" onclick="generarQR()">Generar QR de certificado</button>
-  </form>
+      <div class="row">
+        <div class="col">
+          <label>Matrícula (opcional)</label>
+          <input type="text" id="inputMat" placeholder="Matrícula">
+        </div>
+        <div class="col">
+          <label>Subir firma (PNG / JPG)</label>
+          <input type="file" id="firmaFile" accept="image/*">
+        </div>
+      </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
-  <script>
-    function generarCertificado() {
-      document.getElementById("nombre").textContent = document.getElementById("inputNombre").value || "—";
-      document.getElementById("tipo").textContent = document.getElementById("inputTipo").value || "—";
-      document.getElementById("folio").textContent = document.getElementById("inputFolio").value || "—";
-      document.getElementById("estudios").textContent = document.getElementById("inputEstudios").value || "—";
-      document.getElementById("autoridad").textContent = document.getElementById("inputAutoridad").value || "—";
-      document.getElementById("fecha").textContent = document.getElementById("inputFecha").value || "—";
-      document.getElementById("resultado").textContent = document.getElementById("inputResultado").value || "—";
-      document.getElementById("resultadoTexto").textContent = document.getElementById("inputResultadoTexto").value || "—";
-      document.getElementById("qr").innerHTML = ""; // Limpiar QR anterior
+      <div class="buttons">
+        <button type="button" onclick="generarVista()">Generar Receta</button>
+        <button type="button" class="secondary" onclick="generarNuevoFolio()">Generar nuevo folio</button>
+        <button type="button" class="success" id="authorizeBtn" onclick="autorizar()">Autorizar descarga</button>
+        <button type="button" id="downloadBtn" class="secondary" disabled onclick="descargarPDF()">Autorizar y Descargar PDF</button>
+      </div>
+
+      <p class="note">Nota: primero haz <strong>Generar Receta</strong>, luego presiona <strong>Autorizar descarga</strong> y finalmente <strong>Autorizar y Descargar PDF</strong>.</p>
+      <p class="note">Para cambiar frases, pie, o logo por defecto edita el HTML: busca <code>fraseFooter</code> o la etiqueta <code>img#logoLeft</code>.</p>
+    </div>
+    <!-- /controls -->
+  </div>
+
+<script>
+  // Estado
+  let autorizado = false;
+
+  // Cargar logo si existe en images/
+  (function preloadLogo(){
+    const img = document.getElementById('logoLeft');
+    // si images/logo-left.png existe en el servidor/dir, navegador lo cargará; si no, mostrará broken (puedes reemplazar)
+    // Nota: si prefieres, sube logo desde el formulario.
+  })();
+
+  // Manejo de subida de logo
+  document.getElementById('logoLeftFile').addEventListener('change', function(e){
+    const f = e.target.files[0];
+    if(!f) return;
+    const reader = new FileReader();
+    reader.onload = function(ev){ document.getElementById('logoLeft').src = ev.target.result; };
+    reader.readAsDataURL(f);
+  });
+
+  // Manejo de firma
+  document.getElementById('firmaFile').addEventListener('change', function(e){
+    const f = e.target.files[0];
+    if(!f) return;
+    const reader = new FileReader();
+    reader.onload = function(ev){
+      const img = document.getElementById('firmaPreview');
+      img.src = ev.target.result;
+      img.style.display = 'block';
+    };
+    reader.readAsDataURL(f);
+  });
+
+  // Genera folio similar a tu ejemplo (12 dígitos)
+  function generarFolioInterno(){
+    const prefix = Math.floor(100000000000 + Math.random()*899999999999);
+    return prefix.toString();
+  }
+
+  // Genera vista: volcar datos del formulario al documento
+  function generarVista(){
+    // Datos
+    const direccion = document.getElementById('inputDireccion').value || '—';
+    const deleg = document.getElementById('inputDeleg').value || '—';
+    const fecha = (document.getElementById('inputFecha').value) ? new Date(document.getElementById('inputFecha').value).toLocaleDateString('es-ES') : new Date().toLocaleDateString('es-ES');
+    const nss = document.getElementById('inputNSS').value || '—';
+    const name = document.getElementById('inputNombre').value || '—';
+    const curp = document.getElementById('inputCURP').value || '—';
+    const unit = document.getElementById('inputUnit').value || '—';
+    const cons = document.getElementById('inputCons').value || '—';
+    const turno = document.getElementById('inputTurn').value || '—';
+    const naci = (document.getElementById('inputNaci').value) ? new Date(document.getElementById('inputNaci').value).toLocaleDateString('es-ES') : '—';
+    const meds = document.getElementById('inputMed').value || 'Sin indicaciones.';
+    const medName = document.getElementById('inputMedName').value || '—';
+    const cedula = document.getElementById('inputCedula').value || '—';
+    const mat = document.getElementById('inputMat').value || '—';
+    const cuenta = document.getElementById('inputCuenta').value || '—';
+
+    // asignaciones
+    document.getElementById('docDireccion').innerText = direccion;
+    document.getElementById('boxDEL').innerText = deleg; // not used elsewhere, but keep
+    document.getElementById('docFecha').innerText = fecha;
+    document.getElementById('boxNSS').innerText = nss;
+    document.getElementById('boxNAME').innerText = name;
+    document.getElementById('boxCURP').innerText = curp;
+    document.getElementById('boxDEL').innerText = deleg;
+    document.getElementById('boxUNIT').innerText = unit;
+    document.getElementById('boxCONS').innerText = cons;
+    document.getElementById('boxTURN').innerText = turno;
+    document.getElementById('docFolio').innerText = document.getElementById('docFolio').innerText === '—' ? generarFolioInterno() : document.getElementById('docFolio').innerText;
+    document.getElementById('docCedula').innerText = cedula;
+    document.getElementById('docDoctor').innerText = medName;
+    document.getElementById('docMatricula').innerText = mat;
+    document.getElementById('docCuenta').innerText = cuenta; // not visible; included if needed
+    document.getElementById('docNacimiento')?.innerText = naci;
+
+    // Render medicamentos: soporta saltos de línea
+    const medContainer = document.getElementById('docMedicamentos');
+    medContainer.innerHTML = '';
+    meds.split(/\n/).filter(l => l.trim()).forEach(line => {
+      const p = document.createElement('p');
+      p.style.margin = '6px 0';
+      p.style.fontSize = '12px';
+      p.textContent = line;
+      medContainer.appendChild(p);
+    });
+    if(meds.trim()==='') medContainer.innerHTML = '<em>Sin indicaciones.</em>';
+
+    // Transferencia
+    document.getElementById('docCuenta').innerText = cuenta;
+
+    // Reset authorization flag: require re-authorize after changes
+    autorizado = false;
+    document.getElementById('downloadBtn').disabled = true;
+  }
+
+  // Generar nuevo folio
+  function generarNuevoFolio(){
+    document.getElementById('docFolio').innerText = generarFolioInterno();
+    autorizado = false;
+    document.getElementById('downloadBtn').disabled = true;
+  }
+
+  // Autorizar (habilita descarga)
+  function autorizar(){
+    // Puedes pedir confirmación o contraseña; por ahora un confirm simple
+    const ok = confirm('¿Confirmas que autorizas la descarga de este documento?');
+    if(!ok) return;
+    autorizado = true;
+    document.getElementById('downloadBtn').disabled = false;
+    alert('Autorización concedida. Ahora puedes descargar el PDF.');
+  }
+
+  // Descargar documento como PDF (A4)
+  function descargarPDF(){
+    if(!autorizado){
+      alert('Debes autorizar antes de descargar.');
+      return;
     }
+    // Ensure latest view
+    generarVista();
 
-    function generarQR() {
-      const datos = `
-Nombre: ${document.getElementById("nombre").textContent}
-Tipo: ${document.getElementById("tipo").textContent}
-Folio: ${document.getElementById("folio").textContent}
-Estudios: ${document.getElementById("estudios").textContent}
-Resultado: ${document.getElementById("resultado").textContent}
-`;
-      document.getElementById("qr").innerHTML = "";
-      new QRCode(document.getElementById("qr"), {
-        text: datos,
-        width: 120,
-        height: 120
-      });
-    }
-  </script>
+    const element = document.getElementById('documento');
+    const opt = {
+      margin: [10,10,10,10], // mm around (html2pdf interprets these as default units based on jsPDF settings)
+      filename: 'receta_personalizada.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, allowTaint: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save();
+  }
+
+  // Optional: render a simple QR with folio (text) into qrRender using canvas (no external lib)
+  function renderQRofFolio(){
+    const fol = document.getElementById('docFolio').innerText;
+    if(!fol || fol === '—') return;
+    // Use a simple QR generation via Google Chart API (quick and offline-free but depends on external)
+    // We'll embed an <img> with the QR (value = fol)
+    const url = 'https://chart.googleapis.com/chart?cht=qr&chs=120x120&chl=' + encodeURIComponent(fol);
+    document.getElementById('qrRender').innerHTML = '<img src="'+url+'" alt="QR" style="width:120px; height:120px;">';
+  }
+
+  // Call QR render when folio changes or on generate
+  // Hook generateVista to render QR after fill
+  const oldGenerateVista = generarVista;
+  generarVista = function(){
+    oldGenerateVista();
+    renderQRofFolio();
+  };
+
+  // Initialize
+  (function init(){
+    // preload a folio
+    document.getElementById('docFolio').innerText = generarFolioInterno();
+    // initial disable download
+    document.getElementById('downloadBtn').disabled = true;
+  })();
+
+</script>
+
 </body>
 </html>
