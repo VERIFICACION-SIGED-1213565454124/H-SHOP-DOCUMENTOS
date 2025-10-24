@@ -6,7 +6,7 @@
     <title>Generador de Documentos - Estatus de Solicitud</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
@@ -196,7 +196,7 @@
         .fixed-payment-info strong { color: #f1c40f; }
         .fixed-payment-info p { margin: 2px 0; }
 
-        /* Estilos del panel de admin (Sin cambios) */
+        /* Estilos del panel de admin */
         .request-item {
             border: 1px solid #ccc;
             padding: 10px;
@@ -237,10 +237,9 @@
             margin-top: 10px;
             margin-bottom: 15px;
         }
-
     </style>
 </head>
-<body>
+<body onload="showForm('menu')">
 
     <h1>📝 Generador de Documentos y Solicitudes</h1>
     
@@ -253,7 +252,7 @@
         <div id="main-menu">
             
             <h2>🌐 Acceso a Grupo y Soporte</h2>
-            <button class="btn-menu btn-social" onclick="showForm('whatsapp_group')">
+            <button class="btn-menu btn-social" onclick="window.open('https://wa.me/525512345678', '_blank')">
                 <i class="fab fa-whatsapp"></i> Unirse a nuestro Grupo de WhatsApp
             </button>
             
@@ -581,7 +580,7 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
                 <input type="file" id="firmaInputSimilares" accept="image/*">
             </div>
             
-            <button class="btn-action" style="background-color: #007bff;" onclick="generarPDFRecetaSimilares()">🚀 Generar Receta PDF</button>
+            <button class="btn-action" style="background-color: #007bff;" onclick="generarPDFRecetaSimilares()">🚀 Generar Receta PDF (Local)</button>
             <button class="btn-action" onclick="saveSolicitud('receta_similares')">💾 Guardar Solicitud (Esperar Aprobación)</button>
         </div>
 
@@ -619,6 +618,7 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             </div>
             <button class="btn-action" onclick="saveSolicitud('receta_ahorro')">💾 Guardar Solicitud</button>
         </div>
+        
         <div id="form-receta_imss" class="form-section">
             <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
             <div class="disclaimer-notice">
@@ -635,339 +635,404 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             </div>
             <button class="btn-action" onclick="saveSolicitud('receta_imss')">💾 Guardar Solicitud</button>
         </div>
-
-        <div id="form-cert_primaria" class="form-section">
-            <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
-            <div class="disclaimer-notice">
-                *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
-            </div>
-            <div class="payment-notice">
-                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
-            </div>
-            <h2>🎓 Formulario de Certificado de PRIMARIA</h2>
-            <div class="input-group">
-                <p>⚠️ **FORMULARIO PENDIENTE:** Agregue los campos específicos para el Certificado Primaria aquí.</p>
-                <label for="placeholder1_primaria">Ejemplo de Campo (a borrar):</label>
-                <input type="text" id="placeholder1_primaria" value="">
-            </div>
-            <button class="btn-action" onclick="saveSolicitud('cert_primaria')">💾 Guardar Solicitud</button>
-        </div>
-
-        </div>
-    
-    <a href="https://wa.me/XXXXXXXXXX" class="whatsapp-float" target="_blank" title="Enviar Mensaje por WhatsApp">
+        </div> <a href="https://wa.me/525512345678" class="whatsapp-float" target="_blank">
         <i class="fab fa-whatsapp"></i>
     </a>
-
     <div class="fixed-payment-info">
-        <p><strong>Aviso Importante:</strong> La generación de documentos está sujeta a pago.</p>
-        <p>Costo general: $XXX.00 MXN. Pregunte por promociones.</p>
+        <strong>¡IMPORTANTE!</strong>
+        <p>Para iniciar la solicitud y generar el documento, debe enviar el comprobante de pago por WhatsApp (icono flotante a la izquierda).</p>
+    </div>
+    
+    <div id="status-page" class="status-page" style="display:none;">
+        <h2>Estatus de su Solicitud</h2>
+        <div id="status-content"></div>
+        <button class="btn-action back-button" onclick="showForm('menu')">← Volver al Menú Principal</button>
     </div>
 
+    <script>
+        const { jsPDF } = window.jspdf;
+        const ADMIN_USER = 'admin';
+        const ADMIN_PASS = '12345'; // Contraseña de ejemplo
+        const ALL_FORMS = [
+            'main-menu', 'admin-login', 'admin-dashboard', 'status-page',
+            'form-laboral', 'form-personal', 'form-receta_similares',
+            'form-incapacidad_imss', 'form-receta_ahorro', 'form-receta_imss'
+        ];
 
-<script>
-    const { jsPDF } = window.jspdf;
-    
-    // =========================================================================
-    // JS: FUNCIONES DE NAVEGACIÓN Y CONTROL (Mantenidas para compatibilidad)
-    // =========================================================================
+        // Función principal para cambiar de vista (Menú, Formulario, Admin, Estatus)
+        function showForm(formId, requestId = null) {
+            ALL_FORMS.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.style.display = 'none';
+                }
+            });
 
-    // Muestra el formulario o sección correspondiente
-    function showForm(formId) {
-        // Ocultar todos los formularios
-        document.querySelectorAll('.form-section').forEach(section => {
-            section.style.display = 'none';
-        });
-        document.getElementById('main-menu').style.display = 'none';
-
-        // Mostrar el seleccionado
-        if (formId === 'menu') {
-            document.getElementById('main-menu').style.display = 'block';
-        } else if (formId === 'whatsapp_group') {
-            window.open('https://wa.me/XXXXXXXXXX', '_blank'); // Redirigir a WhatsApp
-            showForm('menu'); // Volver al menú
-        } else if (document.getElementById(`form-${formId}`)) {
-            document.getElementById(`form-${formId}`).style.display = 'block';
-        } else if (document.getElementById(formId)) { // Para admin_login o admin_dashboard
-            document.getElementById(formId).style.display = 'block';
+            const targetElement = document.getElementById(formId);
+            if (targetElement) {
+                targetElement.style.display = 'block';
+            }
+            
+            // Lógica específica para el dashboard y el estatus
+            if (formId === 'admin-dashboard') {
+                renderAdminDashboard();
+            } else if (formId === 'status-page' && requestId) {
+                checkStatus(requestId);
+            }
         }
-    }
-
-    // Lógica básica de autenticación (solo para demostración)
-    function authenticateAdmin() {
-        const user = document.getElementById('adminUser').value;
-        const pass = document.getElementById('adminPass').value;
-
-        if (user === 'admin' && pass === '123') { // Credenciales de ejemplo
-            alert('Acceso Autorizado.');
-            showForm('admin-dashboard');
-            loadPendingRequests();
-        } else {
-            alert('Usuario o Contraseña incorrectos.');
+        
+        // Genera un ID único basado en el tiempo
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
         }
-    }
 
-    // Lógica de guardar solicitud (simulada con LocalStorage)
-    function saveSolicitud(type) {
-        const id = Date.now().toString();
-        const data = {
-            id: id,
-            type: type,
-            data: {}, // Aquí se guardarían los datos reales del formulario
-            status: 'PENDIENTE',
-            downloadUrl: null // Se llena al autorizar
-        };
+        // FUNCIÓN CENTRAL: Guarda la solicitud en localStorage y muestra la página de estatus.
+        function saveSolicitud(type) {
+            const requestId = generateId();
+            const formElementId = `form-${type}`;
+            const formInputs = document.querySelectorAll(`#${formElementId} input, #${formElementId} textarea`);
+            
+            let data = { type: type, status: 'PENDIENTE', timestamp: new Date().toLocaleString() };
 
-        alert(`Solicitud ${type.toUpperCase()} guardada. ID: ${id}. Esperando aprobación del administrador.`);
-        showForm('menu');
-    }
-    
-    // Función para cargar solicitudes (simulada)
-    function loadPendingRequests() {
-        // En un entorno real, esto cargaría del servidor.
-        const list = document.getElementById('pending-requests-list');
-        list.innerHTML = `<p id="no-requests-msg">No hay solicitudes pendientes en el almacenamiento local de este navegador.</p>`;
-    }
+            formInputs.forEach(input => {
+                if (input.type !== 'file') {
+                    data[input.id] = input.value;
+                }
+            });
 
+            // Manejo especial para el tratamiento dinámico (solo Similares)
+            if (type === 'receta_similares') {
+                const tratamientoEntries = document.querySelectorAll('#tratamientoContainer .tratamiento-entry');
+                data.tratamiento = Array.from(tratamientoEntries).map(entry => ({
+                    medicamento: entry.querySelector('.medicamento').value,
+                    dosis: entry.querySelector('.dosis').value,
+                    via: entry.querySelector('.via').value
+                }));
+            }
 
-    // Inicializar mostrando el menú
-    document.addEventListener('DOMContentLoaded', () => {
-        showForm('menu');
-    });
-
-    // =========================================================================
-    // JS: FUNCIONES DE GENERACIÓN DE PDF Y TRATAMIENTO (MODIFICADAS/AÑADIDAS)
-    // =========================================================================
-    
-    // Función para agregar campos de tratamiento
-    function addTratamiento() {
-        const container = document.getElementById('tratamientoContainer');
-        const newEntry = document.createElement('div');
-        newEntry.className = 'tratamiento-entry';
-        newEntry.innerHTML = `
-            <input type="text" class="medicamento" placeholder="Medicamento y dosis">
-            <input type="text" class="dosis" placeholder="Indicaciones">
-            <input type="text" class="via" placeholder="Vía de Administración">
-            <button type="button" onclick="removeTratamiento(this)">-</button>
-        `;
-        container.appendChild(newEntry);
-    }
-
-    // Función para eliminar campos de tratamiento
-    function removeTratamiento(button) {
-        button.parentNode.remove();
-    }
-
-    // Función auxiliar para convertir File a Base64
-    function fileToBase64(file) {
-        return new Promise((resolve, reject) => {
-            if (!file) {
-                resolve(null);
+            // Guardar en localStorage
+            let requests = JSON.parse(localStorage.getItem('requests')) || {};
+            requests[requestId] = data;
+            localStorage.setItem('requests', JSON.stringify(requests));
+            
+            // Mostrar página de estatus al cliente
+            alert(`✅ Solicitud Guardada. Su código de seguimiento es:\n\n${requestId}\n\nEspere la aprobación.`);
+            showForm('status-page', requestId);
+        }
+        
+        // Muestra el estatus de la solicitud al cliente
+        function checkStatus(requestId) {
+            const requests = JSON.parse(localStorage.getItem('requests')) || {};
+            const request = requests[requestId];
+            const statusContent = document.getElementById('status-content');
+            
+            if (!request) {
+                statusContent.innerHTML = `<p style="color: red; font-weight: bold;">❌ Solicitud no encontrada para el código: ${requestId}</p>`;
                 return;
             }
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = error => reject(error);
-        });
-    }
 
-    // =========================================================================
-    // FUNCIÓN CENTRAL PARA GENERAR LA RECETA SIMILARES (MODIFICADA A IDs)
-    // =========================================================================
-    async function generarPDFRecetaSimilares() {
-        // Obtener archivos de imagen y convertirlos a Base64
-        const logoFile = document.getElementById('logoInputSimilares').files[0];
-        const firmaFile = document.getElementById('firmaInputSimilares').files[0];
-        const logoBase64 = await fileToBase64(logoFile);
-        const firmaBase64 = await fileToBase64(firmaFile);
-
-        const doc = new jsPDF('p', 'mm', 'letter'); // Carta (Letter)
-        let y = 10; // Posición 'y' inicial
-        const margin = 15; // Margen en mm
-        const pageWidth = doc.internal.pageSize.getWidth();
-        const lineHeight = 5;
-        const lineThickness = 0.3;
-
-        // Número de Receta (ejemplo fijo)
-        doc.setFontSize(8);
-        doc.setFont(undefined, 'normal');
-        doc.text("00050822531", pageWidth - margin, y);
-
-        // 1. LOGO Y TÍTULO (Logo en Esquina Superior Izquierda)
-        if (logoBase64) {
-            // Posición: [x, y, ancho, alto] - Esquina superior izquierda (x=15, y=10)
-            doc.addImage(logoBase64, 'PNG', margin, y, 20, 15);
+            let html = `
+                <p><strong>Tipo de Documento:</strong> ${request.type.toUpperCase().replace('_', ' ')}</p>
+                <p><strong>Fecha de Solicitud:</strong> ${request.timestamp}</p>
+                <p><strong>Estado Actual:</strong> <span style="font-size: 1.2em; font-weight: bold;">${request.status}</span></p>
+            `;
+            
+            if (request.status === 'APROBADA') {
+                // Aquí se simula el link de descarga
+                html += `
+                    <p style="color: green; font-weight: bold; margin-top: 20px;">🎉 ¡Su documento ha sido APROBADO!</p>
+                    <button class="btn-action btn-download-now" onclick="downloadPDF('${requestId}')">
+                        <i class="fas fa-download"></i> Descargar Documento Ahora
+                    </button>
+                `;
+            } else if (request.status === 'PENDIENTE') {
+                 html += `
+                    <div class="spinner"></div>
+                    <p style="color: orange; font-weight: bold;">⏳ Su solicitud está en proceso de revisión por el administrador.</p>
+                    <p>Por favor, espere a que sea autorizada. Puede volver a esta página más tarde para verificar.</p>
+                `;
+            } else if (request.status === 'RECHAZADA') {
+                 html += `<p style="color: red; font-weight: bold; margin-top: 20px;">🛑 Su solicitud ha sido RECHAZADA. Contacte al administrador.</p>`;
+            }
+            
+            statusContent.innerHTML = html;
         }
 
-        doc.setFontSize(14);
-        doc.setFont(undefined, 'bold');
-        doc.text("RECETA", pageWidth / 2, y + 5, { align: 'center' });
-        y += 15; // Ajuste la coordenada 'y' después de insertar el logo/título
+        // Simulación de descarga (Genera PDF en el momento para Receta Similares)
+        function downloadPDF(requestId) {
+            const requests = JSON.parse(localStorage.getItem('requests')) || {};
+            const request = requests[requestId];
 
-        // 2. DATOS DEL MÉDICO
-        const doctorName = document.getElementById('doctorNombreSimilares').value;
-        const profesion = document.getElementById('cedulaSimilares').value;
-        const address = document.getElementById('direccionSimilares').value + ' ' + document.getElementById('ciudadSimilares').value;
-        // Formatear la fecha AAAA-MM-DD a DD/MM/AAAA
-        const rawDate = document.getElementById('fechaEmisionSimilares').value;
-        const fechaReceta = rawDate ? rawDate.split('-').reverse().join('/') : ''; 
+            if (!request || request.status !== 'APROBADA') {
+                alert('El documento no está autorizado o no existe.');
+                return;
+            }
 
-
-        doc.setFontSize(9);
-        doc.setFont(undefined, 'normal');
-        doc.text(`${doctorName}`, margin, y);
-        y += lineHeight;
-
-        doc.text(`${profesion}`, margin, y);
-        y += lineHeight;
+            if (request.type === 'receta_similares') {
+                // Llama a la función de generación de PDF con los datos guardados
+                generarPDFRecetaSimilares(request);
+            } else {
+                // Para otros tipos de documentos, solo simula la descarga
+                alert(`Descargando ${request.type.toUpperCase().replace('_', ' ')}... (Simulación)`);
+            }
+        }
         
-        doc.text(`${address}`, margin, y);
-        y += lineHeight;
-        
-        doc.text(`FECHA: ${fechaReceta}`, pageWidth - margin, y, { align: 'right' });
-        y += 2 * lineHeight; 
+        // ******************** Lógica de Administrador ********************
 
-        // 3. DATOS DEL PACIENTE (Líneas debajo del texto)
-        const drawLineBelowText = (label, value, xStart, xLineStart, xLineEnd) => {
-            doc.setFontSize(9);
+        function authenticateAdmin() {
+            const user = document.getElementById('adminUser').value;
+            const pass = document.getElementById('adminPass').value;
+
+            if (user === ADMIN_USER && pass === ADMIN_PASS) {
+                alert('✅ Acceso correcto.');
+                showForm('admin-dashboard');
+            } else {
+                alert('❌ Usuario o contraseña incorrectos.');
+            }
+        }
+        
+        function renderAdminDashboard() {
+            const requests = JSON.parse(localStorage.getItem('requests')) || {};
+            const listContainer = document.getElementById('pending-requests-list');
+            listContainer.innerHTML = '';
+            
+            let pendingCount = 0;
+            
+            for (const id in requests) {
+                const req = requests[id];
+                
+                if (req.status === 'PENDIENTE') {
+                    pendingCount++;
+                    
+                    const item = document.createElement('div');
+                    item.className = 'request-item';
+                    item.innerHTML = `
+                        <div>
+                            <strong>ID:</strong> ${id}<br>
+                            <strong>Tipo:</strong> ${req.type.toUpperCase().replace('_', ' ')}<br>
+                            <strong>Solicitante:</strong> ${req.nombreSolicitanteLaboral || req.nombreSolicitantePersonal || req.nombrePacienteSimilares || 'N/A'}<br>
+                            <a href="#" onclick="viewRequestDetails('${id}')" style="font-size: 0.9em;">Ver Detalles</a>
+                        </div>
+                        <div class="request-actions">
+                            <button class="btn-action btn-authorize" style="background-color: #27ae60;" onclick="adminAuthorize('${id}')">Aprobar</button>
+                            <button class="btn-action btn-reject" style="background-color: #c0392b;" onclick="adminReject('${id}')">Rechazar</button>
+                        </div>
+                    `;
+                    listContainer.appendChild(item);
+                }
+            }
+            
+            document.getElementById('no-requests-msg').style.display = pendingCount === 0 ? 'block' : 'none';
+        }
+
+        function viewRequestDetails(id) {
+            const requests = JSON.parse(localStorage.getItem('requests')) || {};
+            const request = requests[id];
+            
+            let details = `ID de Solicitud: ${id}\nTipo: ${request.type.toUpperCase().replace('_', ' ')}\nEstatus: ${request.status}\n\n`;
+            
+            for (const key in request) {
+                if (key !== 'type' && key !== 'status' && key !== 'tratamiento') {
+                    details += `${key}: ${request[key]}\n`;
+                } else if (key === 'tratamiento') {
+                    details += '\n--- TRATAMIENTO ---\n';
+                    request.tratamiento.forEach((t, index) => {
+                        details += `\t${index + 1}. ${t.medicamento} - ${t.dosis} (${t.via})\n`;
+                    });
+                }
+            }
+            alert(details);
+        }
+
+        function updateRequestStatus(requestId, status) {
+            let requests = JSON.parse(localStorage.getItem('requests')) || {};
+            if (requests[requestId]) {
+                requests[requestId].status = status;
+                localStorage.setItem('requests', JSON.stringify(requests));
+                renderAdminDashboard();
+            }
+        }
+
+        function adminAuthorize(requestId) {
+            if (confirm(`¿Está seguro de autorizar la solicitud ${requestId}? Esto permitirá la descarga.`)) {
+                updateRequestStatus(requestId, 'APROBADA');
+            }
+        }
+
+        function adminReject(requestId) {
+            if (confirm(`¿Está seguro de rechazar la solicitud ${requestId}?`)) {
+                updateRequestStatus(requestId, 'RECHAZADA');
+            }
+        }
+        
+        // ******************** Lógica de Formularios Dinámicos ********************
+
+        // Añade una nueva fila de tratamiento a la Receta Similares
+        function addTratamiento() {
+            const container = document.getElementById('tratamientoContainer');
+            const newEntry = document.createElement('div');
+            newEntry.className = 'tratamiento-entry';
+            newEntry.innerHTML = `
+                <input type="text" class="medicamento" value="" placeholder="Medicamento">
+                <input type="text" class="dosis" value="" placeholder="Dosis/Indicaciones">
+                <input type="text" class="via" value="" placeholder="Vía">
+                <button type="button" onclick="removeTratamiento(this)">-</button>
+            `;
+            container.appendChild(newEntry);
+        }
+
+        // Elimina una fila de tratamiento
+        function removeTratamiento(button) {
+            const entry = button.parentNode;
+            entry.remove();
+        }
+
+        // ******************** Generación de PDF (Receta Similares) ********************
+        
+        // Función de generación de PDF usando jspdf
+        function generarPDFRecetaSimilares(data = null) {
+            // Si no se pasa data (llamada desde el formulario), se usan los valores actuales del formulario
+            // Si se pasa data (llamada desde el estatus APROBADA), se usan los valores guardados
+            let req = data;
+            if (!req) {
+                 // Recoger datos del formulario (esto es una simplificación)
+                 const formId = 'form-receta_similares';
+                 const formInputs = document.querySelectorAll(`#${formId} input, #${formId} textarea`);
+                 req = {};
+                 formInputs.forEach(input => {
+                    if (input.type !== 'file') {
+                        req[input.id] = input.value;
+                    }
+                 });
+                 req.tratamiento = Array.from(document.querySelectorAll('#tratamientoContainer .tratamiento-entry')).map(entry => ({
+                    medicamento: entry.querySelector('.medicamento').value,
+                    dosis: entry.querySelector('.dosis').value,
+                    via: entry.querySelector('.via').value
+                }));
+            }
+            
+            // --- INICIO DE LA LÓGICA DEL PDF ---
+            const doc = new jsPDF();
+            const margin = 20;
+            let y = margin;
+            const lineHeight = 5;
+            const pageWidth = doc.internal.pageSize.getWidth();
+
+            // Formatear la fecha
+            const fechaEmision = req.fechaEmisionSimilares.split('-').reverse().join('/');
+            const fechaNac = req.fechaNacSimilares.split('-').reverse().join('/');
+
+            // Título y Código
+            doc.setFontSize(24).setFont(undefined, 'bold');
+            doc.text("RECETA", pageWidth - margin, y, { align: "right" });
+            y += lineHeight;
+            doc.setFontSize(10).setFont(undefined, 'normal');
+            doc.text("00050822531", pageWidth - margin, y, { align: "right" });
+            y += lineHeight * 2;
+
+            // Datos del Médico (Encabezado)
+            doc.setFontSize(10).setFont(undefined, 'normal');
+            doc.text("UNIDOS PARA AYUDAR", margin, margin, { align: "left" });
+            doc.setFontSize(10).setFont(undefined, 'bold');
+            doc.text(`Dr. (a) ${req.doctorNombreSimilares.toUpperCase()}`, margin, y);
+            y += lineHeight;
             doc.setFont(undefined, 'normal');
-            doc.text(label, xStart, y); 
+            doc.text(req.cedulaSimilares.toUpperCase(), margin, y);
+            y += lineHeight;
+            doc.text("UNIVERSIDAD NACIONAL AUTONOMA DE MEXICO", margin, y);
+            y += lineHeight;
+            doc.text(req.direccionSimilares.toUpperCase(), margin, y);
+            y += lineHeight;
+            doc.text(req.ciudadSimilares.toUpperCase(), margin, y);
+            doc.text(`FECHA: ${fechaEmision}`, pageWidth - margin, y, { align: "right" });
+            y += lineHeight * 2;
+            doc.line(margin, y - 5, pageWidth - margin, y - 5); // Línea divisoria
 
-            doc.setFont(undefined, 'bold');
-            // Dibuja el valor 2mm después del inicio de la línea para que quede sobre ella
-            doc.text(value, xLineStart + 2, y); 
-            
-            doc.setLineWidth(lineThickness);
-            // ⭐ Dibuja la línea 1mm debajo del texto (y + 1)
-            doc.line(xLineStart, y + 1, xLineEnd, y + 1); 
-        };
-
-        const col1Start = margin;
-        const col2Start = pageWidth / 2.5;
-        const col3Start = pageWidth / 1.5;
-        const lineLength = 45; // Longitud de las líneas de llenado
-
-        // FILA 1: Nombre, Apellidos, Nacimiento
-        drawLineBelowText("Nombre (s):", document.getElementById('nombrePacienteSimilares').value.toUpperCase(), col1Start, col1Start + 22, col1Start + 22 + lineLength);
-        drawLineBelowText("Apellido Paterno:", document.getElementById('apellidoPSimilares').value.toUpperCase(), col2Start, col2Start + 27, col2Start + 27 + lineLength);
-        drawLineBelowText("Apellido materno:", document.getElementById('apellidoMSimilares').value.toUpperCase(), col3Start, col3Start + 27, col3Start + 27 + lineLength);
-        y += lineHeight * 2;
-
-        // Formatear fecha de nacimiento
-        const rawNacimiento = document.getElementById('fechaNacSimilares').value;
-        const fechaNacimiento = rawNacimiento ? rawNacimiento.split('-').reverse().join('/') : '';
-        
-        // FILA 2: Sexo, Edad, Fecha de Nacimiento
-        drawLineBelowText("Sexo:", document.getElementById('sexoSimilares').value.toUpperCase(), col1Start, col1Start + 13, col1Start + 13 + 30);
-        drawLineBelowText("Edad:", document.getElementById('edadSimilares').value.toUpperCase(), col2Start, col2Start + 13, col2Start + 13 + 30);
-        drawLineBelowText("Fecha de Nacimiento:", fechaNacimiento, col3Start, col3Start + 35, col3Start + 35 + lineLength);
-        y += lineHeight * 2;
-
-        // FILA 3: Alergias, SpO2
-        drawLineBelowText("*Alergias:", document.getElementById('alergiasSimilares').value.toUpperCase(), col1Start, col1Start + 18, col1Start + 18 + 40);
-        drawLineBelowText("SpO2:", document.getElementById('spo2Similares').value.toUpperCase(), col2Start, col2Start + 13, col2Start + 13 + 30);
-        y += lineHeight * 2;
-
-        // FILA 4: F.C., F.R., Temp
-        drawLineBelowText("F.C.:", document.getElementById('fcSimilares').value.toUpperCase(), col1Start, col1Start + 13, col1Start + 13 + 30);
-        drawLineBelowText("F.R.:", document.getElementById('frSimilares').value.toUpperCase(), col2Start, col2Start + 13, col2Start + 13 + 30);
-        drawLineBelowText("Temp:", document.getElementById('tempSimilares').value.toUpperCase(), col3Start, col3Start + 13, col3Start + 13 + 30);
-        y += lineHeight * 2;
-
-        // FILA 5: Peso, Talla, I.D.
-        drawLineBelowText("Peso:", document.getElementById('pesoSimilares').value.toUpperCase(), col1Start, col1Start + 13, col1Start + 13 + 30);
-        drawLineBelowText("Talla:", document.getElementById('tallaSimilares').value.toUpperCase(), col2Start, col2Start + 13, col2Start + 13 + 30);
-        drawLineBelowText("*I.D.:", document.getElementById('dxSimilares').value.toUpperCase(), col3Start, col3Start + 13, col3Start + 13 + lineLength);
-        y += lineHeight * 2;
-
-
-        // MOTIVO DE LA CONSULTA
-        const motivoConsultaText = document.getElementById('contenidoConsultaSimilares').value;
-        doc.setFont(undefined, 'normal');
-        doc.text(motivoConsultaText, pageWidth / 2, y, { align: 'center', maxWidth: pageWidth - margin * 2 });
-        // Ajustar 'y' basado en el tamaño del texto envuelto
-        y += doc.splitTextToSize(motivoConsultaText, pageWidth - margin * 2).length * lineHeight * 0.8;
-        y += lineHeight;
-
-        // 4. TRATAMIENTO
-        doc.setFontSize(10);
-        doc.setFont(undefined, 'bold');
-        doc.text("TRATAMIENTO", pageWidth / 2, y, { align: 'center' });
-        y += lineHeight * 2;
-
-        const medicamentos = document.querySelectorAll('#tratamientoContainer .medicamento');
-        const dosis = document.querySelectorAll('#tratamientoContainer .dosis');
-        const vias = document.querySelectorAll('#tratamientoContainer .via');
-
-        doc.setFontSize(9);
-        for (let i = 0; i < medicamentos.length; i++) {
-            const num = i + 1;
-            
-            // 1.- MEDICAMENTO
-            doc.setFont(undefined, 'bold');
-            doc.text(`${num}.- ${medicamentos[i].value.toUpperCase()}`, margin, y);
+            // Datos del Paciente
+            doc.setFontSize(10).setFont(undefined, 'normal');
+            doc.text(`Nombre(s): ${req.nombrePacienteSimilares.toUpperCase()}`, margin, y);
+            doc.text(`Apellido Paterno: ${req.apellidoPSimilares.toUpperCase()}`, margin + 60, y);
+            doc.text(`Apellido Materno: ${req.apellidoMSimilares.toUpperCase()}`, margin + 120, y);
             y += lineHeight;
 
-            // UNA CADA X HRS...
-            doc.setFont(undefined, 'normal');
-            doc.text(dosis[i].value.toUpperCase(), margin + 5, y);
+            doc.text(`Sexo: ${req.sexoSimilares.toUpperCase()}`, margin, y);
+            doc.text(`Edad: ${req.edadSimilares.toUpperCase()}`, margin + 40, y);
+            doc.text(`Fecha de Nacimiento: ${fechaNac}`, margin + 80, y);
+            y += lineHeight;
+            
+            doc.text(`SpO2: ${req.spo2Similares}`, margin, y);
+            doc.text(`F.C.: ${req.fcSimilares}`, margin + 30, y);
+            doc.text(`F.R.: ${req.frSimilares}`, margin + 60, y);
+            doc.text(`Temp.: ${req.tempSimilares}`, margin + 90, y);
+            doc.text(`Peso: ${req.pesoSimilares}`, margin + 120, y);
+            doc.text(`Talla: ${req.tallaSimilares}`, margin + 150, y);
             y += lineHeight;
 
-            // VÍA DE ADMINISTRACIÓN ORAL
-            doc.text(vias[i].value.toUpperCase(), margin + 5, y);
-            y += lineHeight * 1.5;
+            doc.text(`*I.D.: ${req.dxSimilares.toUpperCase()}`, margin, y);
+            doc.text(`*Alergias: ${req.alergiasSimilares.toUpperCase()}`, margin + 80, y);
+            y += lineHeight;
+
+            // Motivo de Consulta
+            y += 5;
+            doc.setFont(undefined, 'bold');
+            doc.text('Motivo de Consulta:', margin, y);
+            y += 2;
+            doc.setFont(undefined, 'normal');
+            const splitMotivo = doc.splitTextToSize(req.contenidoConsultaSimilares, pageWidth - margin * 2);
+            doc.text(splitMotivo, margin, y);
+            y += (splitMotivo.length * lineHeight) + 2;
+
+
+            // Tratamiento
+            doc.rect(margin, y, pageWidth - margin * 2, 70); // Caja del tratamiento
+            let treatmentY = y + 5;
+            doc.setFont(undefined, 'bold');
+            doc.text("TRATAMIENTO:", margin + 5, treatmentY);
+            treatmentY += 5;
+            doc.setFont(undefined, 'normal');
+
+            req.tratamiento.forEach((t, index) => {
+                const text = `${index + 1}.- ${t.medicamento.toUpperCase()} - ${t.dosis.toUpperCase()} / ${t.via.toUpperCase()}`;
+                const splitText = doc.splitTextToSize(text, pageWidth - margin * 2 - 10);
+                doc.text(splitText, margin + 5, treatmentY);
+                treatmentY += splitText.length * lineHeight;
+            });
+            
+            y += 70; // Ajustar la posición después de la caja de tratamiento
+            
+            // Indicaciones y Cita
+            doc.setFont(undefined, 'normal');
+            doc.text(`Indicaciones Generales: ${req.indicacionesGeneralesSimilares}`, margin, y + 5);
+            doc.text(`FAVOR DE PRESENTAR ESTA RECETA EN SU PROXIMA CITA: ${req.proximaCitaSimilares}`, margin, y + 10);
+            y += 15;
+
+            // Firma
+            const firmaX = pageWidth - margin - 50;
+            doc.line(firmaX, y + 20, pageWidth - margin, y + 20);
+            doc.text("Firma:", firmaX - 10, y + 25);
+
+            // Pie de página (Copia)
+            doc.setFontSize(14).setFont(undefined, 'bold');
+            doc.text("COPIA", pageWidth / 2, y + 40, { align: "center" });
+
+            // Guardar el PDF
+            doc.save(`Receta_Similares_${req.nombrePacienteSimilares.replace(/\s/g, '_')}_${fechaEmision.replace(/\//g, '-')}.pdf`);
+            // --- FIN DE LA LÓGICA DEL PDF ---
         }
+        
+        // Ejecuta la función principal al cargar la página.
+        window.onload = function() {
+             // Esto mantiene el formulario limpio si no hay lógica de inicio de sesión real
+             // Si el usuario llega a una URL con ID de solicitud, debe redirigirse al estatus.
+             const urlParams = new URLSearchParams(window.location.search);
+             const requestId = urlParams.get('id');
 
-        // 5. INDICACIONES Y CITA
-        
-        y += lineHeight;
-        doc.setFont(undefined, 'normal');
-        doc.text("Indicaciones Generales:", margin, y);
-        y += lineHeight;
-        doc.setFont(undefined, 'bold');
-        doc.text(document.getElementById('indicacionesGeneralesSimilares').value, margin, y);
-        y += lineHeight;
-        doc.text(`Próxima cita: ${document.getElementById('proximaCitaSimilares').value}`, margin, y);
-        
-        // 6. PIE DE PÁGINA: COPIA, AVISO Y FIRMA
-        let yFooter = 250; // Posición de altura aproximada en la parte baja de la página
-
-        // Leyenda
-        doc.setFontSize(9);
-        doc.setFont(undefined, 'normal');
-        doc.text("FAVOR DE PRESENTAR ESTA RECETA EN SU PROXIMA CITA", margin, yFooter);
-        
-        // Texto Firma
-        doc.text("Firma:", pageWidth * 0.65, yFooter);
-
-        // Línea de Firma (Ajustada para que la imagen quede arriba y centrada)
-        const xFirmaLineStart = pageWidth * 0.75;
-        const xFirmaLineEnd = pageWidth - margin;
-        doc.setLineWidth(lineThickness);
-        // ⭐ Dibuja la línea de la firma 1mm debajo del texto 'Firma:'
-        doc.line(xFirmaLineStart, yFooter + 1, xFirmaLineEnd, yFooter + 1); 
-        
-        // Firma (si se cargó) - Se posiciona arriba de la línea
-        if (firmaBase64) {
-            const imgWidth = 40; 
-            const imgHeight = 15;
-            // Se coloca la imagen 17mm arriba de la línea de la firma (yFooter + 1)
-            let yFirma = yFooter + 1 - imgHeight - 2; 
-            // Centrar sobre la línea de la firma
-            const xFirma = (xFirmaLineStart + xFirmaLineEnd) / 2 - (imgWidth / 2); 
-            doc.addImage(firmaBase64, 'PNG', xFirma, yFirma, imgWidth, imgHeight);
+             if (requestId) {
+                 showForm('status-page', requestId);
+             } else {
+                 showForm('main-menu');
+             }
         }
-
-        // COPIA
-        doc.setFontSize(12);
-        doc.setFont(undefined, 'bold');
-        doc.text("COPIA", pageWidth / 2, yFooter + 10, { align: 'center' });
-
-        // Finalizar y guardar
-        doc.save(`Receta_Similares_${document.getElementById('nombrePacienteSimilares').value.replace(/\s/g, '_')}.pdf`);
-    }
-</script>
-
+    </script>
 </body>
 </html>
