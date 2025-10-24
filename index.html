@@ -8,7 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <style>
-        /* Estilos de la página (Sin cambios) */
+        /* Estilos de la página */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 850px; margin: 0 auto; padding: 25px; background-color: #f4f4f9; }
         h1 { color: #2c3e50; text-align: center; margin-bottom: 25px; }
         .input-group { background-color: #ffffff; padding: 20px; margin-bottom: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
@@ -49,29 +49,29 @@
         <label for="logoInput">Insertar Logo de la Empresa (Aparecerá en la esquina superior izquierda del PDF):</label>
         <input type="file" id="logoInput" accept="image/*">
         
-        <label for="firmaInput">Insertar Firma (Aparecerá al centro, encima de los datos del firmante):</label>
+        <label for="firmaInput">Insertar Firma (Aparecerá al centro):</label>
         <input type="file" id="firmaInput" accept="image/*">
     </div>
 
     <div class="input-group">
         <h2>👤 Datos del Empleado</h2>
         <label for="fechaEmision">Fecha de Emisión de la Carta (Hoy):</label>
-        <input type="date" id="fechaEmision" value="2025-10-23">
+        <input type="date" id="fechaEmision" value="2025-10-24">
         
         <label for="nombreEmpleado">Nombre Completo del Empleado:</label>
-        <input type="text" id="nombreEmpleado" value="JAIME LEONARDO GARCIA MENDEZ">
+        <input type="text" id="nombreEmpleado" value="Antonio Galván Guardado">
 
         <label for="puestoDesempenado">Puesto Desempeñado:</label>
-        <input type="text" id="puestoDesempenado" value="ANALISTA DE MANTENIMIENTO">
+        <input type="text" id="puestoDesempenado" value="Ayudante General">
         
         <div class="date-container">
             <div>
                 <label for="fechaInicio">Fecha de Inicio Laboral:</label>
-                <input type="date" id="fechaInicio" value="2024-09-08">
+                <input type="date" id="fechaInicio" value="2024-08-10">
             </div>
             <div>
                 <label for="fechaFin">Fecha de Término Laboral:</label>
-                <input type="date" id="fechaFin" value="2025-11-09">
+                <input type="date" id="fechaFin" value="2025-09-12">
             </div>
         </div>
     </div>
@@ -79,7 +79,7 @@
     <div class="input-group">
         <h2>📝 Contenido de la Carta</h2>
         <label for="nombreEmpresa">Nombre de la Empresa (Encabezado y Cuerpo):</label>
-        <input type="text" id="nombreEmpresa" value="LARMEX">
+        <input type="text" id="nombreEmpresa" value="GRUPO VELAS CONSTRUCTORA">
         
         <label for="cuerpoPersonalidad">Párrafo de Personalidad y Habilidades (Use **[nombre]** para el nombre del empleado):</label>
         <textarea id="cuerpoPersonalidad">Durante el tiempo que trabajó con nosotros, [nombre] demostró ser una persona responsable, proactiva y comprometida con su trabajo. Su disposición para aprender y colaborar fue excelente, adaptándose de forma eficaz a las exigencias de los diferentes proyectos. Su desempeño siempre fue satisfactorio y su actitud de trabajo en equipo fue un gran aporte.</textarea>
@@ -99,7 +99,7 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
     <div class="input-group">
         <h2>✍️ Datos del Firmante</h2>
         <label for="nombreFirmante">Nombre Completo del Firmante:</label>
-        <input type="text" id="nombreFirmante" value="JOSE GARCIA CHAIDEZ">
+        <input type="text" id="nombreFirmante" value="[Nombre del Director/Gerente]">
 
         <label for="cargoFirmante">Cargo del Firmante:</label>
         <input type="text" id="cargoFirmante" value="Director de Recursos Humanos">
@@ -170,7 +170,7 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
                 doc.addImage(logoBase64, 'PNG', margin, y, 50, 20); 
                 y += 15; 
             }
-            y = Math.max(y, 35);
+            y = Math.max(y, 35); // Asegura que el contenido comience al menos después del espacio del logo
 
             // --- 3. Encabezado de la Empresa ---
             doc.setFontSize(14);
@@ -193,14 +193,12 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             doc.setFont(undefined, 'normal');
             const presentacion = `Por medio de la presente, me permito recomendar ampliamente al Sr. ${nombreEmpleado} quien se desempeñó como ${puesto} en ${empresa} desde el ${f_inicio} hasta el ${f_fin}.`;
             let splitText = doc.splitTextToSize(presentacion, textWidth);
-            // **Alineación Justificada**
-            doc.text(splitText, margin, y, { align: 'justify' });
+            doc.text(splitText, margin, y, { align: 'justify' }); // Texto Justificado
             y += splitText.length * lineHeight + lineHeight;
 
             // --- 7. Párrafo de Personalidad ---
             splitText = doc.splitTextToSize(personalidad, textWidth);
-            // **Alineación Justificada**
-            doc.text(splitText, margin, y, { align: 'justify' });
+            doc.text(splitText, margin, y, { align: 'justify' }); // Texto Justificado
             y += splitText.length * lineHeight + lineHeight;
             
             // --- 8. Título de Tareas ---
@@ -213,7 +211,6 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             const listaTareas = tareas.split('\n').filter(t => t.trim() !== '');
             listaTareas.forEach(tarea => {
                 const tareaFormato = `• ${tarea.trim()}`;
-                // Ajuste para la viñeta
                 splitText = doc.splitTextToSize(tareaFormato, textWidth - 10); 
                 doc.text(splitText, margin + 5, y, { align: 'justify' });
                 y += splitText.length * lineHeight;
@@ -222,8 +219,7 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
 
             // --- 10. Párrafo de Recomendación y Cierre ---
             splitText = doc.splitTextToSize(cierre, textWidth);
-            // **Alineación Justificada**
-            doc.text(splitText, margin, y, { align: 'justify' });
+            doc.text(splitText, margin, y, { align: 'justify' }); // Texto Justificado
             y += splitText.length * lineHeight * 2;
 
             // --- 11. Despedida (Alineado al Centro) ---
@@ -232,7 +228,6 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
 
             // --- 12. Firma (Alineado al Centro) ---
             if (firmaBase64) {
-                // X = (Ancho de la página / 2) - (Ancho de la imagen / 2)
                 const imgWidth = 50; 
                 const xFirma = (pageWidth / 2) - (imgWidth / 2);
                 doc.addImage(firmaBase64, 'PNG', xFirma, y, imgWidth, 20);
