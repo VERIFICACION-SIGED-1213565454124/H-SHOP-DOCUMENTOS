@@ -4,14 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generador Profesional de Carta de Recomendación</title>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
     <style>
+        /* Estilos de la página */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 850px; margin: 0 auto; padding: 25px; background-color: #f4f4f9; }
         h1 { color: #2c3e50; text-align: center; margin-bottom: 25px; }
         .input-group { background-color: #ffffff; padding: 20px; margin-bottom: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
         h2 { color: #34495e; border-bottom: 2px solid #3498db; padding-bottom: 5px; margin-bottom: 15px; }
         label { display: block; margin-top: 10px; font-weight: bold; color: #555; }
-        input[type="text"], input[type="date"], textarea {
+        input[type="text"], input[type="date"], textarea, input[type="file"] {
             width: 100%;
             padding: 10px;
             margin-top: 5px;
@@ -42,14 +45,17 @@
     <h1>📝 Generador de Carta de Recomendación Laboral</h1>
 
     <div class="input-group">
-        <h2>📂 Logo de la Empresa</h2>
-        <label for="logoInput">Insertar Logo (Aparecerá en la esquina superior izquierda del PDF):</label>
+        <h2>📂 Logo y Firma</h2>
+        <label for="logoInput">Insertar Logo de la Empresa (Aparecerá en la esquina superior izquierda del PDF):</label>
         <input type="file" id="logoInput" accept="image/*">
+        
+        <label for="firmaInput">Insertar Firma (Aparecerá al centro, encima de los datos del firmante):</label>
+        <input type="file" id="firmaInput" accept="image/*">
     </div>
 
     <div class="input-group">
         <h2>👤 Datos del Empleado</h2>
-        <label for="fechaEmision">Fecha de Emisión de la Carta:</label>
+        <label for="fechaEmision">Fecha de Emisión de la Carta (Hoy):</label>
         <input type="date" id="fechaEmision" value="2025-10-24">
         
         <label for="nombreEmpleado">Nombre Completo del Empleado:</label>
@@ -75,7 +81,174 @@
         <label for="nombreEmpresa">Nombre de la Empresa Constructora (Encabezado y Firma):</label>
         <input type="text" id="nombreEmpresa" value="GRUPO VELAS CONSTRUCTORA">
         
-        <label for="cuerpoPersonalidad">Párrafo de Personalidad y Habilidades:</label>
+        <label for="cuerpoPersonalidad">Párrafo de Personalidad y Habilidades (Use **[nombre]** para el nombre del empleado):</label>
         <textarea id="cuerpoPersonalidad">Durante el tiempo que trabajó con nosotros, [nombre] demostró ser una persona responsable, proactiva y comprometida con su trabajo. Su disposición para aprender y colaborar fue excelente, adaptándose de forma eficaz a las exigencias de los diferentes proyectos. Su desempeño siempre fue satisfactorio y su actitud de trabajo en equipo fue un gran aporte.</textarea>
         
-        <label for="tareas">Tareas Princip
+        <label for="tareas">Tareas Principales (Una por línea. Se enlistarán con viñetas en el PDF):</label>
+        <textarea id="tareas">Preparación de materiales: Ayudó a organizar y preparar cemento, mezcla y otros materiales esenciales para las labores de construcción.
+Asistencia en albañilería: Apoyó a los maestros de obra en la preparación y colocación de ladrillos, bloques y otros elementos estructurales.
+Mantenimiento del área de trabajo: Colaboró activamente en la limpieza y el orden de la obra, asegurando un ambiente de trabajo seguro y eficiente.
+Traslado de equipo y herramientas: Ayudó a mover y distribuir herramientas y equipo pesado, demostrando fuerza y precaución.</textarea>
+        
+        <label for="cuerpoCierre">Párrafo de Recomendación y Cierre (Use **[nombre]** para el nombre del empleado):</label>
+        <textarea id="cuerpoCierre">Considero que [nombre] es un empleado valioso, con la capacidad y el deseo de crecer profesionalmente. Recomiendo su contratación para cualquier puesto que se ajuste a su perfil, pues estoy seguro que será un gran activo para cualquier equipo.
+
+Para cualquier duda o aclaración, estoy a su disposición.</textarea>
+    </div>
+
+    <div class="input-group">
+        <h2>✍️ Datos del Firmante</h2>
+        <label for="nombreFirmante">Nombre Completo del Firmante:</label>
+        <input type="text" id="nombreFirmante" value="[Nombre del Director/Gerente]">
+
+        <label for="cargoFirmante">Cargo del Firmante:</label>
+        <input type="text" id="cargoFirmante" value="Director de Recursos Humanos">
+
+        <label for="telefonoFirmante">Teléfono de Contacto:</label>
+        <input type="text" id="telefonoFirmante" value="T. (442) 880 1675">
+    </div>
+
+    <button onclick="generarPDF()">✅ Generar y Descargar Carta en PDF</button>
+
+    <script>
+        // Inicializa jsPDF
+        const { jsPDF } = window.jspdf;
+
+        // Función auxiliar para convertir archivo de imagen a Base64
+        const fileToBase64 = (file) => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+
+        // Función principal para generar el PDF
+        async function generarPDF() {
+            // Configuración del documento (tamaño A4, unidades en mm)
+            const doc = new jsPDF('p', 'mm', 'a4');
+            const margin = 20;
+            let y = 10;
+            const lineHeight = 6;
+            
+            // --- 1. Recolección de Datos ---
+            const fechaEmision = document.getElementById('fechaEmision').value;
+            const nombreEmpleado = document.getElementById('nombreEmpleado').value;
+            const primerNombreEmpleado = nombreEmpleado.split(' ')[0]; // Para reemplazar en los textos
+            const puesto = document.getElementById('puestoDesempenado').value;
+            const inicio = document.getElementById('fechaInicio').value;
+            const fin = document.getElementById('fechaFin').value;
+            const empresa = document.getElementById('nombreEmpresa').value.toUpperCase();
+            
+            const personalidad = document.getElementById('cuerpoPersonalidad').value.replace(/\[nombre\]/g, primerNombreEmpleado);
+            const tareas = document.getElementById('tareas').value.trim();
+            const cierre = document.getElementById('cuerpoCierre').value.replace(/\[nombre\]/g, primerNombreEmpleado);
+            
+            const nombreFirmante = document.getElementById('nombreFirmante').value;
+            const cargoFirmante = document.getElementById('cargoFirmante').value;
+            const telefonoFirmante = document.getElementById('telefonoFirmante').value;
+            
+            // Archivos
+            const logoFile = document.getElementById('logoInput').files[0];
+            const firmaFile = document.getElementById('firmaInput').files[0];
+            let logoBase64 = null;
+            let firmaBase64 = null;
+
+            if (logoFile) { logoBase64 = await fileToBase64(logoFile); }
+            if (firmaFile) { firmaBase64 = await fileToBase64(firmaFile); }
+            
+            // Formatear las fechas
+            const f_emision = new Date(fechaEmision).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+            const f_inicio = new Date(inicio).toLocaleDateString('es-ES');
+            const f_fin = new Date(fin).toLocaleDateString('es-ES');
+
+
+            // --- 2. Inserción del Logo (Superior Izquierda, como en tu ejemplo) ---
+            if (logoBase64) {
+                // Posición (x=20mm, y=10mm) y tamaño (width=50mm, height=20mm)
+                doc.addImage(logoBase64, 'PNG', margin, y, 50, 20); 
+                y += 15; 
+            }
+            y = Math.max(y, 35); // Asegura que el contenido comience al menos después del espacio del logo
+
+            // --- 3. Encabezado de la Empresa ---
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.text(empresa, doc.internal.pageSize.getWidth() / 2, y, { align: 'center' });
+            y += lineHeight * 1.5;
+
+            // --- 4. Fecha de Emisión ---
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'normal');
+            doc.text(f_emision, doc.internal.pageSize.getWidth() - margin, y, { align: 'right' });
+            y += lineHeight * 2;
+            
+            // --- 5. Saludo ---
+            doc.text("A quien corresponda:", margin, y);
+            y += lineHeight * 1.5;
+            
+            // --- 6. Primer Párrafo (Presentación) ---
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'normal');
+            const presentacion = `Por medio de la presente, me permito recomendar ampliamente al Sr. ${nombreEmpleado} quien se desempeñó como ${puesto} en ${empresa} desde el ${f_inicio} hasta el ${f_fin}.`;
+            let splitText = doc.splitTextToSize(presentacion, 170);
+            doc.text(splitText, margin, y);
+            y += splitText.length * lineHeight + lineHeight;
+
+            // --- 7. Párrafo de Personalidad ---
+            splitText = doc.splitTextToSize(personalidad, 170);
+            doc.text(splitText, margin, y);
+            y += splitText.length * lineHeight + lineHeight;
+            
+            // --- 8. Título de Tareas ---
+            doc.setFont(undefined, 'bold');
+            doc.text("Sus principales tareas incluyeron:", margin, y);
+            y += lineHeight;
+
+            // --- 9. Tareas (Lista de puntos) ---
+            doc.setFont(undefined, 'normal');
+            const listaTareas = tareas.split('\n').filter(t => t.trim() !== '');
+            listaTareas.forEach(tarea => {
+                const tareaFormato = `• ${tarea.trim()}`;
+                // Ajuste para la viñeta
+                splitText = doc.splitTextToSize(tareaFormato, 160); 
+                doc.text(splitText, margin + 5, y);
+                y += splitText.length * lineHeight;
+            });
+            y += lineHeight;
+
+            // --- 10. Párrafo de Recomendación y Cierre ---
+            splitText = doc.splitTextToSize(cierre, 170);
+            doc.text(splitText, margin, y);
+            y += splitText.length * lineHeight * 2;
+
+            // --- 11. Despedida ---
+            doc.text("Atentamente,", margin, y);
+            y += lineHeight * 2;
+
+            // --- 12. Firma (Si existe) ---
+            if (firmaBase64) {
+                // Posición al centro: X = (Ancho de la página / 2) - (Ancho de la imagen / 2)
+                const imgWidth = 50; 
+                const xFirma = (doc.internal.pageSize.getWidth() / 2) - (imgWidth / 2);
+                doc.addImage(firmaBase64, 'PNG', xFirma, y, imgWidth, 20);
+                y += 25; 
+            } else {
+                 y += 20; // Espacio para la firma
+            }
+
+            // --- 13. Datos del Firmante ---
+            doc.setFont(undefined, 'bold');
+            doc.text(nombreFirmante, doc.internal.pageSize.getWidth() / 2, y, { align: 'center' });
+            y += lineHeight;
+            doc.setFont(undefined, 'normal');
+            doc.text(cargoFirmante, doc.internal.pageSize.getWidth() / 2, y, { align: 'center' });
+            y += lineHeight;
+            doc.text(telefonoFirmante, doc.internal.pageSize.getWidth() / 2, y, { align: 'center' });
+
+
+            // --- 14. Descarga del PDF ---
+            doc.save(`Carta_Recomendacion_${nombreEmpleado.replace(/\s/g, '_')}.pdf`);
+        }
+    </script>
+</body>
+</html>
