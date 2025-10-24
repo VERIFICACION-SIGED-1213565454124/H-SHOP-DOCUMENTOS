@@ -8,7 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <style>
-        /* Estilos de la página */
+        /* Estilos de la página (Sin cambios) */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 850px; margin: 0 auto; padding: 25px; background-color: #f4f4f9; }
         h1 { color: #2c3e50; text-align: center; margin-bottom: 25px; }
         .input-group { background-color: #ffffff; padding: 20px; margin-bottom: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
@@ -56,30 +56,30 @@
     <div class="input-group">
         <h2>👤 Datos del Empleado</h2>
         <label for="fechaEmision">Fecha de Emisión de la Carta (Hoy):</label>
-        <input type="date" id="fechaEmision" value="2025-10-24">
+        <input type="date" id="fechaEmision" value="2025-10-23">
         
         <label for="nombreEmpleado">Nombre Completo del Empleado:</label>
-        <input type="text" id="nombreEmpleado" value="Antonio Galván Guardado">
+        <input type="text" id="nombreEmpleado" value="JAIME LEONARDO GARCIA MENDEZ">
 
         <label for="puestoDesempenado">Puesto Desempeñado:</label>
-        <input type="text" id="puestoDesempenado" value="Ayudante General">
+        <input type="text" id="puestoDesempenado" value="ANALISTA DE MANTENIMIENTO">
         
         <div class="date-container">
             <div>
                 <label for="fechaInicio">Fecha de Inicio Laboral:</label>
-                <input type="date" id="fechaInicio" value="2024-08-10">
+                <input type="date" id="fechaInicio" value="2024-09-08">
             </div>
             <div>
                 <label for="fechaFin">Fecha de Término Laboral:</label>
-                <input type="date" id="fechaFin" value="2025-09-12">
+                <input type="date" id="fechaFin" value="2025-11-09">
             </div>
         </div>
     </div>
 
     <div class="input-group">
         <h2>📝 Contenido de la Carta</h2>
-        <label for="nombreEmpresa">Nombre de la Empresa Constructora (Encabezado y Firma):</label>
-        <input type="text" id="nombreEmpresa" value="GRUPO VELAS CONSTRUCTORA">
+        <label for="nombreEmpresa">Nombre de la Empresa (Encabezado y Cuerpo):</label>
+        <input type="text" id="nombreEmpresa" value="LARMEX">
         
         <label for="cuerpoPersonalidad">Párrafo de Personalidad y Habilidades (Use **[nombre]** para el nombre del empleado):</label>
         <textarea id="cuerpoPersonalidad">Durante el tiempo que trabajó con nosotros, [nombre] demostró ser una persona responsable, proactiva y comprometida con su trabajo. Su disposición para aprender y colaborar fue excelente, adaptándose de forma eficaz a las exigencias de los diferentes proyectos. Su desempeño siempre fue satisfactorio y su actitud de trabajo en equipo fue un gran aporte.</textarea>
@@ -99,7 +99,7 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
     <div class="input-group">
         <h2>✍️ Datos del Firmante</h2>
         <label for="nombreFirmante">Nombre Completo del Firmante:</label>
-        <input type="text" id="nombreFirmante" value="[Nombre del Director/Gerente]">
+        <input type="text" id="nombreFirmante" value="JOSE GARCIA CHAIDEZ">
 
         <label for="cargoFirmante">Cargo del Firmante:</label>
         <input type="text" id="cargoFirmante" value="Director de Recursos Humanos">
@@ -129,21 +129,24 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             const margin = 20;
             let y = 10;
             const lineHeight = 6;
-            
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const textWidth = 170; // Ancho máximo del texto
+
             // --- 1. Recolección de Datos ---
             const fechaEmision = document.getElementById('fechaEmision').value;
-            const nombreEmpleado = document.getElementById('nombreEmpleado').value;
-            const primerNombreEmpleado = nombreEmpleado.split(' ')[0]; // Para reemplazar en los textos
-            const puesto = document.getElementById('puestoDesempenado').value;
+            const nombreEmpleado = document.getElementById('nombreEmpleado').value.toUpperCase();
+            const primerNombreEmpleado = nombreEmpleado.split(' ')[0]; 
+            const puesto = document.getElementById('puestoDesempenado').value.toUpperCase();
             const inicio = document.getElementById('fechaInicio').value;
             const fin = document.getElementById('fechaFin').value;
             const empresa = document.getElementById('nombreEmpresa').value.toUpperCase();
             
+            // Reemplazo de marcadores de posición y obtención de textos
             const personalidad = document.getElementById('cuerpoPersonalidad').value.replace(/\[nombre\]/g, primerNombreEmpleado);
             const tareas = document.getElementById('tareas').value.trim();
             const cierre = document.getElementById('cuerpoCierre').value.replace(/\[nombre\]/g, primerNombreEmpleado);
             
-            const nombreFirmante = document.getElementById('nombreFirmante').value;
+            const nombreFirmante = document.getElementById('nombreFirmante').value.toUpperCase();
             const cargoFirmante = document.getElementById('cargoFirmante').value;
             const telefonoFirmante = document.getElementById('telefonoFirmante').value;
             
@@ -161,25 +164,24 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             const f_inicio = new Date(inicio).toLocaleDateString('es-ES');
             const f_fin = new Date(fin).toLocaleDateString('es-ES');
 
-
-            // --- 2. Inserción del Logo (Superior Izquierda, como en tu ejemplo) ---
+            // --- 2. Inserción del Logo (Superior Izquierda) ---
             if (logoBase64) {
                 // Posición (x=20mm, y=10mm) y tamaño (width=50mm, height=20mm)
                 doc.addImage(logoBase64, 'PNG', margin, y, 50, 20); 
                 y += 15; 
             }
-            y = Math.max(y, 35); // Asegura que el contenido comience al menos después del espacio del logo
+            y = Math.max(y, 35);
 
             // --- 3. Encabezado de la Empresa ---
             doc.setFontSize(14);
             doc.setFont(undefined, 'bold');
-            doc.text(empresa, doc.internal.pageSize.getWidth() / 2, y, { align: 'center' });
+            doc.text(empresa, pageWidth / 2, y, { align: 'center' });
             y += lineHeight * 1.5;
 
             // --- 4. Fecha de Emisión ---
             doc.setFontSize(11);
             doc.setFont(undefined, 'normal');
-            doc.text(f_emision, doc.internal.pageSize.getWidth() - margin, y, { align: 'right' });
+            doc.text(f_emision, pageWidth - margin, y, { align: 'right' });
             y += lineHeight * 2;
             
             // --- 5. Saludo ---
@@ -190,13 +192,15 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             doc.setFontSize(11);
             doc.setFont(undefined, 'normal');
             const presentacion = `Por medio de la presente, me permito recomendar ampliamente al Sr. ${nombreEmpleado} quien se desempeñó como ${puesto} en ${empresa} desde el ${f_inicio} hasta el ${f_fin}.`;
-            let splitText = doc.splitTextToSize(presentacion, 170);
-            doc.text(splitText, margin, y);
+            let splitText = doc.splitTextToSize(presentacion, textWidth);
+            // **Alineación Justificada**
+            doc.text(splitText, margin, y, { align: 'justify' });
             y += splitText.length * lineHeight + lineHeight;
 
             // --- 7. Párrafo de Personalidad ---
-            splitText = doc.splitTextToSize(personalidad, 170);
-            doc.text(splitText, margin, y);
+            splitText = doc.splitTextToSize(personalidad, textWidth);
+            // **Alineación Justificada**
+            doc.text(splitText, margin, y, { align: 'justify' });
             y += splitText.length * lineHeight + lineHeight;
             
             // --- 8. Título de Tareas ---
@@ -210,40 +214,41 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             listaTareas.forEach(tarea => {
                 const tareaFormato = `• ${tarea.trim()}`;
                 // Ajuste para la viñeta
-                splitText = doc.splitTextToSize(tareaFormato, 160); 
-                doc.text(splitText, margin + 5, y);
+                splitText = doc.splitTextToSize(tareaFormato, textWidth - 10); 
+                doc.text(splitText, margin + 5, y, { align: 'justify' });
                 y += splitText.length * lineHeight;
             });
             y += lineHeight;
 
             // --- 10. Párrafo de Recomendación y Cierre ---
-            splitText = doc.splitTextToSize(cierre, 170);
-            doc.text(splitText, margin, y);
+            splitText = doc.splitTextToSize(cierre, textWidth);
+            // **Alineación Justificada**
+            doc.text(splitText, margin, y, { align: 'justify' });
             y += splitText.length * lineHeight * 2;
 
-            // --- 11. Despedida ---
-            doc.text("Atentamente,", margin, y);
+            // --- 11. Despedida (Alineado al Centro) ---
+            doc.text("Atentamente,", pageWidth / 2, y, { align: 'center' });
             y += lineHeight * 2;
 
-            // --- 12. Firma (Si existe) ---
+            // --- 12. Firma (Alineado al Centro) ---
             if (firmaBase64) {
-                // Posición al centro: X = (Ancho de la página / 2) - (Ancho de la imagen / 2)
+                // X = (Ancho de la página / 2) - (Ancho de la imagen / 2)
                 const imgWidth = 50; 
-                const xFirma = (doc.internal.pageSize.getWidth() / 2) - (imgWidth / 2);
+                const xFirma = (pageWidth / 2) - (imgWidth / 2);
                 doc.addImage(firmaBase64, 'PNG', xFirma, y, imgWidth, 20);
                 y += 25; 
             } else {
                  y += 20; // Espacio para la firma
             }
 
-            // --- 13. Datos del Firmante ---
+            // --- 13. Datos del Firmante (Alineado al Centro) ---
             doc.setFont(undefined, 'bold');
-            doc.text(nombreFirmante, doc.internal.pageSize.getWidth() / 2, y, { align: 'center' });
+            doc.text(nombreFirmante, pageWidth / 2, y, { align: 'center' });
             y += lineHeight;
             doc.setFont(undefined, 'normal');
-            doc.text(cargoFirmante, doc.internal.pageSize.getWidth() / 2, y, { align: 'center' });
+            doc.text(cargoFirmante, pageWidth / 2, y, { align: 'center' });
             y += lineHeight;
-            doc.text(telefonoFirmante, doc.internal.pageSize.getWidth() / 2, y, { align: 'center' });
+            doc.text(telefonoFirmante, pageWidth / 2, y, { align: 'center' });
 
 
             // --- 14. Descarga del PDF ---
