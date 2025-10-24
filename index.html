@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador de Cartas de Recomendación</title>
+    <title>Generador de Cartas de Recomendación - Autorización</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
@@ -14,7 +14,7 @@
         .input-group, .form-section { background-color: #ffffff; padding: 20px; margin-bottom: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
         h2 { color: #34495e; border-bottom: 2px solid #3498db; padding-bottom: 5px; margin-bottom: 15px; }
         label { display: block; margin-top: 10px; font-weight: bold; color: #555; }
-        input[type="text"], input[type="date"], textarea, input[type="file"] {
+        input[type="text"], input[type="date"], textarea, input[type="file"], input[type="password"] {
             width: 100%;
             padding: 10px;
             margin-top: 5px;
@@ -50,9 +50,14 @@
             margin-bottom: 15px;
             font-size: 1.2em;
         }
-        #main-menu .btn-menu:hover {
-            background-color: #2980b9;
+        #main-menu .btn-menu:hover { background-color: #2980b9; }
+
+        .btn-admin { /* Botón de Admin */
+            background-color: #27ae60;
+            margin-top: 25px !important;
         }
+        .btn-admin:hover { background-color: #229954; }
+        
         .back-button {
             background-color: #95a5a6; 
             width: auto;
@@ -60,6 +65,26 @@
             font-size: 1em;
         }
         .back-button:hover { background-color: #7f8c8d; }
+
+        /* Estilos del panel de admin */
+        #pending-requests-list { 
+            border: 1px solid #ddd; 
+            padding: 15px; 
+            background-color: #ecf0f1;
+        }
+        .request-item {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .request-item button {
+            width: auto;
+            padding: 8px 15px;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
 
         /* Ocultar secciones de formulario al inicio */
         .form-section { display: none; }
@@ -73,6 +98,55 @@
         <h2>Seleccione el tipo de carta que desea generar:</h2>
         <button class="btn-menu" onclick="showForm('laboral')">Carta de Recomendación LABORAL</button>
         <button class="btn-menu" onclick="showForm('personal')">Carta de Recomendación PERSONAL</button>
+        <hr>
+        <button class="btn-menu btn-admin" onclick="showForm('admin_login')">Acceso del Administrador (Autorización)</button>
+    </div>
+
+    <div id="admin-login" class="form-section">
+        <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+        <h2>🔒 Acceso del Administrador</h2>
+        <p>Esta sección **simula** el inicio de sesión. Usa las credenciales por defecto para probar el panel de control.</p>
+        
+        <div class="input-group">
+            <label for="adminUser">Usuario (Ej: admin):</label>
+            <input type="text" id="adminUser" value="admin">
+
+            <label for="adminPass">Contraseña (Ej: 1234):</label>
+            <input type="password" id="adminPass" value="1234">
+            
+            <button class="btn-action" style="background-color: #2c3e50;" onclick="authenticateAdmin()">Iniciar Sesión</button>
+        </div>
+    </div>
+
+    <div id="admin-dashboard" class="form-section">
+        <button class="back-button" onclick="showForm('menu')">← Cerrar Sesión</button>
+        <h2>⚙️ Panel de Solicitudes Pendientes</h2>
+        <p>⚠️ **NOTA IMPORTANTE:** Este panel es una **simulación** ya que no hay servidor. El "botón de Autorización" abrirá el cliente de correo para que envíes la carta, simulando la acción de un solo clic.</p>
+
+        <h3>Solicitudes Recibidas (Simulación)</h3>
+        <div id="pending-requests-list" class="input-group">
+            <p><strong>En un sistema real, aquí aparecerían las solicitudes de los usuarios que esperan tu aprobación.</strong></p>
+            
+            <div class="request-item">
+                <strong>Carta Laboral - Antonio G.</strong>
+                <p>Solicitante: antonio.g@ejemplo.com</p>
+                <button style="background-color: #27ae60; margin-right: 10px;" 
+                        onclick="authorizeSimulatedRequest('Laboral', 'Antonio Galván Guardado', 'antonio.g@ejemplo.com', 'Por medio de la presente, me permito recomendar ampliamente al Sr. Antonio Galván Guardado quien se desempeñó como Ayudante General en GRUPO VELAS CONSTRUCTORA desde el 10/8/2024 hasta el 12/9/2025.')">
+                    Aprobar y Enviar
+                </button>
+                <button style="background-color: #c0392b;">Rechazar</button>
+            </div>
+            
+            <div class="request-item">
+                <strong>Carta Personal - Juan C.</strong>
+                <p>Solicitante: juan.c@ejemplo.com</p>
+                <button style="background-color: #27ae60; margin-right: 10px;" 
+                        onclick="authorizeSimulatedRequest('Personal', 'Juan Carlos Ramírez Soto', 'juan.c@ejemplo.com', 'Por medio de la presente, yo, MARIA ISABEL LÓPEZ PÉREZ, extiendo esta carta de recomendación personal para Juan Carlos Ramírez Soto, a quien conozco Desde hace 8 años.')">
+                    Aprobar y Enviar
+                </button>
+                <button style="background-color: #c0392b;">Rechazar</button>
+            </div>
+        </div>
     </div>
 
     <div id="form-laboral" class="form-section">
@@ -81,7 +155,9 @@
 
         <div class="input-group">
             <h2>📧 Solicitud de Aprobación</h2>
-            <p>⚠️ **Aviso:** El PDF NO se descargará automáticamente. Al presionar el botón, se enviará una solicitud de correo con los datos al administrador para su aprobación y envío. **¡Asegúrate de llenar tu correo correctamente!**</p>
+            <label for="nombreSolicitanteLaboral">Tu Nombre Completo (Quien Pide la Carta):</label>
+            <input type="text" id="nombreSolicitanteLaboral" value="Nombre del Solicitante">
+            
             <label for="emailSolicitanteLaboral">Tu Correo Electrónico (Donde te enviaremos el PDF aprobado):</label>
             <input type="text" id="emailSolicitanteLaboral" value="solicitante@ejemplo.com">
         </div>
@@ -101,19 +177,19 @@
             <input type="date" id="fechaEmisionLaboral" value="2025-10-24">
             
             <label for="nombreEmpleadoLaboral">Nombre Completo del Empleado:</label>
-            <input type="text" id="nombreEmpleadoLaboral" value="JAIME LEONARDO GARCIA MENDEZ">
+            <input type="text" id="nombreEmpleadoLaboral" value="ANTONIO GALVÁN GUARDADO">
 
             <label for="puestoDesempenadoLaboral">Puesto Desempeñado:</label>
-            <input type="text" id="puestoDesempenadoLaboral" value="ANALISTA DE MANTENIMIENTO">
+            <input type="text" id="puestoDesempenadoLaboral" value="AYUDANTE GENERAL">
             
             <div class="date-container">
                 <div>
                     <label for="fechaInicioLaboral">Fecha de Inicio Laboral:</label>
-                    <input type="date" id="fechaInicioLaboral" value="2024-09-08">
+                    <input type="date" id="fechaInicioLaboral" value="2024-08-10">
                 </div>
                 <div>
                     <label for="fechaFinLaboral">Fecha de Término Laboral:</label>
-                    <input type="date" id="fechaFinLaboral" value="2025-11-09">
+                    <input type="date" id="fechaFinLaboral" value="2025-09-12">
                 </div>
             </div>
         </div>
@@ -121,7 +197,7 @@
         <div class="input-group">
             <h2>📝 Contenido de la Carta</h2>
             <label for="nombreEmpresaLaboral">Nombre de la Empresa:</label>
-            <input type="text" id="nombreEmpresaLaboral" value="LARMEX">
+            <input type="text" id="nombreEmpresaLaboral" value="GRUPO VELAS CONSTRUCTORA">
             
             <label for="cuerpoPersonalidadLaboral">Párrafo de Personalidad y Habilidades:</label>
             <textarea id="cuerpoPersonalidadLaboral">Durante el tiempo que trabajó con nosotros, [nombre] demostró ser una persona responsable, proactiva y comprometida con su trabajo. Su disposición para aprender y colaborar fue excelente, adaptándose de forma eficaz a las exigencias de los diferentes proyectos. Su desempeño siempre fue satisfactorio y su actitud de trabajo en equipo fue un gran aporte.</textarea>
@@ -159,7 +235,9 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
 
         <div class="input-group">
             <h2>📧 Solicitud de Aprobación</h2>
-            <p>⚠️ **Aviso:** El PDF NO se descargará automáticamente. Al presionar el botón, se enviará una solicitud de correo con los datos al administrador para su aprobación y envío.</p>
+            <label for="nombreSolicitantePersonal">Tu Nombre Completo (Quien Pide la Carta):</label>
+            <input type="text" id="nombreSolicitantePersonal" value="Nombre del Solicitante">
+
             <label for="emailSolicitantePersonal">Tu Correo Electrónico (Donde te enviaremos el PDF aprobado):</label>
             <input type="text" id="emailSolicitantePersonal" value="solicitante@ejemplo.com">
         </div>
@@ -188,7 +266,7 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
         <div class="input-group">
             <h2>📝 Contenido de la Carta</h2>
             
-            <label for="cuerpoPersonalidadPersonal">Párrafo de Cualidades y Personalidad (Use **[nombre]** para la persona recomendada):</label>
+            <label for="cuerpoPersonalidadPersonal">Párrafo de Cualidades y Personalidad:</label>
             <textarea id="cuerpoPersonalidadPersonal">Conozco a [nombre] desde hace 8 años en un contexto social y comunitario. Siempre ha demostrado ser una persona de gran integridad, honesta y de palabra. Destaca por su madurez, su compromiso en las actividades que realiza y su excelente trato interpersonal. Es alguien en quien se puede confiar plenamente.</textarea>
             
             <label for="cuerpoRecomendacionPersonal">Párrafo de Recomendación y Cierre:</label>
@@ -203,13 +281,14 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
     <script>
         const { jsPDF } = window.jspdf;
 
-        // --- FUNCIONES AUXILIARES ---
+        // --- FUNCIONES DE NAVEGACIÓN Y AUTENTICACIÓN SIMULADA ---
 
-        // Función de Navegación: Muestra el formulario seleccionado y oculta los demás
         function showForm(formId) {
             document.getElementById('main-menu').style.display = 'none';
             document.getElementById('form-laboral').style.display = 'none';
             document.getElementById('form-personal').style.display = 'none';
+            document.getElementById('admin-login').style.display = 'none';
+            document.getElementById('admin-dashboard').style.display = 'none';
 
             if (formId === 'menu') {
                 document.getElementById('main-menu').style.display = 'block';
@@ -217,11 +296,55 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
                 document.getElementById('form-laboral').style.display = 'block';
             } else if (formId === 'personal') {
                 document.getElementById('form-personal').style.display = 'block';
+            } else if (formId === 'admin_login') {
+                document.getElementById('admin-login').style.display = 'block';
+            } else if (formId === 'admin_dashboard') {
+                document.getElementById('admin-dashboard').style.display = 'block';
             }
-            window.scrollTo(0, 0); // Vuelve al inicio de la página
+            window.scrollTo(0, 0);
         }
         
-        // **FUNCIÓN CLAVE: Justificación manual**
+        function authenticateAdmin() {
+            const user = document.getElementById('adminUser').value;
+            const pass = document.getElementById('adminPass').value;
+            
+            // Credenciales SIMULADAS
+            if (user === 'admin' && pass === '1234') {
+                alert("¡Bienvenido, Administrador! Accediendo al Panel de Control.");
+                showForm('admin_dashboard');
+            } else {
+                alert("Usuario o Contraseña incorrectos. Inténtalo de nuevo.");
+            }
+        }
+
+        // --- FUNCIÓN PARA AUTORIZACIÓN SIMULADA (UN SOLO CLIC) ---
+        function authorizeSimulatedRequest(tipoCarta, nombreEmpleado, emailSolicitante, contenidoBase) {
+            // Este es el "un solo clic" del administrador.
+            // Genera una ventana de correo pre-rellenada para ENVIAR la carta al solicitante.
+            
+            const asunto = encodeURIComponent(`CARTA APROBADA: ${tipoCarta} para ${nombreEmpleado}`);
+            const cuerpo = `Hola ${emailSolicitante.split('@')[0]},
+            
+La Carta de Recomendación (${tipoCarta}) para ${nombreEmpleado} ha sido **APROBADA**.
+
+Adjunto a este correo, encontrarás el archivo PDF para su uso.
+
+--- (Cuerpo base para referencia) ---
+${contenidoBase}`;
+
+            const fileName = `Carta_Recomendacion_${nombreEmpleado.replace(/\s/g, '_')}_${tipoCarta}.pdf`;
+            
+            // Advertencia: Aquí NO se adjunta el PDF, solo se indica el proceso simulado.
+            // En un sistema real, un servidor haría el adjunto y el envío sin la ventana mailto.
+            const mailtoLink = `mailto:${emailSolicitante}?subject=${asunto}&body=${encodeURIComponent(cuerpo)}`;
+
+            window.location.href = mailtoLink;
+            alert(`Simulación de envío de aprobación exitosa para ${nombreEmpleado}. Se abrió el cliente de correo para que envíes el PDF FINAL al solicitante. En un sistema real, el servidor haría esto automáticamente.`);
+        }
+
+
+        // --- FUNCIONES AUXILIARES DE GENERACIÓN Y SOLICITUD ---
+
         function drawJustifiedText(doc, text, x, y, maxWidth, lineHeight) {
             let currentY = y;
             const splitText = doc.splitTextToSize(text, maxWidth);
@@ -237,7 +360,6 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             return currentY; 
         }
         
-        // Función auxiliar para convertir archivo de imagen a Base64
         const fileToBase64 = (file) => new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
@@ -245,67 +367,67 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             reader.onerror = error => resolve(null);
         });
 
-        // --- FUNCIÓN PRINCIPAL DE SOLICITUD DE APROBACIÓN ---
         async function solicitarAprobacion(tipoCarta) {
-            let emailSolicitante;
-            let nombreAsunto;
-            let pdfData;
-            let docType;
+            let emailSolicitante, nombreSolicitante, nombreAsunto, pdfData, docType;
 
             // 1. Recolección de datos y generación de PDF base64
             if (tipoCarta === 'laboral') {
                 emailSolicitante = document.getElementById('emailSolicitanteLaboral').value;
+                nombreSolicitante = document.getElementById('nombreSolicitanteLaboral').value;
                 nombreAsunto = document.getElementById('nombreEmpleadoLaboral').value.toUpperCase();
                 pdfData = await generarPDFLaboral(false);
                 docType = "Laboral";
             } else if (tipoCarta === 'personal') {
                 emailSolicitante = document.getElementById('emailSolicitantePersonal').value;
+                nombreSolicitante = document.getElementById('nombreSolicitantePersonal').value;
                 nombreAsunto = document.getElementById('nombreRecomendadoPersonal').value.toUpperCase();
                 pdfData = await generarPDFPersonal(false);
                 docType = "Personal";
             }
 
             if (!pdfData) {
-                alert(`Error al generar el contenido de la Carta ${docType}. Por favor, revisa que todos los campos estén llenos y los archivos de imagen sean válidos.`);
+                alert(`Error al generar el contenido de la Carta ${docType}. Revisa campos y archivos de imagen.`);
                 return;
             }
 
-            // 2. Preparar el correo (mailto)
-            // *** IMPORTANTE: CAMBIA ESTE CORREO POR EL TUYO ***
-            const correoAdministrador = "tucorreo@tuempresa.com"; 
-            const asunto = encodeURIComponent(`SOLICITUD DE APROBACIÓN (${docType}): Carta para ${nombreAsunto}`);
+            // 2. Preparar el correo (mailto) para ti (el administrador)
+            // *** REEMPLAZA ESTE CORREO CON EL TUYO REAL ***
+            const correoAdministrador = "tu.correo.de.administrador@ejemplo.com"; 
+            const asunto = encodeURIComponent(`NUEVA SOLICITUD DE APROBACIÓN (${docType}): Carta para ${nombreAsunto}`);
 
             const cuerpo = `Hola Administrador,
             
-Se ha generado una solicitud de Carta de Recomendación ${docType} para: ${nombreAsunto}.
-
-- Tipo de Carta: ${docType}
+Hay una nueva solicitud pendiente de revisión y aprobación.
+            
+- Solicitante (Quien pide la carta): ${nombreSolicitante}
 - Correo del Solicitante (para reenvío): ${emailSolicitante}
+- Tipo de Carta: ${docType}
+- Destinatario de la Carta: ${nombreAsunto}
 
-El archivo PDF generado está incluido en el enlace mailto (sujeto a límites de tamaño de tu cliente de correo).
+--- INSTRUCCIONES PARA APROBAR MANUALMENTE ---
+1. Revisa el archivo PDF adjunto (en Base64).
+2. Para aprobar con un solo clic (simulación), usa el Panel de Administrador.
 
---- INSTRUCCIONES PARA TI ---
-1. Revisa el archivo PDF adjunto (o el archivo base64 si tu cliente de correo no lo maneja).
-2. Si apruebas la solicitud, reenvía el PDF original al solicitante: ${emailSolicitante}.`;
+Base64 del PDF (para uso en Panel de Control):
+${pdfData}`;
             
-            const fileName = `Carta_Recomendacion_${nombreAsunto.replace(/\s/g, '_')}_${docType}.pdf`;
-            const mailtoLink = `mailto:${correoAdministrador}?subject=${asunto}&body=${encodeURIComponent(cuerpo)}&attachment=${encodeURIComponent(fileName)};base64,${pdfData}`;
+            const fileName = `Solicitud_${nombreAsunto.replace(/\s/g, '_')}_${docType}.txt`;
+            const mailtoLink = `mailto:${correoAdministrador}?subject=${asunto}&body=${encodeURIComponent(cuerpo)}`;
             
-            // 3. Crear el enlace mailto y alertar sobre el límite de tamaño
+            // 3. Crear el enlace mailto
             if (mailtoLink.length > 2000) {
-                 alert(`Advertencia: El tamaño de los datos es muy grande para enviarse por mailto. La solicitud se enviará sin el adjunto. Por favor, revisa la Consola (F12) para obtener los datos de la carta en base64 para envío manual.`);
-                 console.log(`Base64 del PDF (para envío manual de ${fileName}): ${pdfData}`);
-                 // Abrimos un correo simple sin adjunto para notificar.
-                 window.location.href = `mailto:${correoAdministrador}?subject=${asunto}&body=${encodeURIComponent(`Solicitud de ${nombreAsunto}. Por favor, consulta la consola del navegador del solicitante para obtener los datos base64 y generar la carta.`)}`;
+                 alert(`Advertencia: La solicitud se enviará sin el adjunto por el límite de caracteres de tu cliente de correo. El Base64 completo está en el cuerpo del correo. Revisa la Consola (F12) si no aparece el cuerpo.`);
+                 window.location.href = `mailto:${correoAdministrador}?subject=${asunto}&body=${encodeURIComponent(`Solicitud de ${nombreAsunto}. El Base64 del PDF se adjunta en el cuerpo del correo para su revisión. Correo del Solicitante: ${emailSolicitante}`)}`;
             } else {
                  window.location.href = mailtoLink;
             }
 
-            alert(`Solicitud enviada a ${correoAdministrador}. Por favor, revisa tu cliente de correo para completar el envío.`);
+            alert(`Solicitud enviada a ${correoAdministrador}. Revisa tu correo.`);
         }
 
 
-        // --- FUNCIÓN DE GENERACIÓN PDF LABORAL (ADAPTADA) ---
+        // --- FUNCIONES DE GENERACIÓN PDF (Se mantienen las correcciones de justificación) ---
+
         async function generarPDFLaboral(descargar = true) {
             const doc = new jsPDF('p', 'mm', 'a4');
             const margin = 20;
@@ -409,12 +531,10 @@ El archivo PDF generado está incluido en el enlace mailto (sujeto a límites de
             }
         }
 
-
-        // --- FUNCIÓN DE GENERACIÓN PDF PERSONAL (NUEVA) ---
         async function generarPDFPersonal(descargar = true) {
             const doc = new jsPDF('p', 'mm', 'a4');
             const margin = 20;
-            let y = 30; // Empieza más abajo por ser personal
+            let y = 30;
             const lineHeight = 6;
             const pageWidth = doc.internal.pageSize.getWidth();
             const textWidth = 170; 
@@ -482,8 +602,6 @@ El archivo PDF generado está incluido en el enlace mailto (sujeto a límites de
             }
         }
 
-
-        // Muestra el menú al cargar la página
         window.onload = function() {
             showForm('menu');
         };
