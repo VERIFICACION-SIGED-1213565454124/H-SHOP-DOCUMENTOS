@@ -91,170 +91,183 @@
         #btn-go-admin:hover {
             background-color: #1f2a36;
         }
+        
+        /* Estilo para la página de descarga */
+        .download-page {
+            text-align: center; 
+            padding: 50px; 
+            background-color: #fff; 
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body>
 
     <h1>📝 Generador de Cartas de Recomendación</h1>
     
-    <div id="main-menu">
-        <h2>Seleccione el tipo de carta que desea generar:</h2>
-        <button class="btn-menu" onclick="showForm('laboral')">Carta de Recomendación LABORAL</button>
-        <button class="btn-menu" onclick="showForm('personal')">Carta de Recomendación PERSONAL</button>
-        
-        <button id="btn-go-admin" onclick="showForm('admin_login')">Acceso de Administrador</button>
-    </div>
-
-    <div id="admin-login" class="form-section">
-        <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
-        <h2>🔒 Acceso del Administrador</h2>
-        <p>Ingrese sus credenciales para autorizar las solicitudes.</p>
-        
-        <div class="input-group">
-            <label for="adminUser">Usuario:</label>
-            <input type="text" id="adminUser" placeholder="Ingrese su usuario">
-
-            <label for="adminPass">Contraseña:</label>
-            <input type="password" id="adminPass" placeholder="Ingrese su contraseña">
+    <div id="app-container">
+    
+        <div id="main-menu">
+            <h2>Seleccione el tipo de carta que desea generar:</h2>
+            <button class="btn-menu" onclick="showForm('laboral')">Carta de Recomendación LABORAL</button>
+            <button class="btn-menu" onclick="showForm('personal')">Carta de Recomendación PERSONAL</button>
             
-            <button class="btn-action" style="background-color: #2c3e50;" onclick="authenticateAdmin()">Iniciar Sesión</button>
+            <button id="btn-go-admin" onclick="showForm('admin_login')">Acceso de Administrador</button>
         </div>
-    </div>
 
-    <div id="admin-dashboard" class="form-section">
-        <button class="back-button" onclick="showForm('menu')">← Cerrar Sesión</button>
-        <h2>⚙️ Panel de Autorización de Solicitudes</h2>
-        <p>Clic en **Autorizar** para generar el enlace de descarga único que debe copiar y enviar al cliente.</p>
-
-        <h3>Solicitudes Pendientes:</h3>
-        <div id="pending-requests-list" class="input-group">
-            <p id="no-requests-msg">No hay solicitudes pendientes en el almacenamiento local de este navegador.</p>
-        </div>
-    </div>
-
-    <div id="form-laboral" class="form-section">
-        <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
-        <h2>💼 Formulario de Carta Laboral</h2>
-
-        <div class="input-group">
-            <h2>📝 Datos de la Solicitud</h2>
-            <label for="nombreSolicitanteLaboral">Tu Nombre Completo (Quien Pide la Carta):</label>
-            <input type="text" id="nombreSolicitanteLaboral" value="Nombre del Solicitante">
+        <div id="admin-login" class="form-section">
+            <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <h2>🔒 Acceso del Administrador</h2>
+            <p>Ingrese sus credenciales para autorizar las solicitudes.</p>
             
-            <label for="emailSolicitanteLaboral">Tu Correo Electrónico (Solo para referencia):</label>
-            <input type="text" id="emailSolicitanteLaboral" value="solicitante@ejemplo.com">
-        </div>
-        
-        <div class="input-group">
-            <h2>📂 Logo y Firma</h2>
-            <label for="logoInputLaboral">Insertar Logo de la Empresa:</label>
-            <input type="file" id="logoInputLaboral" accept="image/*">
-            
-            <label for="firmaInputLaboral">Insertar Firma:</label>
-            <input type="file" id="firmaInputLaboral" accept="image/*">
-        </div>
-        <div class="input-group">
-            <h2>👤 Datos del Empleado</h2>
-            <label for="fechaEmisionLaboral">Fecha de Emisión de la Carta:</label>
-            <input type="date" id="fechaEmisionLaboral" value="2025-10-24">
-            
-            <label for="nombreEmpleadoLaboral">Nombre Completo del Empleado:</label>
-            <input type="text" id="nombreEmpleadoLaboral" value="ANTONIO GALVÁN GUARDADO">
+            <div class="input-group">
+                <label for="adminUser">Usuario:</label>
+                <input type="text" id="adminUser" placeholder="Ingrese su usuario">
 
-            <label for="puestoDesempenadoLaboral">Puesto Desempeñado:</label>
-            <input type="text" id="puestoDesempenadoLaboral" value="AYUDANTE GENERAL">
-            
-            <div class="date-container">
-                <div>
-                    <label for="fechaInicioLaboral">Fecha de Inicio Laboral:</label>
-                    <input type="date" id="fechaInicioLaboral" value="2024-08-10">
-                </div>
-                <div>
-                    <label for="fechaFinLaboral">Fecha de Término Laboral:</label>
-                    <input type="date" id="fechaFinLaboral" value="2025-09-12">
-                </div>
+                <label for="adminPass">Contraseña:</label>
+                <input type="password" id="adminPass" placeholder="Ingrese su contraseña">
+                
+                <button class="btn-action" style="background-color: #2c3e50;" onclick="authenticateAdmin()">Iniciar Sesión</button>
             </div>
         </div>
-        <div class="input-group">
-            <h2>📝 Contenido de la Carta</h2>
-            <label for="nombreEmpresaLaboral">Nombre de la Empresa:</label>
-            <input type="text" id="nombreEmpresaLaboral" value="GRUPO VELAS CONSTRUCTORA">
+
+        <div id="admin-dashboard" class="form-section">
+            <button class="back-button" onclick="showForm('menu')">← Cerrar Sesión</button>
+            <h2>⚙️ Panel de Autorización de Solicitudes</h2>
+            <p>Clic en **Autorizar** para generar el enlace de descarga único que debe copiar y enviar al cliente.</p>
+
+            <h3>Solicitudes Pendientes:</h3>
+            <div id="pending-requests-list" class="input-group">
+                <p id="no-requests-msg">No hay solicitudes pendientes en el almacenamiento local de este navegador.</p>
+            </div>
+        </div>
+
+        <div id="form-laboral" class="form-section">
+            <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <h2>💼 Formulario de Carta Laboral</h2>
+
+            <div class="input-group">
+                <h2>📝 Datos de la Solicitud</h2>
+                <label for="nombreSolicitanteLaboral">Tu Nombre Completo (Quien Pide la Carta):</label>
+                <input type="text" id="nombreSolicitanteLaboral" value="Nombre del Solicitante">
+                
+                <label for="emailSolicitanteLaboral">Tu Correo Electrónico (Solo para referencia):</label>
+                <input type="text" id="emailSolicitanteLaboral" value="solicitante@ejemplo.com">
+            </div>
             
-            <label for="cuerpoPersonalidadLaboral">Párrafo de Personalidad y Habilidades:</label>
-            <textarea id="cuerpoPersonalidadLaboral">Durante el tiempo que trabajó con nosotros, [nombre] demostró ser una persona responsable, proactiva y comprometida con su trabajo. Su disposición para aprender y colaborar fue excelente, adaptándose de forma eficaz a las exigencias de los diferentes proyectos. Su desempeño siempre fue satisfactorio y su actitud de trabajo en equipo fue un gran aporte.</textarea>
-            
-            <label for="tareasLaboral">Tareas Principales (una por línea):</label>
-            <textarea id="tareasLaboral">Preparación de materiales: Ayudó a organizar y preparar cemento, mezcla y otros materiales esenciales para las labores de construcción.
+            <div class="input-group">
+                <h2>📂 Logo y Firma</h2>
+                <label for="logoInputLaboral">Insertar Logo de la Empresa:</label>
+                <input type="file" id="logoInputLaboral" accept="image/*">
+                
+                <label for="firmaInputLaboral">Insertar Firma:</label>
+                <input type="file" id="firmaInputLaboral" accept="image/*">
+            </div>
+            <div class="input-group">
+                <h2>👤 Datos del Empleado</h2>
+                <label for="fechaEmisionLaboral">Fecha de Emisión de la Carta:</label>
+                <input type="date" id="fechaEmisionLaboral" value="2025-10-24">
+                
+                <label for="nombreEmpleadoLaboral">Nombre Completo del Empleado:</label>
+                <input type="text" id="nombreEmpleadoLaboral" value="ANTONIO GALVÁN GUARDADO">
+
+                <label for="puestoDesempenadoLaboral">Puesto Desempeñado:</label>
+                <input type="text" id="puestoDesempenadoLaboral" value="AYUDANTE GENERAL">
+                
+                <div class="date-container">
+                    <div>
+                        <label for="fechaInicioLaboral">Fecha de Inicio Laboral:</label>
+                        <input type="date" id="fechaInicioLaboral" value="2024-08-10">
+                    </div>
+                    <div>
+                        <label for="fechaFinLaboral">Fecha de Término Laboral:</label>
+                        <input type="date" id="fechaFinLaboral" value="2025-09-12">
+                    </div>
+                </div>
+            </div>
+            <div class="input-group">
+                <h2>📝 Contenido de la Carta</h2>
+                <label for="nombreEmpresaLaboral">Nombre de la Empresa:</label>
+                <input type="text" id="nombreEmpresaLaboral" value="GRUPO VELAS CONSTRUCTORA">
+                
+                <label for="cuerpoPersonalidadLaboral">Párrafo de Personalidad y Habilidades:</label>
+                <textarea id="cuerpoPersonalidadLaboral">Durante el tiempo que trabajó con nosotros, [nombre] demostró ser una persona responsable, proactiva y comprometida con su trabajo. Su disposición para aprender y colaborar fue excelente, adaptándose de forma eficaz a las exigencias de los diferentes proyectos. Su desempeño siempre fue satisfactorio y su actitud de trabajo en equipo fue un gran aporte.</textarea>
+                
+                <label for="tareasLaboral">Tareas Principales (una por línea):</label>
+                <textarea id="tareasLaboral">Preparación de materiales: Ayudó a organizar y preparar cemento, mezcla y otros materiales esenciales para las labores de construcción.
 Asistencia en albañilería: Apoyó a los maestros de obra en la preparación y colocación de ladrillos, bloques y otros elementos estructurales.
 Mantenimiento del área de trabajo: Colaboró activamente en la limpieza y el orden de la obra, asegurando un ambiente de trabajo seguro y eficiente.
 Traslado de equipo y herramientas: Ayudó a mover y distribuir herramientas y equipo pesado, demostrando fuerza y precaución.</textarea>
-            
-            <label for="cuerpoCierreLaboral">Párrafo de Recomendación y Cierre:</label>
-            <textarea id="cuerpoCierreLaboral">Considero que [nombre] es un empleado valioso, con la capacidad y el deseo de crecer profesionalmente. Recomiendo su contratación para cualquier puesto que se ajuste a su perfil, pues estoy seguro que será un gran activo para cualquier equipo.
+                
+                <label for="cuerpoCierreLaboral">Párrafo de Recomendación y Cierre:</label>
+                <textarea id="cuerpoCierreLaboral">Considero que [nombre] es un empleado valioso, con la capacidad y el deseo de crecer profesionalmente. Recomiendo su contratación para cualquier puesto que se ajuste a su perfil, pues estoy seguro que será un gran activo para cualquier equipo.
 
 Para cualquier duda o aclaración, estoy a su disposición.</textarea>
+            </div>
+            <div class="input-group">
+                <h2>✍️ Datos del Firmante</h2>
+                <label for="nombreFirmanteLaboral">Nombre Completo del Firmante:</label>
+                <input type="text" id="nombreFirmanteLaboral" value="JOSE GARCIA CHAIDEZ">
+
+                <label for="cargoFirmanteLaboral">Cargo del Firmante:</label>
+                <input type="text" id="cargoFirmanteLaboral" value="Director de Recursos Humanos">
+
+                <label for="telefonoFirmanteLaboral">Teléfono de Contacto:</label>
+                <input type="text" id="telefonoFirmanteLaboral" value="T. (442) 880 1675">
+            </div>
+
+            <button class="btn-action" onclick="saveSolicitud('laboral')">💾 Guardar Solicitud (Esperar Aprobación)</button>
         </div>
-        <div class="input-group">
-            <h2>✍️ Datos del Firmante</h2>
-            <label for="nombreFirmanteLaboral">Nombre Completo del Firmante:</label>
-            <input type="text" id="nombreFirmanteLaboral" value="JOSE GARCIA CHAIDEZ">
 
-            <label for="cargoFirmanteLaboral">Cargo del Firmante:</label>
-            <input type="text" id="cargoFirmanteLaboral" value="Director de Recursos Humanos">
+        <div id="form-personal" class="form-section">
+            <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <h2>🏠 Formulario de Carta Personal</h2>
 
-            <label for="telefonoFirmanteLaboral">Teléfono de Contacto:</label>
-            <input type="text" id="telefonoFirmanteLaboral" value="T. (442) 880 1675">
-        </div>
+            <div class="input-group">
+                <h2>📝 Datos de la Solicitud</h2>
+                <label for="nombreSolicitantePersonal">Tu Nombre Completo (Quien Pide la Carta):</label>
+                <input type="text" id="nombreSolicitantePersonal" value="Nombre del Solicitante">
 
-        <button class="btn-action" onclick="saveSolicitud('laboral')">💾 Guardar Solicitud (Esperar Aprobación)</button>
-    </div>
+                <label for="emailSolicitantePersonal">Tu Correo Electrónico (Solo para referencia):</label>
+                <input type="text" id="emailSolicitantePersonal" value="solicitante@ejemplo.com">
+            </div>
+            
+            <div class="input-group">
+                <h2>✍️ Datos del Firmante (Recomendador)</h2>
+                <label for="fechaEmisionPersonal">Fecha de Emisión de la Carta:</label>
+                <input type="date" id="fechaEmisionPersonal" value="2025-10-24">
 
-    <div id="form-personal" class="form-section">
-        <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
-        <h2>🏠 Formulario de Carta Personal</h2>
+                <label for="nombreFirmantePersonal">Nombre Completo del Recomendador:</label>
+                <input type="text" id="nombreFirmantePersonal" value="MARIA ISABEL LÓPEZ PÉREZ">
+                
+                <label for="firmaInputPersonal">Insertar Firma del Recomendador:</label>
+                <input type="file" id="firmaInputPersonal" accept="image/*">
+            </div>
+            <div class="input-group">
+                <h2>👤 Datos de la Persona Recomendada</h2>
+                <label for="nombreRecomendadoPersonal">Nombre Completo de la Persona Recomendada:</label>
+                <input type="text" id="nombreRecomendadoPersonal" value="JUAN CARLOS RAMÍREZ SOTO">
 
-        <div class="input-group">
-            <h2>📝 Datos de la Solicitud</h2>
-            <label for="nombreSolicitantePersonal">Tu Nombre Completo (Quien Pide la Carta):</label>
-            <input type="text" id="nombreSolicitantePersonal" value="Nombre del Solicitante">
+                <label for="tiempoConocidoPersonal">Tiempo que conoce a la persona (Ej: 5 años):</label>
+                <input type="text" id="tiempoConocidoPersonal" value="Desde hace 8 años">
+            </div>
+            <div class="input-group">
+                <h2>📝 Contenido de la Carta</h2>
+                
+                <label for="cuerpoPersonalidadPersonal">Párrafo de Cualidades y Personalidad:</label>
+                <textarea id="cuerpoPersonalidadPersonal">Conozco a [nombre] desde hace 8 años en un contexto social y comunitario. Siempre ha demostrado ser una persona de gran integridad, honesta y de palabra. Destaca por su madurez, su compromiso en las actividades que realiza y su excelente trato interpersonal. Es alguien en quien se puede confiar plenamente.</textarea>
+                
+                <label for="cuerpoRecomendacionPersonal">Párrafo de Recomendación y Cierre:</label>
+                <textarea id="cuerpoRecomendacionPersonal">Recomiendo a [nombre] sin ninguna reserva para cualquier propósito que requiera de una persona con sólidos valores y ética. Estoy seguro/a de que su carácter y responsabilidad serán de gran valor.
 
-            <label for="emailSolicitantePersonal">Tu Correo Electrónico (Solo para referencia):</label>
-            <input type="text" id="emailSolicitantePersonal" value="solicitante@ejemplo.com">
+Para cualquier duda o aclaración, estoy a su disposición.</textarea>
+            </div>
+
+            <button class="btn-action" onclick="saveSolicitud('personal')">💾 Guardar Solicitud (Esperar Aprobación)</button>
         </div>
         
-        <div class="input-group">
-            <h2>✍️ Datos del Firmante (Recomendador)</h2>
-            <label for="fechaEmisionPersonal">Fecha de Emisión de la Carta:</label>
-            <input type="date" id="fechaEmisionPersonal" value="2025-10-24">
-
-            <label for="nombreFirmantePersonal">Nombre Completo del Recomendador:</label>
-            <input type="text" id="nombreFirmantePersonal" value="MARIA ISABEL LÓPEZ PÉREZ">
-            
-            <label for="firmaInputPersonal">Insertar Firma del Recomendador:</label>
-            <input type="file" id="firmaInputPersonal" accept="image/*">
-        </div>
-        <div class="input-group">
-            <h2>👤 Datos de la Persona Recomendada</h2>
-            <label for="nombreRecomendadoPersonal">Nombre Completo de la Persona Recomendada:</label>
-            <input type="text" id="nombreRecomendadoPersonal" value="JUAN CARLOS RAMÍREZ SOTO">
-
-            <label for="tiempoConocidoPersonal">Tiempo que conoce a la persona (Ej: 5 años):</label>
-            <input type="text" id="tiempoConocidoPersonal" value="Desde hace 8 años">
-        </div>
-        <div class="input-group">
-            <h2>📝 Contenido de la Carta</h2>
-            
-            <label for="cuerpoPersonalidadPersonal">Párrafo de Cualidades y Personalidad:</label>
-            <textarea id="cuerpoPersonalidadPersonal">Conozco a [nombre] desde hace 8 años en un contexto social y comunitario. Siempre ha demostrado ser una persona de gran integridad, honesta y de palabra. Destaca por su madurez, su compromiso en las actividades que realiza y su excelente trato interpersonal. Es alguien en quien se puede confiar plenamente.</textarea>
-            
-            <label for="cuerpoRecomendacionPersonal">Párrafo de Recomendación y Cierre:</label>
-            <textarea id="cuerpoRecomendacionPersonal">Recomiendo a [nombre] sin ninguna reserva para cualquier propósito que requiera de una persona con sólidos valores y ética. Estoy seguro/a de que su carácter y responsabilidad serán de gran valor.
-
-Para cualquier duda o aclaración, estoy a su disposición.</textarea>
-        </div>
-
-        <button class="btn-action" onclick="saveSolicitud('personal')">💾 Guardar Solicitud (Esperar Aprobación)</button>
-    </div>
+    </div> <div id="download-message" class="download-page" style="display:none;"></div>
 
 
     <script>
@@ -263,7 +276,6 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
         const APPROVED_KEY = 'approved_requests_list';
 
         // --- CREDENCIALES FIJAS DEL ADMINISTRADOR (SOLO CÓDIGO) ---
-        // IMPORTANTE: NO CAMBIE ESTOS VALORES si ya los tiene memorizados.
         const ADMIN_USER = 'trollgaga999@gmail.com';
         const ADMIN_PASS = 'Johan207';
 
@@ -285,18 +297,22 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
                 const requestId = params.get('id');
                 if (requestId) {
                     forceClientDownload(requestId);
-                } else {
-                    showView('menu');
+                    return; // Detener la ejecución para mantener la pantalla de descarga
                 }
-            } else if (hash === 'admin_dashboard') {
-                // Si el hash es admin_dashboard, mostrar el panel (asumiendo que viene del login)
-                showView('admin_dashboard');
+            } 
+            
+            // Ocultar el contenedor de mensajes de descarga
+            document.getElementById('download-message').style.display = 'none';
+            // Mostrar el contenedor principal
+            document.getElementById('app-container').style.display = 'block';
+
+            if (hash === 'admin_dashboard') {
+                showForm('admin_dashboard');
             } else if (hash === 'admin_login') {
-                // Si el hash es admin_login, mostrar el login
-                 showView('admin_login');
+                 showForm('admin_login');
             } else {
                 // Por defecto, o si es #cliente, mostrar el menú
-                showView('menu');
+                showForm('menu');
             }
         }
 
@@ -314,6 +330,8 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
                 window.location.hash = '';
             } else if (viewId === 'admin_login') {
                 window.location.hash = 'admin_login';
+            } else if (viewId === 'admin_dashboard') {
+                 window.location.hash = 'admin_dashboard';
             }
             
             // Mapeo simple de IDs para simplificar el llamado: showForm('menu') -> #main-menu
@@ -344,7 +362,6 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             
             if (user === ADMIN_USER && pass === ADMIN_PASS) {
                 alert("¡Bienvenido, Administrador! Accediendo al Panel de Autorización.");
-                window.location.hash = 'admin_dashboard'; 
                 showForm('admin_dashboard');
             } else {
                 alert("Usuario o Contraseña incorrectos. Inténtalo de nuevo.");
@@ -464,7 +481,7 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             itemElement.innerHTML = `
                 <div class="request-info">
                     <strong>¡AUTORIZADA! Carta para ${request.name}</strong>
-                    <p>Envíe el siguiente enlace al solicitante:</p>
+                    <p>Envíe el siguiente enlace al solicitante. **La descarga será automática.**</p>
                     <div class="download-link-box">
                        <a href="${downloadUrl}" target="_blank">${downloadUrl}</a>
                        <button onclick="navigator.clipboard.writeText('${downloadUrl}')" style="margin-top:5px; background-color:#2c3e50; padding: 5px 10px; width: auto;">Copiar Enlace</button>
@@ -479,13 +496,18 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             loadPendingRequests();
         }
 
-        // Función que el cliente usa para forzar la descarga
+        // Función que el cliente usa para forzar la descarga (Descarga Inmediata)
         function forceClientDownload(requestId) {
             const approvedRequests = getRequests(APPROVED_KEY);
             const request = approvedRequests.find(req => req.id === requestId);
             
+            // Ocultar la interfaz principal y mostrar solo el mensaje de descarga
+            document.getElementById('app-container').style.display = 'none';
+            const downloadMessageElement = document.getElementById('download-message');
+            downloadMessageElement.style.display = 'block';
+
             if (!request) {
-                document.body.innerHTML = '<h1>Error 404: Enlace de descarga inválido o caducado.</h1><p>Por favor, contacte al administrador.</p>';
+                downloadMessageElement.innerHTML = '<h1>Error 404: Enlace de descarga inválido o caducado.</h1><p>Por favor, contacte al administrador.</p>';
                 return;
             }
 
@@ -493,22 +515,26 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             const name = request.name.toUpperCase().replace(/\s/g, '_');
             const type = request.type.toUpperCase();
 
-            // Forzar la descarga en el navegador del cliente
+            // 1. Forzar la descarga en el navegador del cliente
             const link = document.createElement('a');
             link.href = `data:application/pdf;base64,${pdfBase64}`;
             link.download = `Carta_Aprobada_${name}_${type}.pdf`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-
-            // Mostrar mensaje de éxito
-            document.body.innerHTML = `
-                <div style="text-align:center; padding: 50px;">
+            
+            // 2. Mostrar mensaje de éxito
+            downloadMessageElement.innerHTML = `
+                <div>
                     <h1>✅ Descarga de Carta Exitosa</h1>
-                    <p>Su carta para **${request.name}** ha sido descargada. Por favor, revise su carpeta de descargas.</p>
-                    <p>Puede cerrar esta ventana.</p>
+                    <p>Su carta para **${request.name}** ha sido descargada automáticamente.</p>
+                    <p>Por favor, revise su carpeta de descargas.</p>
+                    <p style="margin-top: 30px;">Puede cerrar esta ventana.</p>
                 </div>
             `;
+            
+            // Opcional: Podríamos eliminar la carta descargada del historial de aprobados para liberar espacio
+            // deleteApprovedRequest(requestId);
         }
 
         function deleteRequest(requestId) {
