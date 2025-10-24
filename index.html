@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador de Cartas - Acceso Único</title>
+    <title>Generador de Cartas - Estatus de Solicitud</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
@@ -92,13 +92,39 @@
             background-color: #1f2a36;
         }
         
-        /* Estilo para la página de descarga */
-        .download-page {
+        /* Estilos de la página de estatus */
+        .status-page {
             text-align: center; 
             padding: 50px; 
             background-color: #fff; 
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .status-page .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .btn-download-now {
+            background-color: #27ae60;
+            margin-top: 20px;
+            width: 50%;
+            margin: 20px auto;
+        }
+        .btn-download-now:hover {
+            background-color: #229954;
         }
     </style>
 </head>
@@ -135,7 +161,7 @@
         <div id="admin-dashboard" class="form-section">
             <button class="back-button" onclick="showForm('menu')">← Cerrar Sesión</button>
             <h2>⚙️ Panel de Autorización de Solicitudes</h2>
-            <p>Clic en **Autorizar** para generar el enlace de descarga único que debe copiar y enviar al cliente.</p>
+            <p>Al autorizar, el cliente verá automáticamente el botón de descarga en su página de espera.</p>
 
             <h3>Solicitudes Pendientes:</h3>
             <div id="pending-requests-list" class="input-group">
@@ -267,51 +293,58 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             <button class="btn-action" onclick="saveSolicitud('personal')">💾 Guardar Solicitud (Esperar Aprobación)</button>
         </div>
         
-    </div> <div id="download-message" class="download-page" style="display:none;"></div>
+    </div> <div id="status-page" class="status-page" style="display:none;"></div>
 
 
     <script>
         const { jsPDF } = window.jspdf;
-        const STORAGE_KEY = 'pending_requests_list';
-        const APPROVED_KEY = 'approved_requests_list';
+        const STORAGE_KEY = 'pending_requests_list'; // Solicitudes que esperan aprobación
+        const APPROVED_KEY = 'approved_requests_list'; // Solicitudes aprobadas
 
-        // --- CREDENCIALES FIJAS DEL ADMINISTRADOR (SOLO CÓDIGO) ---
+        // --- CREDENCIALES FIJAS DEL ADMINISTRADOR ---
         const ADMIN_USER = 'trollgaga999@gmail.com';
         const ADMIN_PASS = 'Johan207';
-
+        
+        let statusCheckInterval = null; // Variable para controlar el intervalo de verificación
 
         // --- MANEJO DE URL Y VISTAS ---
 
-        // Función para obtener la URL base (sin hash)
         function getBaseUrl() {
             return window.location.href.split('#')[0];
         }
 
         // Función inicial para verificar la URL y dirigir al usuario/admin
         function checkURL() {
+            // Limpiar cualquier intervalo de verificación anterior
+            if (statusCheckInterval) {
+                clearInterval(statusCheckInterval);
+                statusCheckInterval = null;
+            }
+            
             const hash = window.location.hash.substring(1); 
             const params = new URLSearchParams(hash.split('?')[1] || '');
-
-            // Si hay un ID de descarga, forzar descarga (vista del cliente)
-            if (hash.startsWith('download')) {
-                const requestId = params.get('id');
-                if (requestId) {
-                    forceClientDownload(requestId);
-                    return; // Detener la ejecución para mantener la pantalla de descarga
-                }
-            } 
+            const requestId = params.get('id');
             
-            // Ocultar el contenedor de mensajes de descarga
-            document.getElementById('download-message').style.display = 'none';
-            // Mostrar el contenedor principal
+            // 1. Manejar la página de estatus/descarga del cliente
+            if (hash.startsWith('status') && requestId) {
+                document.getElementById('app-container').style.display = 'none';
+                document.getElementById('status-page').style.display = 'flex';
+                // Iniciar la verificación automática
+                checkStatus(requestId);
+                statusCheckInterval = setInterval(() => checkStatus(requestId), 5000); // Revisa cada 5 segundos
+                return; 
+            }
+            
+            // Ocultar la página de estatus si no estamos en esa vista
+            document.getElementById('status-page').style.display = 'none';
             document.getElementById('app-container').style.display = 'block';
 
+            // 2. Manejar vistas de la aplicación
             if (hash === 'admin_dashboard') {
                 showForm('admin_dashboard');
             } else if (hash === 'admin_login') {
                  showForm('admin_login');
             } else {
-                // Por defecto, o si es #cliente, mostrar el menú
                 showForm('menu');
             }
         }
@@ -319,22 +352,13 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
         // Función de navegación mejorada
         function showForm(viewId) {
             // Ocultar todas las secciones
-            document.getElementById('main-menu').style.display = 'none';
-            document.getElementById('form-laboral').style.display = 'none';
-            document.getElementById('form-personal').style.display = 'none';
-            document.getElementById('admin-login').style.display = 'none';
-            document.getElementById('admin-dashboard').style.display = 'none';
+            const sections = ['main-menu', 'form-laboral', 'form-personal', 'admin-login', 'admin-dashboard'];
+            sections.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
             
-            // Revertir el hash si se vuelve al menú principal
-            if (viewId === 'menu') {
-                window.location.hash = '';
-            } else if (viewId === 'admin_login') {
-                window.location.hash = 'admin_login';
-            } else if (viewId === 'admin_dashboard') {
-                 window.location.hash = 'admin_dashboard';
-            }
-            
-            // Mapeo simple de IDs para simplificar el llamado: showForm('menu') -> #main-menu
+            // Mapeo simple de IDs
             const idMap = {
                 'menu': 'main-menu',
                 'laboral': 'form-laboral',
@@ -343,7 +367,16 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
                 'admin_dashboard': 'admin-dashboard'
             };
 
-            const viewElement = document.getElementById(idMap[viewId] || viewId);
+            const targetId = idMap[viewId] || viewId;
+            const viewElement = document.getElementById(targetId);
+            
+            // Actualizar hash y mostrar vista
+            if (viewId === 'menu') {
+                window.location.hash = '';
+            } else if (viewId.startsWith('admin')) {
+                 window.location.hash = viewId;
+            }
+            
             if (viewElement) {
                 viewElement.style.display = 'block';
                 if (viewId === 'admin_dashboard') {
@@ -358,7 +391,6 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
         function authenticateAdmin() {
             const user = document.getElementById('adminUser').value;
             const pass = document.getElementById('adminPass').value;
-            
             
             if (user === ADMIN_USER && pass === ADMIN_PASS) {
                 alert("¡Bienvenido, Administrador! Accediendo al Panel de Autorización.");
@@ -395,12 +427,13 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             }
 
             if (!pdfBase64) {
-                alert(`Error al generar la carta ${tipoCarta}. Por favor, revise todos los campos. Revise el tamaño de sus imágenes (logo/firma) si las cargó.`);
+                alert(`Error al generar la carta ${tipoCarta}. Por favor, revise todos los campos.`);
                 return;
             }
 
+            const requestId = Date.now().toString();
             const newRequest = {
-                id: Date.now().toString(),
+                id: requestId,
                 type: tipoCarta,
                 name: nombreAsunto,
                 requesterName: nombreSolicitante,
@@ -412,10 +445,79 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             const requests = getRequests(STORAGE_KEY);
             requests.push(newRequest);
             saveRequests(STORAGE_KEY, requests);
-
-            alert(`Solicitud de Carta ${tipoCarta} para ${nombreAsunto} guardada localmente. Por favor, avise al administrador para que autorice su descarga.`);
-            showForm('menu');
+            
+            // Dirigir al cliente a su página de estatus personal
+            window.location.hash = `status?id=${requestId}`;
         }
+        
+        // --- PÁGINA DE ESPERA DEL CLIENTE ---
+        
+        function checkStatus(requestId) {
+            const approvedRequests = getRequests(APPROVED_KEY);
+            const request = approvedRequests.find(req => req.id === requestId);
+            const statusPage = document.getElementById('status-page');
+            
+            if (!request) {
+                // Estatus: Pendiente (Cargando)
+                statusPage.innerHTML = `
+                    <h2>⏳ Solicitud Enviada - Esperando Autorización</h2>
+                    <div class="spinner"></div>
+                    <p>Su solicitud de carta para **${requestId}** ha sido recibida.</p>
+                    <p>Estamos esperando que el administrador la apruebe.</p>
+                    <p style="font-size: 0.8em; color: #555;">(Esta página se actualizará automáticamente cada 5 segundos)</p>
+                    <p style="margin-top: 20px;">Puede guardar este enlace: <code>${getBaseUrl()}#status?id=${requestId}</code></p>
+                `;
+            } else {
+                // Estatus: Aprobado (Botón de descarga)
+                if (statusCheckInterval) {
+                    clearInterval(statusCheckInterval); // Detener la verificación
+                }
+                
+                statusPage.innerHTML = `
+                    <h2>✅ ¡Solicitud Aprobada!</h2>
+                    <p>El administrador ha autorizado su carta para **${request.name}**.</p>
+                    <button class="btn-action btn-download-now" onclick="triggerDownload('${request.id}')">
+                        Descargar Carta Ahora
+                    </button>
+                    <p style="margin-top: 30px;"><a href="#" onclick="showForm('menu')">← Volver al Menú Principal</a></p>
+                `;
+            }
+        }
+        
+        // Función para forzar la descarga cuando el cliente hace clic en el botón
+        function triggerDownload(requestId) {
+            const approvedRequests = getRequests(APPROVED_KEY);
+            const request = approvedRequests.find(req => req.id === requestId);
+            
+            if (!request) {
+                alert("Error: Archivo no encontrado. Podría haber sido eliminado.");
+                showForm('menu');
+                return;
+            }
+            
+            const pdfBase64 = request.pdfBase64;
+            const name = request.name.toUpperCase().replace(/\s/g, '_');
+            const type = request.type.toUpperCase();
+
+            // Forzar la descarga en el navegador del cliente
+            const link = document.createElement('a');
+            link.href = `data:application/pdf;base64,${pdfBase64}`;
+            link.download = `Carta_Aprobada_${name}_${type}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Mensaje de descarga exitosa
+            const statusPage = document.getElementById('status-page');
+             statusPage.innerHTML = `
+                <div>
+                    <h1>✅ Descarga Exitosa</h1>
+                    <p>Su carta para **${request.name}** ha sido descargada. Por favor, revise su carpeta de descargas.</p>
+                    <p style="margin-top: 30px;"><a href="#" onclick="showForm('menu')">← Volver al Menú Principal</a></p>
+                </div>
+            `;
+        }
+
 
         // --- FUNCIONES DEL ADMINISTRADOR ---
 
@@ -437,18 +539,19 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
                 item.innerHTML = `
                     <div class="request-info">
                         <strong>${req.type === 'laboral' ? 'Carta Laboral' : 'Carta Personal'} - ${req.name}</strong>
-                        <p>Solicitante: ${req.requesterName}</p>
+                        <p>Solicitante: ${req.requesterName} (ID: ${req.id})</p>
+                        <p style="font-size:0.8em;">URL del Cliente: <code style="word-break: break-all;">${getBaseUrl()}#status?id=${req.id}</code></p>
                     </div>
                     <div class="request-actions">
                         <button class="btn-authorize" onclick="authorizeRequest('${req.id}')">Autorizar</button>
-                        <button class="btn-reject" onclick="deleteRequest('${req.id}')">Rechazar</button>
+                        <button class="btn-reject" onclick="deleteRequest('${req.id}', '${STORAGE_KEY}')">Rechazar</button>
                     </div>
                 `;
                 listElement.appendChild(item);
             });
         }
         
-        // FUNCIÓN CLAVE: Autorizar la solicitud y generar el enlace de descarga
+        // FUNCIÓN CLAVE: Autorizar la solicitud
         function authorizeRequest(requestId) {
             let pendingRequests = getRequests(STORAGE_KEY);
             const index = pendingRequests.findIndex(req => req.id === requestId);
@@ -464,7 +567,7 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             // 1. Mover la solicitud de 'pending' a 'approved'
             request.status = 'approved';
             
-            // 2. Guardar la solicitud en la lista de aprobadas (para el enlace de descarga)
+            // 2. Guardar la solicitud en la lista de aprobadas 
             const approvedRequests = getRequests(APPROVED_KEY);
             approvedRequests.push(request);
             saveRequests(APPROVED_KEY, approvedRequests);
@@ -473,93 +576,34 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             pendingRequests.splice(index, 1);
             saveRequests(STORAGE_KEY, pendingRequests);
 
-            // 4. Generar el enlace de descarga único (para enviar al cliente)
-            const baseUrl = getBaseUrl();
-            const downloadUrl = `${baseUrl}#download?id=${request.id}`;
-
-            const itemElement = document.getElementById(`request-${requestId}`);
-            itemElement.innerHTML = `
-                <div class="request-info">
-                    <strong>¡AUTORIZADA! Carta para ${request.name}</strong>
-                    <p>Envíe el siguiente enlace al solicitante. **La descarga será automática.**</p>
-                    <div class="download-link-box">
-                       <a href="${downloadUrl}" target="_blank">${downloadUrl}</a>
-                       <button onclick="navigator.clipboard.writeText('${downloadUrl}')" style="margin-top:5px; background-color:#2c3e50; padding: 5px 10px; width: auto;">Copiar Enlace</button>
-                    </div>
-                </div>
-                <div class="request-actions">
-                    <button class="btn-reject" onclick="deleteApprovedRequest('${requestId}')">Eliminar del Historial</button>
-                </div>
-            `;
-            alert(`¡Solicitud Autorizada! Copie el enlace generado y envíelo a ${request.requesterName}.`);
+            alert(`¡Solicitud Autorizada! El cliente ahora puede descargar el archivo usando el enlace de su página de estatus.`);
             
             loadPendingRequests();
         }
 
-        // Función que el cliente usa para forzar la descarga (Descarga Inmediata)
-        function forceClientDownload(requestId) {
-            const approvedRequests = getRequests(APPROVED_KEY);
-            const request = approvedRequests.find(req => req.id === requestId);
+        // Función para eliminar solicitudes de cualquier lista (Admin usa esta)
+        function deleteRequest(requestId, key) {
+            const confirmMsg = key === STORAGE_KEY 
+                ? "Está seguro de rechazar y eliminar esta solicitud pendiente?"
+                : "Está seguro de eliminar esta solicitud APROBADA del historial? (Ya no podrá ser descargada)";
             
-            // Ocultar la interfaz principal y mostrar solo el mensaje de descarga
-            document.getElementById('app-container').style.display = 'none';
-            const downloadMessageElement = document.getElementById('download-message');
-            downloadMessageElement.style.display = 'block';
-
-            if (!request) {
-                downloadMessageElement.innerHTML = '<h1>Error 404: Enlace de descarga inválido o caducado.</h1><p>Por favor, contacte al administrador.</p>';
-                return;
-            }
-
-            const pdfBase64 = request.pdfBase64;
-            const name = request.name.toUpperCase().replace(/\s/g, '_');
-            const type = request.type.toUpperCase();
-
-            // 1. Forzar la descarga en el navegador del cliente
-            const link = document.createElement('a');
-            link.href = `data:application/pdf;base64,${pdfBase64}`;
-            link.download = `Carta_Aprobada_${name}_${type}.pdf`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            if (!confirm(confirmMsg)) return;
             
-            // 2. Mostrar mensaje de éxito
-            downloadMessageElement.innerHTML = `
-                <div>
-                    <h1>✅ Descarga de Carta Exitosa</h1>
-                    <p>Su carta para **${request.name}** ha sido descargada automáticamente.</p>
-                    <p>Por favor, revise su carpeta de descargas.</p>
-                    <p style="margin-top: 30px;">Puede cerrar esta ventana.</p>
-                </div>
-            `;
-            
-            // Opcional: Podríamos eliminar la carta descargada del historial de aprobados para liberar espacio
-            // deleteApprovedRequest(requestId);
-        }
-
-        function deleteRequest(requestId) {
-            if (!confirm("¿Está seguro de rechazar y eliminar esta solicitud pendiente?")) return;
-            let requests = getRequests(STORAGE_KEY);
+            let requests = getRequests(key);
             const index = requests.findIndex(req => req.id === requestId);
             if (index > -1) {
                 requests.splice(index, 1);
-                saveRequests(STORAGE_KEY, requests);
+                saveRequests(key, requests);
             }
-            loadPendingRequests();
+            // Si eliminamos del historial de aprobados, recargar el panel para que se actualice la vista
+            if (key === APPROVED_KEY) {
+                 loadPendingRequests();
+            } else {
+                 loadPendingRequests();
+            }
         }
         
-        function deleteApprovedRequest(requestId) {
-            if (!confirm("¿Está seguro de eliminar esta solicitud APROBADA del historial? (Ya no podrá ser descargada)")) return;
-            let approved = getRequests(APPROVED_KEY);
-            const index = approved.findIndex(req => req.id === requestId);
-            if (index > -1) {
-                approved.splice(index, 1);
-                saveRequests(APPROVED_KEY, approved);
-            }
-            loadPendingRequests();
-        }
-
-        // --- Funciones Auxiliares PDF ---
+        // --- Funciones Auxiliares PDF (Sin cambios) ---
 
         function drawJustifiedText(doc, text, x, y, maxWidth, lineHeight) { 
             let currentY = y;
@@ -582,8 +626,6 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             reader.onerror = error => resolve(null);
         });
 
-        // Funciones de Generación de PDF (generarPDFLaboral, generarPDFPersonal)
-
         async function generarPDFLaboral(descargar = true) { 
             const doc = new jsPDF('p', 'mm', 'a4');
             const margin = 20;
@@ -601,7 +643,6 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             const empresa = document.getElementById('nombreEmpresaLaboral').value.toUpperCase();
             
             const personalidad = document.getElementById('cuerpoPersonalidadLaboral').value.replace(/\[nombre\]/g, primerNombreEmpleado);
-            const tareas = document.getElementById('tareasLaboral').value.trim();
             const cierre = document.getElementById('cuerpoCierreLaboral').value.replace(/\[nombre\]/g, primerNombreEmpleado);
             
             const nombreFirmante = document.getElementById('nombreFirmanteLaboral').value.toUpperCase();
