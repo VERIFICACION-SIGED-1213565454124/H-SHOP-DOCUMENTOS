@@ -130,10 +130,10 @@
         
         /* Estilo para el nuevo aviso de pago */
         .payment-notice {
-            background-color: #fcebeb;
-            color: #c0392b;
+            background-color: #eaf7ff;
+            color: #2980b9;
             padding: 10px;
-            border: 1px solid #c0392b;
+            border: 1px solid #3498db;
             border-radius: 4px;
             margin-bottom: 15px;
             text-align: center;
@@ -141,7 +141,20 @@
             font-size: 0.95em;
         }
 
-        /* --- Elementos Fijos --- */
+        /* Estilo para el descargo de responsabilidad (Disclaimer) */
+        .disclaimer-notice {
+            background-color: #fcebeb;
+            color: #c0392b;
+            padding: 10px;
+            border: 1px solid #c0392b;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+
+        /* --- Elementos Flotantes (WhatsApp) y Fijos (Aviso de Pago Fijo) --- */
         
         /* Botón Flotante de WhatsApp */
         .whatsapp-float {
@@ -166,12 +179,12 @@
             background-color: #128c7e;
         }
 
-        /* Info Bancaria */
-        .bank-info {
+        /* Aviso de Pago Fijo (reemplaza a bank-info) */
+        .fixed-payment-info {
             position: fixed;
             bottom: 0;
             right: 0; 
-            background-color: #2c3e50;
+            background-color: #34495e;
             color: white;
             padding: 10px 15px;
             border-top-left-radius: 8px;
@@ -180,8 +193,8 @@
             text-align: right;
             max-width: 350px;
         }
-        .bank-info strong { color: #f1c40f; }
-        .bank-info p { margin: 2px 0; }
+        .fixed-payment-info strong { color: #f1c40f; }
+        .fixed-payment-info p { margin: 2px 0; }
 
         /* Estilos del panel de admin (Sin cambios) */
         .request-item {
@@ -214,6 +227,10 @@
 <body>
 
     <h1>📝 Generador de Documentos y Solicitudes</h1>
+    
+    <div class="disclaimer-notice">
+        *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
+    </div>
     
     <div id="app-container">
     
@@ -279,8 +296,11 @@
 
         <div id="form-laboral" class="form-section">
              <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
-             <div class="payment-notice">
-                *UNA VEZ ENVIADO PAGO SE AUTORIZA EL ENVIO DEL DOCUMENTO, TIEMPO DE ESPERA 10-15 MINUTOS*
+             <div class="disclaimer-notice">
+                *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
+            </div>
+            <div class="payment-notice">
+                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
             </div>
             <h2>💼 Formulario de Carta Laboral</h2>
             <div class="input-group">
@@ -358,8 +378,11 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
 
         <div id="form-personal" class="form-section">
             <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <div class="disclaimer-notice">
+                *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
+            </div>
             <div class="payment-notice">
-                *UNA VEZ ENVIADO PAGO SE AUTORIZA EL ENVIO DEL DOCUMENTO, TIEMPO DE ESPERA 10-15 MINUTOS*
+                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
             </div>
             <h2>🏠 Formulario de Carta Personal</h2>
 
@@ -408,8 +431,11 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
         
         <div id="form-incapacidad_imss" class="form-section">
             <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <div class="disclaimer-notice">
+                *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
+            </div>
             <div class="payment-notice">
-                *UNA VEZ ENVIADO PAGO SE AUTORIZA EL ENVIO DEL DOCUMENTO, TIEMPO DE ESPERA 10-15 MINUTOS*
+                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
             </div>
             <h2>💊 Formulario de Incapacidad IMSS</h2>
             <div class="input-group">
@@ -421,8 +447,11 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
         </div>
         <div id="form-receta_similares" class="form-section">
             <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <div class="disclaimer-notice">
+                *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
+            </div>
             <div class="payment-notice">
-                *UNA VEZ ENVIADO PAGO SE AUTORIZA EL ENVIO DEL DOCUMENTO, TIEMPO DE ESPERA 10-15 MINUTOS*
+                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
             </div>
             <h2>💊 Formulario de Receta Médica SIMILARES</h2>
             <div class="input-group">
@@ -434,8 +463,11 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
         </div>
         <div id="form-receta_ahorro" class="form-section">
             <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <div class="disclaimer-notice">
+                *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
+            </div>
             <div class="payment-notice">
-                *UNA VEZ ENVIADO PAGO SE AUTORIZA EL ENVIO DEL DOCUMENTO, TIEMPO DE ESPERA 10-15 MINUTOS*
+                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
             </div>
             <h2>💊 Formulario de Receta Médica DEL AHORRO</h2>
             <div class="input-group">
@@ -447,8 +479,11 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
         </div>
         <div id="form-receta_imss" class="form-section">
             <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <div class="disclaimer-notice">
+                *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
+            </div>
             <div class="payment-notice">
-                *UNA VEZ ENVIADO PAGO SE AUTORIZA EL ENVIO DEL DOCUMENTO, TIEMPO DE ESPERA 10-15 MINUTOS*
+                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
             </div>
             <h2>💊 Formulario de Receta Médica IMSS</h2>
             <div class="input-group">
@@ -461,8 +496,11 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
 
         <div id="form-cert_primaria" class="form-section">
             <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <div class="disclaimer-notice">
+                *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
+            </div>
             <div class="payment-notice">
-                *UNA VEZ ENVIADO PAGO SE AUTORIZA EL ENVIO DEL DOCUMENTO, TIEMPO DE ESPERA 10-15 MINUTOS*
+                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
             </div>
             <h2>🎓 Formulario de Certificado de PRIMARIA</h2>
             <div class="input-group">
@@ -474,8 +512,11 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
         </div>
         <div id="form-cert_secundaria" class="form-section">
             <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <div class="disclaimer-notice">
+                *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
+            </div>
             <div class="payment-notice">
-                *UNA VEZ ENVIADO PAGO SE AUTORIZA EL ENVIO DEL DOCUMENTO, TIEMPO DE ESPERA 10-15 MINUTOS*
+                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
             </div>
             <h2>🎓 Formulario de Certificado de SECUNDARIA</h2>
             <div class="input-group">
@@ -487,8 +528,11 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
         </div>
         <div id="form-cert_prepa" class="form-section">
             <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <div class="disclaimer-notice">
+                *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
+            </div>
             <div class="payment-notice">
-                *UNA VEZ ENVIADO PAGO SE AUTORIZA EL ENVIO DEL DOCUMENTO, TIEMPO DE ESPERA 10-15 MINUTOS*
+                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
             </div>
             <h2>🎓 Formulario de Certificado de PREPARATORIA</h2>
             <div class="input-group">
@@ -501,8 +545,11 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
 
         <div id="form-metodo_shein" class="form-section">
             <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <div class="disclaimer-notice">
+                *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
+            </div>
             <div class="payment-notice">
-                *UNA VEZ ENVIADO PAGO SE AUTORIZA EL ENVIO DEL DOCUMENTO, TIEMPO DE ESPERA 10-15 MINUTOS*
+                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
             </div>
             <h2>⭐ Solicitud de Metodo Shein</h2>
             <div class="input-group">
@@ -514,8 +561,11 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
         </div>
         <div id="form-metodo_cinepolis" class="form-section">
             <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <div class="disclaimer-notice">
+                *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
+            </div>
             <div class="payment-notice">
-                *UNA VEZ ENVIADO PAGO SE AUTORIZA EL ENVIO DEL DOCUMENTO, TIEMPO DE ESPERA 10-15 MINUTOS*
+                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
             </div>
             <h2>⭐ Solicitud de Metodo Cinépolis</h2>
             <div class="input-group">
@@ -527,8 +577,11 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
         </div>
         <div id="form-metodo_temu" class="form-section">
             <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <div class="disclaimer-notice">
+                *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
+            </div>
             <div class="payment-notice">
-                *UNA VEZ ENVIADO PAGO SE AUTORIZA EL ENVIO DEL DOCUMENTO, TIEMPO DE ESPERA 10-15 MINUTOS*
+                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
             </div>
             <h2>⭐ Solicitud de Metodo TEMU</h2>
             <div class="input-group">
@@ -540,8 +593,11 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
         </div>
         <div id="form-cv_desde_cero" class="form-section">
             <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <div class="disclaimer-notice">
+                *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
+            </div>
             <div class="payment-notice">
-                *UNA VEZ ENVIADO PAGO SE AUTORIZA EL ENVIO DEL DOCUMENTO, TIEMPO DE ESPERA 10-15 MINUTOS*
+                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
             </div>
             <h2>⭐ Solicitud de CV DESDE CERO</h2>
             <div class="input-group">
@@ -553,8 +609,11 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
         </div>
         <div id="form-sellos_personales" class="form-section">
             <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <div class="disclaimer-notice">
+                *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
+            </div>
             <div class="payment-notice">
-                *UNA VEZ ENVIADO PAGO SE AUTORIZA EL ENVIO DEL DOCUMENTO, TIEMPO DE ESPERA 10-15 MINUTOS*
+                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
             </div>
             <h2>⭐ Solicitud de SELLOS PERSONALES</h2>
             <div class="input-group">
@@ -566,8 +625,11 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
         </div>
         <div id="form-formato_solicitud_pdf" class="form-section">
             <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <div class="disclaimer-notice">
+                *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
+            </div>
             <div class="payment-notice">
-                *UNA VEZ ENVIADO PAGO SE AUTORIZA EL ENVIO DEL DOCUMENTO, TIEMPO DE ESPERA 10-15 MINUTOS*
+                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
             </div>
             <h2>⭐ Solicitud de FORMATO DE SOLICITUD EN PDF</h2>
             <div class="input-group">
@@ -578,17 +640,19 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             <button class="btn-action" onclick="saveSolicitud('formato_solicitud_pdf')">💾 Guardar Solicitud</button>
         </div>
         
-    </div> <div id="status-page" class="status-page" style="display:none;"></div>
+    </div> <div id="status-page" class="status-page" style="display:none;">
+        <div class="disclaimer-notice">
+            *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
+        </div>
+        </div>
 
     <a href="https://wa.me/message/AZLK65CETSPQL1" class="whatsapp-float" target="_blank">
         <i class="fab fa-whatsapp"></i>
     </a>
     
-    <div class="bank-info">
-        <p>💵 **Datos para Pago**</p>
-        <p>CLABE/Tarjeta: <strong>4189 1432 7771 6216</strong></p>
-        <p>Banco: **Banorte**</p>
-        <p>Destinatario: **Jimmy Garcia**</p>
+    <div class="fixed-payment-info">
+        <p>⚠️ **PAGO**</p>
+        <p>*PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*</p>
     </div>
 
     <script>
@@ -642,6 +706,8 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             if (viewId === 'status' && requestId) {
                 document.getElementById('app-container').style.display = 'none';
                 document.getElementById('status-page').style.display = 'flex';
+                // Asegurar que el disclaimer se muestre antes de actualizar el contenido dinámico
+                document.getElementById('status-page').innerHTML = '<div class="disclaimer-notice">*NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*</div>';
                 checkStatus(requestId);
                 statusCheckInterval = setInterval(() => checkStatus(requestId), 5000); 
                 return; 
@@ -810,13 +876,16 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             const request = approvedRequests.find(req => req.id === requestId);
             const statusPage = document.getElementById('status-page');
             
+            // Clonar el nodo del disclaimer (ya debe estar ahí)
+            const disclaimer = statusPage.querySelector('.disclaimer-notice').outerHTML;
+            
             if (!request) {
                 // Estatus: Pendiente (Cargando)
-                statusPage.innerHTML = `
+                statusPage.innerHTML = disclaimer + `
                     <h2>⏳ Solicitud Enviada - Esperando Autorización</h2>
                     <div class="spinner"></div>
                     <p>Su solicitud de **${requestId}** ha sido recibida.</p>
-                    <p>Estamos esperando que el administrador la apruebe.</p>
+                    <p>Estamos esperando que el administrador la apruebe una vez realizado el pago.</p>
                     <p style="font-size: 0.8em; color: #555;">(Esta página se actualizará automáticamente cada 5 segundos)</p>
                     <p style="margin-top: 20px;">Puede guardar este enlace: <code>${getBaseUrl()}#status?id=${requestId}</code></p>
                 `;
@@ -826,7 +895,7 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
                     clearInterval(statusCheckInterval); 
                 }
                 
-                statusPage.innerHTML = `
+                statusPage.innerHTML = disclaimer + `
                     <h2>✅ ¡Solicitud Aprobada!</h2>
                     <p>El administrador ha autorizado su documento para **${request.name}**.</p>
                     <button class="btn-action btn-download-now" onclick="triggerDownload('${request.id}')">
@@ -867,7 +936,8 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             
             // Mensaje de descarga exitosa
             const statusPage = document.getElementById('status-page');
-             statusPage.innerHTML = `
+            const disclaimer = statusPage.querySelector('.disclaimer-notice').outerHTML;
+             statusPage.innerHTML = disclaimer + `
                 <div>
                     <h1>✅ Descarga Exitosa</h1>
                     <p>Su documento para **${request.name}** ha sido descargado. Por favor, revise su carpeta de descargas.</p>
