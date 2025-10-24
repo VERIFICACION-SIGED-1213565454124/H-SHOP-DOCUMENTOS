@@ -101,6 +101,7 @@
         <code id="link-cliente"></code></p>
         <p><strong>Para el Administrador (Usted):</strong> Use este enlace para acceder al panel de autorización.<br>
         <code id="link-admin"></code></p>
+        <p style="font-size: 0.8em; color: red;">⚠️ **RECOMENDACIÓN IMPORTANTE:** Si tiene problemas con los enlaces, cópielos y péguelos directamente en su navegador.</p>
     </div>
 
     <div id="main-menu">
@@ -270,7 +271,6 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
 
         // Función para obtener la URL base (sin hash)
         function getBaseUrl() {
-            // Elimina el hash de la URL actual (ej: http://.../index.html#admin -> http://.../index.html)
             return window.location.href.split('#')[0];
         }
 
@@ -281,11 +281,14 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             document.getElementById('link-cliente').textContent = `${baseUrl}#cliente`;
             document.getElementById('link-admin').textContent = `${baseUrl}#admin`;
 
-            const hash = window.location.hash.substring(1); // Obtiene la parte después de #
+            const hash = window.location.hash.substring(1); 
             const params = new URLSearchParams(hash.split('?')[1] || '');
 
-            if (hash.startsWith('admin')) {
-                // Si el hash es #admin o #admin_dashboard
+            if (hash.startsWith('admin_dashboard')) {
+                // Si ya está en el dashboard (después de iniciar sesión), lo muestra.
+                showView('admin_dashboard');
+            } else if (hash.startsWith('admin')) {
+                // Si usa el link #admin o cualquier otra variación, lo manda al login.
                 showView('admin_login');
             } else if (hash.startsWith('download')) {
                 // Si la URL es de descarga (Ej: #download?id=12345)
@@ -303,12 +306,14 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
 
         // Función de navegación mejorada
         function showView(viewId) {
+            // Ocultar todas las secciones
             document.getElementById('main-menu').style.display = 'none';
             document.getElementById('form-laboral').style.display = 'none';
             document.getElementById('form-personal').style.display = 'none';
             document.getElementById('admin-login').style.display = 'none';
             document.getElementById('admin-dashboard').style.display = 'none';
             
+            // Mostrar solo la sección deseada
             const viewElement = document.getElementById(viewId);
             if (viewElement) {
                 viewElement.style.display = 'block';
@@ -325,13 +330,12 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             const user = document.getElementById('adminUser').value;
             const pass = document.getElementById('adminPass').value;
             
-            // Credenciales que el usuario especificó
             const ADMIN_USER = 'trollgaga999@gmail.com';
             const ADMIN_PASS = 'Johan207';
             
             if (user === ADMIN_USER && pass === ADMIN_PASS) {
                 alert("¡Bienvenido, Administrador! Accediendo al Panel de Autorización.");
-                // Cambiamos el hash para reflejar la vista, pero usamos showView para el renderizado inmediato
+                // Forzamos el cambio de hash y la vista para asegurar la navegación.
                 window.location.hash = 'admin_dashboard'; 
                 showView('admin_dashboard');
             } else {
@@ -446,7 +450,6 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
 
             // 4. Generar el enlace de descarga único (para enviar al cliente)
             const baseUrl = getBaseUrl();
-            // Creamos un enlace limpio que el cliente puede usar.
             const downloadUrl = `${baseUrl}#download?id=${request.id}`;
 
             const itemElement = document.getElementById(`request-${requestId}`);
@@ -498,9 +501,6 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
                     <p>Puede cerrar esta ventana.</p>
                 </div>
             `;
-            
-            // Opcional: Podríamos eliminar la carta descargada del historial de aprobados para liberar espacio
-            // deleteApprovedRequest(requestId);
         }
 
         function deleteRequest(requestId) {
@@ -549,7 +549,6 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
         });
 
         // Funciones de Generación de PDF (generarPDFLaboral, generarPDFPersonal)
-        // El código completo de estas funciones debe estar aquí para que el script funcione.
 
         async function generarPDFLaboral(descargar = true) { 
             const doc = new jsPDF('p', 'mm', 'a4');
