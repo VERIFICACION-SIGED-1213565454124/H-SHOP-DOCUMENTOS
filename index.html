@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Certificado Template</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #6a0f1a;
+      color: white;
+      padding: 20px;
+      text-align: left;
+      font-weight: bold;
+      position: relative;
+    }
+
+    header .logo {
+      font-size: 1.4em;
+    }
+
+    header .sub {
+      color: #d6af3a;
+      margin-top: 4px;
+    }
+
+    main {
+      max-width: 600px;
+      margin: 30px auto;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .banner {
+      background-color: #d6af3a;
+      color: white;
+      padding: 10px 20px;
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+
+    .contenido {
+      padding: 20px;
+      color: #333;
+    }
+
+    .contenido h2 {
+      font-size: 1.2em;
+      margin-bottom: 10px;
+      border-bottom: 2px solid #d6af3a;
+      display: inline-block;
+      padding-bottom: 3px;
+    }
+
+    .contenido p {
+      margin: 10px 0;
+    }
+
+    .resultado {
+      background-color: #d5efd1;
+      padding: 15px;
+      border-radius: 5px;
+      margin-top: 15px;
+    }
+
+    .resultado strong {
+      display: block;
+      font-size: 1.1em;
+    }
+
+    form {
+      max-width: 600px;
+      margin: 40px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 6px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    form h3 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1em;
+    }
+
+    button {
+      margin-top: 20px;
+      background-color: #6a0f1a;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+
+    button:hover {
+      background-color: #8b1221;
+    }
+
+    #qr {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      main, form {
+        margin: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">Gobierno de México</div>
+    <div class="sub">SIGED</div>
+  </header>
+
+  <main id="certificado">
+    <div class="banner">Detalle del documento</div>
+    <div class="contenido">
+      <p><strong>Nombre:</strong> <span id="nombre">Rene Eduardo Guzman Corona</span></p>
+      <p><strong>Tipo de documento:</strong> <span id="tipo">Certificado de Estudios por Acuerdo 286</span></p>
+      <p><strong>Folio:</strong> <span id="folio">d188k5lp-63b7-3540-k012-1759lkal91nh</span></p>
+      <p><strong>Estudios:</strong> <span id="estudios">Bachillerato o equivalente</span></p>
+      <p><strong>Autoridad emisora:</strong> <span id="autoridad">Dirección General de Bachillerato</span></p>
+      <p><strong>Fecha de registro en SIGED:</strong> <span id="fecha">12/07/2024 10:30:13</span></p>
+      <div class="resultado">
+        <strong>Resultado obtenido:</strong>
+        <span id="resultado">9.3</span><br>
+        <span id="resultadoTexto">Nueve punto tres</span>
+      </div>
+      <div id="qr"></div>
+    </div>
+  </main>
+
+  <form id="formulario">
+    <h3>Editar datos del certificado</h3>
+
+    <label>Nombre:</label>
+    <input type="text" id="inputNombre" placeholder="Escribe el nombre">
+
+    <label>Tipo de documento:</label>
+    <input type="text" id="inputTipo" placeholder="Ejemplo: Certificado de Estudios por Acuerdo 286">
+
+    <label>Folio:</label>
+    <input type="text" id="inputFolio" placeholder="Escribe el folio">
+
+    <label>Estudios:</label>
+    <input type="text" id="inputEstudios" placeholder="Ejemplo: Bachillerato o equivalente">
+
+    <label>Autoridad emisora:</label>
+    <input type="text" id="inputAutoridad" placeholder="Ejemplo: Dirección General de Bachillerato">
+
+    <label>Fecha de registro:</label>
+    <input type="text" id="inputFecha" placeholder="Ejemplo: 12/07/2024 10:30:13">
+
+    <label>Resultado numérico:</label>
+    <input type="text" id="inputResultado" placeholder="Ejemplo: 9.3">
+
+    <label>Resultado en texto:</label>
+    <input type="text" id="inputResultadoTexto" placeholder="Ejemplo: Nueve punto tres">
+
+    <button type="button" onclick="generarCertificado()">Generar certificado</button>
+    <button type="button" onclick="generarQR()">Generar QR de certificado</button>
+  </form>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+  <script>
+    function generarCertificado() {
+      document.getElementById("nombre").textContent = document.getElementById("inputNombre").value || "—";
+      document.getElementById("tipo").textContent = document.getElementById("inputTipo").value || "—";
+      document.getElementById("folio").textContent = document.getElementById("inputFolio").value || "—";
+      document.getElementById("estudios").textContent = document.getElementById("inputEstudios").value || "—";
+      document.getElementById("autoridad").textContent = document.getElementById("inputAutoridad").value || "—";
+      document.getElementById("fecha").textContent = document.getElementById("inputFecha").value || "—";
+      document.getElementById("resultado").textContent = document.getElementById("inputResultado").value || "—";
+      document.getElementById("resultadoTexto").textContent = document.getElementById("inputResultadoTexto").value || "—";
+      document.getElementById("qr").innerHTML = ""; // Limpiar QR anterior
+    }
+
+    function generarQR() {
+      const datos = `
+Nombre: ${document.getElementById("nombre").textContent}
+Tipo: ${document.getElementById("tipo").textContent}
+Folio: ${document.getElementById("folio").textContent}
+Estudios: ${document.getElementById("estudios").textContent}
+Resultado: ${document.getElementById("resultado").textContent}
+`;
+      document.getElementById("qr").innerHTML = "";
+      new QRCode(document.getElementById("qr"), {
+        text: datos,
+        width: 120,
+        height: 120
+      });
+    }
+  </script>
+</body>
+</html>
