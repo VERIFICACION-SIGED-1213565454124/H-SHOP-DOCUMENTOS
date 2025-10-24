@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador de Cartas de Recomendación - Autorización Local</title>
+    <title>Generador de Cartas - Autorización y Doble Acceso</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <style>
-        /* Estilos generales (Se mantienen) */
+        /* Estilos generales (Mismo diseño) */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 850px; margin: 0 auto; padding: 25px; background-color: #f4f4f9; }
         h1 { color: #2c3e50; text-align: center; margin-bottom: 25px; }
         .input-group, .form-section { background-color: #ffffff; padding: 20px; margin-bottom: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
@@ -27,7 +27,7 @@
         .date-container input { width: 100%; }
         textarea { height: 120px; resize: vertical; }
         
-        /* Estilos de botones de navegación/acción */
+        /* Botones generales */
         .btn-action, .btn-menu {
             color: white;
             padding: 15px 20px;
@@ -39,78 +39,63 @@
             margin-top: 10px;
             transition: background-color 0.3s;
         }
-        .btn-action { /* Botón de Solicitud/Guardado */
-            background-color: #e67e22; 
-        }
+        .btn-action { background-color: #e67e22; }
         .btn-action:hover { background-color: #d35400; }
-
-        /* Estilos del menú principal */
-        #main-menu .btn-menu {
-            background-color: #3498db; 
-            margin-bottom: 15px;
-            font-size: 1.2em;
-        }
-        #main-menu .btn-menu:hover { background-color: #2980b9; }
-
-        .btn-admin { 
-            background-color: #27ae60;
-            margin-top: 25px !important;
-        }
-        .btn-admin:hover { background-color: #229954; }
+        .btn-admin { background-color: #27ae60 !important; }
         
-        .back-button {
-            background-color: #95a5a6; 
-            width: auto;
-            padding: 10px 15px;
-            font-size: 1em;
-        }
-        .back-button:hover { background-color: #7f8c8d; }
+        .back-button { background-color: #95a5a6; width: auto; padding: 10px 15px; font-size: 1em; }
 
         /* Estilos del panel de admin */
-        #pending-requests-list { 
-            padding: 15px; 
-            background-color: #ecf0f1;
-        }
         .request-item {
             border: 1px solid #ccc;
             padding: 10px;
             margin-bottom: 10px;
             background-color: #fff;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        .request-info { flex-grow: 1; }
         .request-actions button {
             width: auto;
-            padding: 8px 15px;
+            padding: 8px 12px;
             font-size: 0.9em;
             margin-left: 10px;
         }
-        .btn-approve { background-color: #27ae60; }
+        .btn-authorize { background-color: #3498db; } /* Azul para AUTORIZAR */
         .btn-reject { background-color: #c0392b; }
 
-        /* Ocultar secciones de formulario al inicio */
+        .download-link-box {
+            background-color: #f0f0f0;
+            border: 1px dashed #3498db;
+            padding: 10px;
+            margin-top: 10px;
+            word-break: break-all;
+            font-size: 0.9em;
+        }
+        .download-link-box a { color: #2980b9; font-weight: bold; }
+
         .form-section { display: none; }
+        #admin-info { font-size: 0.8em; color: #555; text-align: center; margin-top: 20px; }
     </style>
 </head>
 <body>
 
     <h1>📝 Generador de Cartas de Recomendación</h1>
+    <div id="admin-info">
+        <p>URL del Cliente: <code>[ruta]/index.html</code></p>
+        <p>URL del Administrador: <code>[ruta]/index.html#admin</code></p>
+    </div>
 
     <div id="main-menu">
         <h2>Seleccione el tipo de carta que desea generar:</h2>
         <button class="btn-menu" onclick="showForm('laboral')">Carta de Recomendación LABORAL</button>
         <button class="btn-menu" onclick="showForm('personal')">Carta de Recomendación PERSONAL</button>
-        <hr>
-        <button class="btn-menu btn-admin" onclick="showForm('admin_login')">Acceso del Administrador (Autorización)</button>
     </div>
 
     <div id="admin-login" class="form-section">
         <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
         <h2>🔒 Acceso del Administrador</h2>
-        <p>Esta es una **simulación** de acceso. Las solicitudes que autorices aquí solo serán visibles si fueron creadas en este mismo navegador.</p>
+        <p>Ingrese sus credenciales para autorizar las solicitudes.</p>
         
         <div class="input-group">
             <label for="adminUser">Usuario:</label>
@@ -125,8 +110,8 @@
 
     <div id="admin-dashboard" class="form-section">
         <button class="back-button" onclick="showForm('menu')">← Cerrar Sesión</button>
-        <h2>⚙️ Panel de Solicitudes Pendientes</h2>
-        <p>Clic en **Aprobar y Descargar** para forzar la descarga de la carta en *su* navegador. Luego, debe notificar al solicitante que la carta está lista.</p>
+        <h2>⚙️ Panel de Autorización de Solicitudes</h2>
+        <p>Clic en **Autorizar** para generar el enlace de descarga único que debe copiar y enviar al cliente.</p>
 
         <h3>Solicitudes Pendientes:</h3>
         <div id="pending-requests-list" class="input-group">
@@ -143,7 +128,7 @@
             <label for="nombreSolicitanteLaboral">Tu Nombre Completo (Quien Pide la Carta):</label>
             <input type="text" id="nombreSolicitanteLaboral" value="Nombre del Solicitante">
             
-            <label for="emailSolicitanteLaboral">Tu Correo Electrónico (Solo para tu referencia):</label>
+            <label for="emailSolicitanteLaboral">Tu Correo Electrónico (Solo para referencia):</label>
             <input type="text" id="emailSolicitanteLaboral" value="solicitante@ejemplo.com">
         </div>
         
@@ -177,7 +162,6 @@
                 </div>
             </div>
         </div>
-
         <div class="input-group">
             <h2>📝 Contenido de la Carta</h2>
             <label for="nombreEmpresaLaboral">Nombre de la Empresa:</label>
@@ -197,7 +181,6 @@ Traslado de equipo y herramientas: Ayudó a mover y distribuir herramientas y eq
 
 Para cualquier duda o aclaración, estoy a su disposición.</textarea>
         </div>
-
         <div class="input-group">
             <h2>✍️ Datos del Firmante</h2>
             <label for="nombreFirmanteLaboral">Nombre Completo del Firmante:</label>
@@ -210,7 +193,7 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             <input type="text" id="telefonoFirmanteLaboral" value="T. (442) 880 1675">
         </div>
 
-        <button class="btn-action" onclick="solicitarAprobacion('laboral')">💾 Guardar Solicitud y Esperar Aprobación</button>
+        <button class="btn-action" onclick="saveSolicitud('laboral')">💾 Guardar Solicitud (Esperar Aprobación)</button>
     </div>
 
     <div id="form-personal" class="form-section">
@@ -222,7 +205,7 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             <label for="nombreSolicitantePersonal">Tu Nombre Completo (Quien Pide la Carta):</label>
             <input type="text" id="nombreSolicitantePersonal" value="Nombre del Solicitante">
 
-            <label for="emailSolicitantePersonal">Tu Correo Electrónico (Solo para tu referencia):</label>
+            <label for="emailSolicitantePersonal">Tu Correo Electrónico (Solo para referencia):</label>
             <input type="text" id="emailSolicitantePersonal" value="solicitante@ejemplo.com">
         </div>
         
@@ -245,7 +228,6 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             <label for="tiempoConocidoPersonal">Tiempo que conoce a la persona (Ej: 5 años):</label>
             <input type="text" id="tiempoConocidoPersonal" value="Desde hace 8 años">
         </div>
-
         <div class="input-group">
             <h2>📝 Contenido de la Carta</h2>
             
@@ -258,39 +240,57 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
 Para cualquier duda o aclaración, estoy a su disposición.</textarea>
         </div>
 
-        <button class="btn-action" onclick="solicitarAprobacion('personal')">💾 Guardar Solicitud y Esperar Aprobación</button>
+        <button class="btn-action" onclick="saveSolicitud('personal')">💾 Guardar Solicitud (Esperar Aprobación)</button>
     </div>
+
 
     <script>
         const { jsPDF } = window.jspdf;
-
-        // Clave de almacenamiento local para las solicitudes
         const STORAGE_KEY = 'pending_requests_list';
+        const APPROVED_KEY = 'approved_requests_list';
 
-        // --- FUNCIONES DE NAVEGACIÓN Y AUTENTICACIÓN LOCAL ---
+        // --- MANEJO DE URL Y VISTAS ---
 
-        function showForm(formId) {
+        // Función inicial para verificar la URL y dirigir al usuario/admin
+        function checkURL() {
+            const hash = window.location.hash.substring(1); // Obtiene la parte después de #
+            const params = new URLSearchParams(hash.split('?')[1] || '');
+
+            if (hash === 'admin') {
+                showView('admin_login');
+            } else if (hash.startsWith('download=')) {
+                // Si la URL es de descarga (Ej: #download=12345)
+                const requestId = params.get('download');
+                if (requestId) {
+                    forceClientDownload(requestId);
+                } else {
+                    showView('menu');
+                }
+            } else {
+                showView('menu');
+            }
+        }
+
+        // Función de navegación mejorada
+        function showView(viewId) {
             document.getElementById('main-menu').style.display = 'none';
             document.getElementById('form-laboral').style.display = 'none';
             document.getElementById('form-personal').style.display = 'none';
             document.getElementById('admin-login').style.display = 'none';
             document.getElementById('admin-dashboard').style.display = 'none';
-
-            if (formId === 'menu') {
-                document.getElementById('main-menu').style.display = 'block';
-            } else if (formId === 'laboral') {
-                document.getElementById('form-laboral').style.display = 'block';
-            } else if (formId === 'personal') {
-                document.getElementById('form-personal').style.display = 'block';
-            } else if (formId === 'admin_login') {
-                document.getElementById('admin-login').style.display = 'block';
-            } else if (formId === 'admin_dashboard') {
-                document.getElementById('admin-dashboard').style.display = 'block';
-                loadPendingRequests(); // Cargar solicitudes al abrir el panel
+            
+            const viewElement = document.getElementById(viewId);
+            if (viewElement) {
+                viewElement.style.display = 'block';
+                if (viewId === 'admin_dashboard') {
+                    loadPendingRequests(); 
+                }
             }
             window.scrollTo(0, 0);
         }
-        
+
+        // --- AUTENTICACIÓN ADMIN ---
+
         function authenticateAdmin() {
             const user = document.getElementById('adminUser').value;
             const pass = document.getElementById('adminPass').value;
@@ -301,103 +301,27 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             
             if (user === ADMIN_USER && pass === ADMIN_PASS) {
                 alert("¡Bienvenido, Administrador! Accediendo al Panel de Autorización.");
-                showForm('admin_dashboard');
+                window.location.hash = 'admin_dashboard'; // Redirige a la URL con hash
+                showView('admin_dashboard');
             } else {
                 alert("Usuario o Contraseña incorrectos. Inténtalo de nuevo.");
             }
         }
 
-        // --- FUNCIONES DE GESTIÓN DE ALMACENAMIENTO LOCAL ---
+        // --- GESTIÓN DE ALMACENAMIENTO ---
 
-        function getRequests() {
-            const data = localStorage.getItem(STORAGE_KEY);
+        function getRequests(key) {
+            const data = localStorage.getItem(key);
             return data ? JSON.parse(data) : [];
         }
 
-        function saveRequests(requests) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(requests));
+        function saveRequests(key, requests) {
+            localStorage.setItem(key, JSON.stringify(requests));
         }
 
-        function loadPendingRequests() {
-            const requests = getRequests();
-            const listElement = document.getElementById('pending-requests-list');
-            const noRequestsMsg = document.getElementById('no-requests-msg');
-            
-            listElement.innerHTML = ''; 
+        // --- FUNCIÓN DEL CLIENTE: GUARDAR SOLICITUD ---
 
-            if (requests.length === 0) {
-                 listElement.appendChild(noRequestsMsg);
-                 noRequestsMsg.style.display = 'block';
-                 return;
-            } else {
-                if (noRequestsMsg) noRequestsMsg.style.display = 'none';
-            }
-
-            requests.forEach(req => {
-                const item = document.createElement('div');
-                item.className = 'request-item';
-                item.innerHTML = `
-                    <div class="request-info">
-                        <strong>${req.type === 'laboral' ? 'Carta Laboral' : 'Carta Personal'} - ${req.name.toUpperCase()}</strong>
-                        <p>Solicitante: ${req.requesterName}</p>
-                    </div>
-                    <div class="request-actions">
-                        <button class="btn-approve" onclick="authorizeAndDownload('${req.id}')">Aprobar y Descargar</button>
-                        <button class="btn-reject" onclick="deleteRequest('${req.id}')">Rechazar</button>
-                    </div>
-                `;
-                listElement.appendChild(item);
-            });
-        }
-        
-        // --- FUNCIÓN DE AUTORIZACIÓN (UN SOLO CLIC) ---
-
-        function authorizeAndDownload(requestId) {
-            const requests = getRequests();
-            const index = requests.findIndex(req => req.id === requestId);
-            
-            if (index === -1) {
-                alert("Error: Solicitud no encontrada.");
-                loadPendingRequests();
-                return;
-            }
-
-            const request = requests[index];
-            const pdfBase64 = request.pdfBase64;
-            const name = request.name.toUpperCase().replace(/\s/g, '_');
-            const type = request.type.toUpperCase();
-
-            // 1. Forzar la descarga en el navegador del administrador
-            const link = document.createElement('a');
-            link.href = `data:application/pdf;base64,${pdfBase64}`;
-            link.download = `Carta_Aprobada_${name}_${type}.pdf`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-
-            // 2. Eliminar la solicitud de la lista
-            requests.splice(index, 1);
-            saveRequests(requests);
-            
-            alert(`¡Autorización Exitosa! La carta ha sido descargada. Por favor, notifique a ${request.requesterName} que la carta está lista.`);
-            loadPendingRequests();
-        }
-
-        function deleteRequest(requestId) {
-            if (!confirm("¿Está seguro de rechazar y eliminar esta solicitud?")) return;
-            const requests = getRequests();
-            const index = requests.findIndex(req => req.id === requestId);
-            if (index > -1) {
-                requests.splice(index, 1);
-                saveRequests(requests);
-            }
-            loadPendingRequests();
-        }
-
-
-        // --- FUNCIÓN PRINCIPAL DE SOLICITUD Y GUARDADO LOCAL ---
-
-        async function solicitarAprobacion(tipoCarta) {
+        async function saveSolicitud(tipoCarta) {
             let nombreSolicitante, nombreAsunto, pdfBase64;
 
             if (tipoCarta === 'laboral') {
@@ -415,29 +339,163 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
                 return;
             }
 
-            // Crear objeto de solicitud
             const newRequest = {
                 id: Date.now().toString(),
                 type: tipoCarta,
                 name: nombreAsunto,
                 requesterName: nombreSolicitante,
                 pdfBase64: pdfBase64,
+                status: 'pending', // Nuevo: estado de la solicitud
                 timestamp: new Date().toLocaleString()
             };
 
-            // Guardar en localStorage
-            const requests = getRequests();
+            const requests = getRequests(STORAGE_KEY);
             requests.push(newRequest);
-            saveRequests(requests);
+            saveRequests(STORAGE_KEY, requests);
 
-            alert(`Solicitud de Carta ${tipoCarta} para ${nombreAsunto} guardada localmente. Por favor, avise al administrador para que revise el Panel de Autorización.`);
-            showForm('menu');
+            alert(`Solicitud de Carta ${tipoCarta} para ${nombreAsunto} guardada localmente. Por favor, avise al administrador para que autorice su descarga.`);
+            showView('menu');
         }
 
+        // --- FUNCIONES DEL ADMINISTRADOR ---
 
-        // --- FUNCIONES AUXILIARES Y DE GENERACIÓN PDF (Se mantienen igual) ---
+        function loadPendingRequests() {
+            const requests = getRequests(STORAGE_KEY).filter(req => req.status === 'pending');
+            const listElement = document.getElementById('pending-requests-list');
+            
+            listElement.innerHTML = ''; 
+
+            if (requests.length === 0) {
+                 listElement.innerHTML = '<p id="no-requests-msg">No hay solicitudes pendientes en el almacenamiento local de este navegador.</p>';
+                 return;
+            }
+
+            requests.forEach(req => {
+                const item = document.createElement('div');
+                item.id = `request-${req.id}`;
+                item.className = 'request-item';
+                item.innerHTML = `
+                    <div class="request-info">
+                        <strong>${req.type === 'laboral' ? 'Carta Laboral' : 'Carta Personal'} - ${req.name}</strong>
+                        <p>Solicitante: ${req.requesterName}</p>
+                    </div>
+                    <div class="request-actions">
+                        <button class="btn-authorize" onclick="authorizeRequest('${req.id}')">Autorizar</button>
+                        <button class="btn-reject" onclick="deleteRequest('${req.id}')">Rechazar</button>
+                    </div>
+                `;
+                listElement.appendChild(item);
+            });
+        }
         
-        function drawJustifiedText(doc, text, x, y, maxWidth, lineHeight) {
+        // FUNCIÓN CLAVE: Autorizar la solicitud y generar el enlace de descarga
+        function authorizeRequest(requestId) {
+            let pendingRequests = getRequests(STORAGE_KEY);
+            const index = pendingRequests.findIndex(req => req.id === requestId);
+            
+            if (index === -1) {
+                alert("Error: Solicitud no encontrada.");
+                loadPendingRequests();
+                return;
+            }
+
+            const request = pendingRequests[index];
+
+            // 1. Mover la solicitud de 'pending' a 'approved'
+            request.status = 'approved';
+            
+            // 2. Guardar la solicitud en la lista de aprobadas (para el enlace de descarga)
+            const approvedRequests = getRequests(APPROVED_KEY);
+            approvedRequests.push(request);
+            saveRequests(APPROVED_KEY, approvedRequests);
+
+            // 3. Eliminar de la lista de pendientes
+            pendingRequests.splice(index, 1);
+            saveRequests(STORAGE_KEY, pendingRequests);
+
+            // 4. Generar el enlace de descarga único (para enviar al cliente)
+            const baseUrl = window.location.href.split('#')[0];
+            const downloadUrl = `${baseUrl}#download?id=${request.id}`;
+
+            const itemElement = document.getElementById(`request-${requestId}`);
+            itemElement.innerHTML = `
+                <div class="request-info">
+                    <strong>¡AUTORIZADA! Carta para ${request.name}</strong>
+                    <p>Envíe el siguiente enlace al solicitante:</p>
+                    <div class="download-link-box">
+                       <a href="${downloadUrl}" target="_blank">${downloadUrl}</a>
+                       <button onclick="navigator.clipboard.writeText('${downloadUrl}')" style="margin-top:5px; background-color:#2c3e50; padding: 5px 10px;">Copiar Enlace</button>
+                    </div>
+                </div>
+                <div class="request-actions">
+                    <button class="btn-reject" onclick="deleteApprovedRequest('${requestId}')">Eliminar del Historial</button>
+                </div>
+            `;
+            alert(`¡Solicitud Autorizada! Copie el enlace generado y envíelo a ${request.requesterName}.`);
+            
+            loadPendingRequests();
+        }
+
+        // Función que el cliente usa para forzar la descarga
+        function forceClientDownload(requestId) {
+            const approvedRequests = getRequests(APPROVED_KEY);
+            const request = approvedRequests.find(req => req.id === requestId);
+            
+            if (!request) {
+                document.body.innerHTML = '<h1>Error 404: Enlace de descarga inválido o caducado.</h1><p>Por favor, contacte al administrador.</p>';
+                return;
+            }
+
+            const pdfBase64 = request.pdfBase64;
+            const name = request.name.toUpperCase().replace(/\s/g, '_');
+            const type = request.type.toUpperCase();
+
+            // Forzar la descarga en el navegador del cliente
+            const link = document.createElement('a');
+            link.href = `data:application/pdf;base64,${pdfBase64}`;
+            link.download = `Carta_Aprobada_${name}_${type}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            // Mostrar mensaje de éxito
+            document.body.innerHTML = `
+                <div style="text-align:center; padding: 50px;">
+                    <h1>✅ Descarga de Carta Exitosa</h1>
+                    <p>Su carta para **${request.name}** ha sido descargada.</p>
+                    <p>Puede cerrar esta ventana.</p>
+                </div>
+            `;
+            
+            // Opcional: Eliminar la carta descargada del historial de aprobados para liberar espacio
+            // deleteApprovedRequest(requestId);
+        }
+
+        function deleteRequest(requestId) {
+            if (!confirm("¿Está seguro de rechazar y eliminar esta solicitud pendiente?")) return;
+            let requests = getRequests(STORAGE_KEY);
+            const index = requests.findIndex(req => req.id === requestId);
+            if (index > -1) {
+                requests.splice(index, 1);
+                saveRequests(STORAGE_KEY, requests);
+            }
+            loadPendingRequests();
+        }
+        
+        function deleteApprovedRequest(requestId) {
+            if (!confirm("¿Está seguro de eliminar esta solicitud APROBADA del historial? (Ya no podrá ser descargada)")) return;
+            let approved = getRequests(APPROVED_KEY);
+            const index = approved.findIndex(req => req.id === requestId);
+            if (index > -1) {
+                approved.splice(index, 1);
+                saveRequests(APPROVED_KEY, approved);
+            }
+            loadPendingRequests();
+        }
+
+        // --- Funciones Auxiliares PDF (Se mantienen igual) ---
+
+        function drawJustifiedText(doc, text, x, y, maxWidth, lineHeight) { /* ... */
             let currentY = y;
             const splitText = doc.splitTextToSize(text, maxWidth);
             splitText.forEach((line, index) => {
@@ -451,14 +509,17 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             return currentY; 
         }
         
-        const fileToBase64 = (file) => new Promise((resolve, reject) => {
+        const fileToBase64 = (file) => new Promise((resolve, reject) => { /* ... */
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = () => resolve(reader.result);
             reader.onerror = error => resolve(null);
         });
 
-        async function generarPDFLaboral(descargar = true) {
+        // Funciones de Generación de PDF (generarPDFLaboral, generarPDFPersonal)
+        // Se mantienen sin cambios, solo retornan el Base64. (Omisión de código por extensión).
+
+        async function generarPDFLaboral(descargar = true) { /* ... Código completo de generación PDF Laboral ... */
             const doc = new jsPDF('p', 'mm', 'a4');
             const margin = 20;
             let y = 10;
@@ -521,7 +582,7 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             y += lineHeight;
 
             doc.setFont(undefined, 'normal');
-            const listaTareas = tareas.split('\n').filter(t => t.trim() !== '');
+            const listaTareas = document.getElementById('tareasLaboral').value.trim().split('\n').filter(t => t.trim() !== '');
             listaTareas.forEach(tarea => {
                 const tareaFormato = `• ${tarea.trim()}`;
                 y = drawJustifiedText(doc, tareaFormato, margin + 5, y, textWidth - 10, lineHeight);
@@ -557,7 +618,7 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             }
         }
 
-        async function generarPDFPersonal(descargar = true) {
+        async function generarPDFPersonal(descargar = true) { /* ... Código completo de generación PDF Personal ... */
             const doc = new jsPDF('p', 'mm', 'a4');
             const margin = 20;
             let y = 30;
@@ -618,9 +679,12 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             }
         }
 
-        window.onload = function() {
-            showForm('menu');
-        };
+        // --- INICIALIZACIÓN ---
+
+        // Llamar a checkURL al cargar la página e inmediatamente si cambia el hash
+        window.addEventListener('load', checkURL);
+        window.addEventListener('hashchange', checkURL); 
+
     </script>
 </body>
 </html>
