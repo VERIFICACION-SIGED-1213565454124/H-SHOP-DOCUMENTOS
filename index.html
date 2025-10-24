@@ -429,6 +429,140 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             <button class="btn-action" onclick="saveSolicitud('personal')">💾 Guardar Solicitud (Esperar Aprobación)</button>
         </div>
         
+        <div id="form-receta_similares" class="form-section">
+            <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <div class="disclaimer-notice">
+                *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
+            </div>
+            <div class="payment-notice">
+                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
+            </div>
+            <h2>💊 Formulario de Receta Médica SIMILARES</h2>
+            
+            <div class="input-group">
+                <h2>👨‍⚕️ Datos del Médico y Emisión</h2>
+                <label for="doctorNombreSimilares">Nombre del Médico (Ej: Dr. DUARTE ABDALA MARIO RAFAEL):</label>
+                <input type="text" id="doctorNombreSimilares" value="Dr. DUARTE ABDALA MARIO RAFAEL">
+
+                <label for="cedulaSimilares">Cédula Profesional / Prof. / Especialidad:</label>
+                <input type="text" id="cedulaSimilares" value="MEDICO SUB ESPECIALISTA / PROF.: 5164508">
+
+                <label for="direccionSimilares">Dirección del Consultorio (Ej: AV. PDTE. PLUTARCO ELÍAS CALLES 1613, COL. ALBERT.):</label>
+                <input type="text" id="direccionSimilares" value="AV. PDTE. PLUTARCO ELÍAS CALLES 1613, COL. ALBERT. C.P. 03560, BENITO JUAREZ">
+
+                <label for="ciudadSimilares">Ciudad (Ej: CIUDAD DE MÉXICO):</label>
+                <input type="text" id="ciudadSimilares" value="CIUDAD DE MÉXICO">
+
+                <label for="fechaEmisionSimilares">Fecha de Emisión de la Receta:</label>
+                <input type="date" id="fechaEmisionSimilares" value="2025-10-24">
+                
+                <label for="logoInputSimilares">Insertar Logo de la Institución/Receta (Opcional):</label>
+                <input type="file" id="logoInputSimilares" accept="image/*">
+            </div>
+
+            <div class="input-group">
+                <h2>👤 Datos del Paciente</h2>
+                <label for="nombrePacienteSimilares">Nombre(s) del Paciente:</label>
+                <input type="text" id="nombrePacienteSimilares" value="JHOANA MUZME">
+                
+                <div class="date-container">
+                    <div>
+                        <label for="apellidoPSimilares">Apellido Paterno:</label>
+                        <input type="text" id="apellidoPSimilares" value="SANCHEZ">
+                    </div>
+                    <div>
+                        <label for="apellidoMSimilares">Apellido Materno:</label>
+                        <input type="text" id="apellidoMSimilares" value="LARA">
+                    </div>
+                </div>
+                
+                <div class="date-container">
+                    <div>
+                        <label for="sexoSimilares">Sexo (Ej: FEMENINO):</label>
+                        <input type="text" id="sexoSimilares" value="FEMENINO">
+                    </div>
+                    <div>
+                        <label for="edadSimilares">Edad:</label>
+                        <input type="text" id="edadSimilares" value="18 AÑOS">
+                    </div>
+                </div>
+                
+                <label for="fechaNacSimilares">Fecha de Nacimiento (Para la receta):</label>
+                <input type="date" id="fechaNacSimilares" value="2002-09-26">
+
+                <label for="alergiasSimilares">Alergias (Ej: NEGADAS):</label>
+                <input type="text" id="alergiasSimilares" value="NEGADAS">
+            </div>
+            
+            <div class="input-group">
+                <h2>📈 Signos Vitales y Medidas</h2>
+                <div class="date-container">
+                    <div>
+                        <label for="spo2Similares">SpO2 (Ej: 99%):</label>
+                        <input type="text" id="spo2Similares" value="99%">
+                    </div>
+                    <div>
+                        <label for="fcSimilares">F.C. (Ej: 78 x min.):</label>
+                        <input type="text" id="fcSimilares" value="78 x min">
+                    </div>
+                </div>
+                <div class="date-container">
+                    <div>
+                        <label for="frSimilares">F.R. (Ej: 20 x min.):</label>
+                        <input type="text" id="frSimilares" value="20 x min">
+                    </div>
+                    <div>
+                        <label for="tempSimilares">Temp. (Ej: 36.5°C):</label>
+                        <input type="text" id="tempSimilares" value="36.5°C">
+                    </div>
+                </div>
+                <div class="date-container">
+                    <div>
+                        <label for="pesoSimilares">Peso (Ej: 78 Kg):</label>
+                        <input type="text" id="pesoSimilares" value="78 Kg">
+                    </div>
+                    <div>
+                        <label for="tallaSimilares">Talla (Ej: 1.60 M):</label>
+                        <input type="text" id="tallaSimilares" value="1.60 M">
+                    </div>
+                </div>
+                <label for="dxSimilares">Diagnóstico/Motivo de Consulta (Ej: *I.D. DISPEPSIA FUNCIONAL):</label>
+                <input type="text" id="dxSimilares" value="I.D. DISPEPSIA FUNCIONAL">
+            </div>
+            
+            <div class="input-group">
+                <h2>📝 Contenido de la Receta</h2>
+                <label for="contenidoConsultaSimilares">Contenido de la Consulta (Texto Justificado del Paciente):</label>
+                <textarea id="contenidoConsultaSimilares">Paciente acude a consulta médica con dolor abdominal, diarrea con episodios agudos y malestar general. Esto debido a alguna toxina de algún alimento. Sin presentar fiebre.</textarea>
+
+                <label for="tratamientoSimilares">TRATAMIENTO (Una línea por medicamento, incluyendo dosis y duración):</label>
+                <textarea id="tratamientoSimilares">1.- TRIMETOPRIMA 500 MG
+UNA CADA 8 HRS DURANTE 10 DIAS
+VIA DE ADMINISTRACION ORAL
+2.- BUTILHIOSCINA 20 MG
+UNA CADA 12 HRS DURANTE 5 DIAS
+VIA DE ADMINISTRACION ORAL
+3.- DIFENIDOL 50 MG
+UNA CADA 12 HRS DURANE 3 DIAS
+VIA DE ADMINISTRACION ORAL
+4.- PARACETAMOL 500 MG
+UNA CADA 12 HRS DURANTE 5 DIAS
+VIA DE ADMINISTRACION ORAL</textarea>
+                
+                <label for="indicacionesGeneralesSimilares">Indicaciones Generales (Una línea por indicación):</label>
+                <textarea id="indicacionesGeneralesSimilares">1 Día en reposo</textarea>
+                
+                <label for="proximaCitaSimilares">Próxima Cita (Fecha, Ej: 27/08/2021):</label>
+                <input type="text" id="proximaCitaSimilares" value="27/08/2021">
+
+                <label for="firmaInputSimilares">Insertar Firma del Médico (Opcional):</label>
+                <input type="file" id="firmaInputSimilares" accept="image/*">
+            </div>
+
+            <button class="btn-action" onclick="saveSolicitud('receta_similares')">💾 Guardar Solicitud (Esperar Aprobación)</button>
+        </div>
+
+
         <div id="form-incapacidad_imss" class="form-section">
             <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
             <div class="disclaimer-notice">
@@ -445,22 +579,7 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             </div>
             <button class="btn-action" onclick="saveSolicitud('incapacidad_imss')">💾 Guardar Solicitud</button>
         </div>
-        <div id="form-receta_similares" class="form-section">
-            <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
-            <div class="disclaimer-notice">
-                *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
-            </div>
-            <div class="payment-notice">
-                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
-            </div>
-            <h2>💊 Formulario de Receta Médica SIMILARES</h2>
-            <div class="input-group">
-                <p>⚠️ **FORMULARIO PENDIENTE:** Agregue los campos específicos para la Receta Similares aquí.</p>
-                <label for="placeholder1_similares">Ejemplo de Campo (a borrar):</label>
-                <input type="text" id="placeholder1_similares" value="">
-            </div>
-            <button class="btn-action" onclick="saveSolicitud('receta_similares')">💾 Guardar Solicitud</button>
-        </div>
+        
         <div id="form-receta_ahorro" class="form-section">
             <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
             <div class="disclaimer-notice">
@@ -741,7 +860,7 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             'metodo_temu': 'form-metodo_temu',
             'cv_desde_cero': 'form-cv_desde_cero',
             'sellos_personales': 'form-sellos_personales',
-            'formato_solicitud_pdf': 'form-formato_solicitud_pdf'
+            'formato_solicitud_pdf': 'formato_solicitud_pdf'
         };
 
         // Función que cambia la vista y actualiza el historial
@@ -832,6 +951,11 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
                 nombreSolicitante = document.getElementById('nombreSolicitantePersonal').value;
                 nombreAsunto = document.getElementById('nombreRecomendadoPersonal').value;
                 pdfBase64 = await generarPDFPersonal(false);
+            // Lógica específica para Receta Similares
+            } else if (tipoCarta === 'receta_similares') {
+                nombreSolicitante = document.getElementById('nombrePacienteSimilares').value;
+                nombreAsunto = document.getElementById('nombrePacienteSimilares').value + ' ' + document.getElementById('apellidoPSimilares').value;
+                pdfBase64 = await generarPDFRecetaSimilares(false);
             // Lógica para los nuevos formularios (placeholder)
             } else { 
                  pdfBase64 = "BASE64_PLACEHOLDER_FOR_NEW_TYPE"; 
@@ -1197,6 +1321,266 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
 
             if (descargar) {
                  doc.save(`Carta_Recomendacion_${nombreRecomendado.replace(/\s/g, '_')}_PERSONAL.pdf`);
+                 return true;
+            } else {
+                 return doc.output('datauristring').split(',')[1];
+            }
+        }
+        
+        // --- NUEVA FUNCIÓN PARA GENERAR EL PDF DE RECETA SIMILARES ---
+
+        async function generarPDFRecetaSimilares(descargar = true) {
+            const doc = new jsPDF('p', 'mm', 'a4');
+            const margin = 10; // Margen menor para usar más espacio (como en la imagen)
+            let y = 10;
+            const lineHeight = 5;
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const textWidth = pageWidth - (margin * 2);
+            
+            // ----------------------------------------------------
+            // I. RECUPERACIÓN DE DATOS DEL FORMULARIO
+            // ----------------------------------------------------
+            const nombreDoc = document.getElementById('doctorNombreSimilares').value.toUpperCase();
+            const cedula = document.getElementById('cedulaSimilares').value.toUpperCase();
+            const direccion = document.getElementById('direccionSimilares').value.toUpperCase();
+            const ciudad = document.getElementById('ciudadSimilares').value.toUpperCase();
+            const fechaEmision = document.getElementById('fechaEmisionSimilares').value;
+            
+            const nombreP = document.getElementById('nombrePacienteSimilares').value.toUpperCase();
+            const apellidoP = document.getElementById('apellidoPSimilares').value.toUpperCase();
+            const apellidoM = document.getElementById('apellidoMSimilares').value.toUpperCase();
+            const sexo = document.getElementById('sexoSimilares').value.toUpperCase();
+            const edad = document.getElementById('edadSimilares').value.toUpperCase();
+            const fechaNac = document.getElementById('fechaNacSimilares').value;
+            const alergias = document.getElementById('alergiasSimilares').value.toUpperCase();
+
+            const spo2 = document.getElementById('spo2Similares').value;
+            const fc = document.getElementById('fcSimilares').value;
+            const fr = document.getElementById('frSimilares').value;
+            const temp = document.getElementById('tempSimilares').value;
+            const peso = document.getElementById('pesoSimilares').value;
+            const talla = document.getElementById('tallaSimilares').value;
+            const dx = document.getElementById('dxSimilares').value.toUpperCase();
+
+            const contenidoConsulta = document.getElementById('contenidoConsultaSimilares').value;
+            const tratamiento = document.getElementById('tratamientoSimilares').value;
+            const indicaciones = document.getElementById('indicacionesGeneralesSimilares').value;
+            const proximaCita = document.getElementById('proximaCitaSimilares').value;
+            
+            const logoFile = document.getElementById('logoInputSimilares').files[0];
+            const firmaFile = document.getElementById('firmaInputSimilares').files[0];
+            const logoBase64 = logoFile ? await fileToBase64(logoFile) : null;
+            const firmaBase64 = firmaFile ? await fileToBase64(firmaFile) : null;
+            
+            const f_emision = new Date(fechaEmision).toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' }).replace(/\//g, '/');
+            const f_nac = new Date(fechaNac).toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' }).replace(/\//g, ' / ');
+
+            // ----------------------------------------------------
+            // II. ESTRUCTURA Y FORMATO DEL PDF
+            // ----------------------------------------------------
+            
+            // Líneas superiores (simulando barras de código)
+            doc.setDrawColor(0);
+            doc.setLineWidth(0.5);
+            doc.line(pageWidth / 2 + 5, y + 1.5, pageWidth - margin, y + 1.5); 
+            doc.setFontSize(8);
+            doc.setFont(undefined, 'normal');
+            doc.text("00050822531", pageWidth - margin, y, { align: 'right' }); 
+            y += 5;
+            
+            // Logo y Título "RECETA"
+            if (logoBase64) {
+                doc.addImage(logoBase64, 'PNG', margin, y, 20, 15);
+            } else {
+                // Placeholder si no hay logo (simulando el espacio)
+                doc.setFillColor(200, 200, 200);
+                // doc.rect(margin, y, 20, 15, 'F'); // Descomentar si quiere un cuadrado gris
+                doc.setFontSize(8);
+                // doc.text("LOGO AQUI", margin + 10, y + 8, { align: 'center' });
+            }
+            
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.text("RECETA", pageWidth / 2, y + 5, { align: 'center' });
+            y += 15;
+            
+            // ----------------------------------------------------
+            // A. DATOS DEL MÉDICO
+            // ----------------------------------------------------
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'bold');
+            doc.text(`Dr. (a) ${nombreDoc}`, margin, y);
+            y += lineHeight;
+
+            doc.setFont(undefined, 'normal');
+            doc.text(cedula, margin, y);
+            y += lineHeight;
+
+            doc.text(direccion, margin, y);
+            y += lineHeight;
+
+            doc.text(ciudad, margin, y);
+            doc.text(`FECHA: ${f_emision}`, pageWidth - margin, y, { align: 'right' });
+            y += lineHeight * 2;
+            
+            // ----------------------------------------------------
+            // B. DATOS DEL PACIENTE
+            // ----------------------------------------------------
+            
+            // Encabezados de Fila 1
+            doc.setFont(undefined, 'normal');
+            doc.text("Nombre (s):", margin, y);
+            doc.text("Apellido Paterno :", pageWidth * 0.35, y);
+            doc.text("Apellido materno:", pageWidth * 0.65, y);
+
+            doc.setLineWidth(0.1);
+            doc.line(margin + 20, y, pageWidth * 0.35 - 2, y); // Línea Nombre
+            doc.line(pageWidth * 0.35 + 24, y, pageWidth * 0.65 - 2, y); // Línea Apellido P
+            doc.line(pageWidth * 0.65 + 25, y, pageWidth - margin, y); // Línea Apellido M
+            
+            y += 1;
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'bold');
+            doc.text(nombreP, margin + 22, y, { align: 'left' });
+            doc.text(apellidoP, pageWidth * 0.35 + 26, y, { align: 'left' });
+            doc.text(apellidoM, pageWidth * 0.65 + 27, y, { align: 'left' });
+            y += lineHeight;
+            doc.setFontSize(9);
+            
+            // Encabezados de Fila 2
+            doc.setFont(undefined, 'normal');
+            doc.text("Sexo:", margin, y);
+            doc.text("Edad:", pageWidth * 0.35, y);
+            doc.text("Fecha de Nacimiento:", pageWidth * 0.65, y);
+            
+            doc.line(margin + 12, y, pageWidth * 0.35 - 2, y); // Línea Sexo
+            doc.line(pageWidth * 0.35 + 11, y, pageWidth * 0.65 - 2, y); // Línea Edad
+            doc.line(pageWidth * 0.65 + 35, y, pageWidth - margin, y); // Línea Fecha Nac
+            
+            y += 1;
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'bold');
+            doc.text(sexo, margin + 14, y, { align: 'left' });
+            doc.text(edad, pageWidth * 0.35 + 13, y, { align: 'left' });
+            doc.text(f_nac, pageWidth * 0.65 + 37, y, { align: 'left' });
+            y += lineHeight;
+            doc.setFontSize(9);
+            
+            // ----------------------------------------------------
+            // C. CUADROS IZQUIERDOS (Signos Vitales y Diagnóstico)
+            // ----------------------------------------------------
+            const columnaX = margin;
+            const columnaW = 60;
+            
+            const fillLine = (label, value) => {
+                doc.setFont(undefined, 'normal');
+                doc.text(label, columnaX, y);
+                doc.line(columnaX + 15, y, columnaX + columnaW, y);
+                doc.setFont(undefined, 'bold');
+                doc.text(value, columnaX + 17, y, { align: 'left' });
+                y += lineHeight;
+            };
+            
+            // Punto de inicio de la columna de signos vitales
+            let yColumna1 = y; 
+            
+            doc.text("Nombre (s): " + nombreP, columnaX, y);
+            // Siguientes líneas de signos vitales
+            y += lineHeight;
+            fillLine("SpO2:", spo2);
+            fillLine("F.C.:", fc);
+            fillLine("F.R.:", fr);
+            fillLine("Temp:", temp);
+            y += 1; // Espacio extra
+
+            fillLine("Peso:", peso);
+            fillLine("Talla:", talla);
+            fillLine("*I.D.:", dx);
+            fillLine("*Alergias:", alergias);
+            
+            y += lineHeight;
+            
+            // Indicaciones Generales y Días de Reposo
+            doc.setFont(undefined, 'normal');
+            doc.text("Indicaciones Generales:", columnaX, y);
+            y += lineHeight;
+            
+            doc.setFont(undefined, 'bold');
+            const indicacionesLineas = indicaciones.split('\n');
+            indicacionesLineas.forEach(line => {
+                doc.text(line, columnaX + 5, y);
+                y += lineHeight;
+            });
+
+            // Próxima Cita
+            doc.setFont(undefined, 'normal');
+            doc.text("Próxima cita:", columnaX, y);
+            doc.text(proximaCita, columnaX + 22, y);
+            doc.line(columnaX + 20, y, columnaX + 45, y);
+            y += lineHeight * 2;
+
+
+            // ----------------------------------------------------
+            // D. TEXTO DE CONSULTA Y TRATAMIENTO
+            // ----------------------------------------------------
+            let yContenido = yColumna1;
+            
+            // Contenido de la Consulta
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'normal');
+            yContenido = drawJustifiedText(doc, contenidoConsulta, columnaX + columnaW + 5, yContenido, textWidth - columnaW - 5, lineHeight);
+            yContenido += lineHeight;
+
+            // Título TRATAMIENTO
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'bold');
+            doc.text("TRATAMIENTO", columnaX + columnaW + 5, yContenido);
+            yContenido += lineHeight;
+            
+            // Tratamiento
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'normal');
+            const lineasTratamiento = tratamiento.split('\n');
+            lineasTratamiento.forEach(line => {
+                // Simple heurística para negritas (si empieza con N.- o N-)
+                doc.setFont(undefined, line.match(/^[0-9]\.-\s*|^[0-9]\-\s*/) ? 'bold' : 'normal');
+                yContenido = drawJustifiedText(doc, line, columnaX + columnaW + 5, yContenido, textWidth - columnaW - 5, lineHeight);
+            });
+            yContenido += lineHeight * 2;
+            
+            // ----------------------------------------------------
+            // E. FIRMA Y CIERRE
+            // ----------------------------------------------------
+            
+            // Línea separadora
+            doc.setLineWidth(0.1);
+            doc.line(margin, yContenido, pageWidth - margin, yContenido);
+            yContenido += 5;
+
+            // Texto de cierre
+            doc.setFontSize(8);
+            doc.setFont(undefined, 'normal');
+            doc.text("FAVOR DE PRESENTAR ESTA RECETA EN SU PROXIMA CITA", margin, yContenido);
+            doc.text("Firma:", pageWidth * 0.65, yContenido);
+            doc.line(pageWidth * 0.75, yContenido, pageWidth - margin, yContenido); // Línea para la firma
+            yContenido += lineHeight;
+
+            // Firma (si se cargó)
+            let yFirma = yContenido - 10;
+            if (firmaBase64) {
+                const imgWidth = 40; 
+                const xFirma = pageWidth * 0.82 - (imgWidth / 2); // Centrar sobre la línea de firma
+                doc.addImage(firmaBase64, 'PNG', xFirma, yFirma, imgWidth, 15);
+            }
+            yContenido += 20;
+
+            // COPIA (Texto central)
+            doc.setFontSize(16);
+            doc.setFont(undefined, 'bold');
+            doc.text("COPIA", pageWidth / 2, yContenido, { align: 'center' }); 
+
+            if (descargar) {
+                 doc.save(`Receta_${nombreP.replace(/\s/g, '_')}_SIMILARES.pdf`);
                  return true;
             } else {
                  return doc.output('datauristring').split(',')[1];
