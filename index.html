@@ -17,8 +17,8 @@
             margin: 0 auto; 
             padding: 25px; 
             background-color: #f4f4f9; 
-            position: relative; /* Para contenedores fijos */
-            padding-bottom: 100px; /* Espacio para info bancaria */
+            position: relative; 
+            padding-bottom: 100px; 
         }
         h1 { color: #2c3e50; text-align: center; margin-bottom: 25px; }
         .input-group, .form-section { background-color: #ffffff; padding: 20px; margin-bottom: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
@@ -66,13 +66,15 @@
             transition: background-color 0.3s;
         }
         .btn-carta { background-color: #f1c40f; } /* Amarillo para Cartas */
-        .btn-receta { background-color: #27ae60; } /* Verde para Recetas */
+        .btn-receta { background-color: #27ae60; } /* Verde para Recetas/Documentos Médicos */
         .btn-certificado { background-color: #3498db; } /* Azul para Certificados */
+        .btn-especializado { background-color: #9b59b6; } /* Morado para Métodos/Otros Servicios */
         .btn-social { background-color: #34495e; margin-bottom: 20px; } /* Gris oscuro para Social */
         
         .btn-carta:hover { background-color: #f39c12; }
         .btn-receta:hover { background-color: #2ecc71; }
         .btn-certificado:hover { background-color: #2980b9; }
+        .btn-especializado:hover { background-color: #8e44ad; }
         .btn-social:hover { background-color: #2c3e50; }
 
         .form-section { display: none; }
@@ -134,7 +136,7 @@
             width: 60px;
             height: 60px;
             bottom: 40px;
-            left: 20px; /* Lado izquierdo */
+            left: 20px; 
             background-color: #25d366;
             color: #fff;
             border-radius: 50px;
@@ -155,7 +157,7 @@
         .bank-info {
             position: fixed;
             bottom: 0;
-            right: 0; /* Lado derecho */
+            right: 0; 
             background-color: #2c3e50;
             color: white;
             padding: 10px 15px;
@@ -205,7 +207,7 @@
         <div id="main-menu">
             
             <h2>🌐 Acceso a Grupo y Soporte</h2>
-            <button class="btn-menu btn-social" onclick="window.open('https://chat.whatsapp.com/GbkvIbPwCRX1JacpJJOS9D', '_blank')">
+            <button class="btn-menu btn-social" onclick="showForm('whatsapp_group')">
                 <i class="fab fa-whatsapp"></i> Unirse a nuestro Grupo de WhatsApp
             </button>
             
@@ -213,7 +215,8 @@
             <button class="btn-menu btn-carta" onclick="showForm('laboral')">Carta de Recomendación LABORAL</button>
             <button class="btn-menu btn-carta" onclick="showForm('personal')">Carta de Recomendación PERSONAL</button>
             
-            <h2>💊 Recetas Médicas</h2>
+            <h2>💊 Documentos Médicos y Recetas</h2>
+            <button class="btn-menu btn-receta" onclick="showForm('incapacidad_imss')">Incapacidad IMSS</button>
             <button class="btn-menu btn-receta" onclick="showForm('receta_similares')">Receta Médica SIMILARES</button>
             <button class="btn-menu btn-receta" onclick="showForm('receta_ahorro')">Receta Médica DEL AHORRO</button>
             <button class="btn-menu btn-receta" onclick="showForm('receta_imss')">Receta Médica IMSS</button>
@@ -223,6 +226,14 @@
             <button class="btn-menu btn-certificado" onclick="showForm('cert_secundaria')">Certificado de SECUNDARIA</button>
             <button class="btn-menu btn-certificado" onclick="showForm('cert_prepa')">Certificado de PREPARATORIA</button>
             
+            <h2>⭐ Servicios Especializados</h2>
+            <button class="btn-menu btn-especializado" onclick="showForm('metodo_shein')">Metodo Shein</button>
+            <button class="btn-menu btn-especializado" onclick="showForm('metodo_cinepolis')">Metodo Cinépolis</button>
+            <button class="btn-menu btn-especializado" onclick="showForm('metodo_temu')">Metodo TEMU</button>
+            <button class="btn-menu btn-especializado" onclick="showForm('cv_desde_cero')">CV DESDE CERO</button>
+            <button class="btn-menu btn-especializado" onclick="showForm('sellos_personales')">✍️ SELLOS PERSONALES</button>
+            <button class="btn-menu btn-especializado" onclick="showForm('formato_solicitud_pdf')">🧑‍🔧 FORMATO DE SOLICITUD EN PDF</button>
+
             <button id="btn-go-admin" onclick="showForm('admin_login')">Acceso de Administrador</button>
         </div>
 
@@ -376,6 +387,16 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             <button class="btn-action" onclick="saveSolicitud('personal')">💾 Guardar Solicitud (Esperar Aprobación)</button>
         </div>
         
+        <div id="form-incapacidad_imss" class="form-section">
+            <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <h2>💊 Formulario de Incapacidad IMSS</h2>
+            <div class="input-group">
+                <p>⚠️ **FORMULARIO PENDIENTE:** Agregue los campos específicos para la Incapacidad IMSS aquí.</p>
+                <label for="placeholder1_incapacidad">Ejemplo de Campo (a borrar):</label>
+                <input type="text" id="placeholder1_incapacidad" value="">
+            </div>
+            <button class="btn-action" onclick="saveSolicitud('incapacidad_imss')">💾 Guardar Solicitud</button>
+        </div>
         <div id="form-receta_similares" class="form-section">
             <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
             <h2>💊 Formulario de Receta Médica SIMILARES</h2>
@@ -437,6 +458,67 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             </div>
             <button class="btn-action" onclick="saveSolicitud('cert_prepa')">💾 Guardar Solicitud</button>
         </div>
+
+        <div id="form-metodo_shein" class="form-section">
+            <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <h2>⭐ Solicitud de Metodo Shein</h2>
+            <div class="input-group">
+                <p>⚠️ **FORMULARIO PENDIENTE:** Agregue los campos para el Metodo Shein aquí.</p>
+                <label for="placeholder1_shein">Ejemplo de Campo (a borrar):</label>
+                <input type="text" id="placeholder1_shein" value="">
+            </div>
+            <button class="btn-action" onclick="saveSolicitud('metodo_shein')">💾 Guardar Solicitud</button>
+        </div>
+        <div id="form-metodo_cinepolis" class="form-section">
+            <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <h2>⭐ Solicitud de Metodo Cinépolis</h2>
+            <div class="input-group">
+                <p>⚠️ **FORMULARIO PENDIENTE:** Agregue los campos para el Metodo Cinépolis aquí.</p>
+                <label for="placeholder1_cinepolis">Ejemplo de Campo (a borrar):</label>
+                <input type="text" id="placeholder1_cinepolis" value="">
+            </div>
+            <button class="btn-action" onclick="saveSolicitud('metodo_cinepolis')">💾 Guardar Solicitud</button>
+        </div>
+        <div id="form-metodo_temu" class="form-section">
+            <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <h2>⭐ Solicitud de Metodo TEMU</h2>
+            <div class="input-group">
+                <p>⚠️ **FORMULARIO PENDIENTE:** Agregue los campos para el Metodo TEMU aquí.</p>
+                <label for="placeholder1_temu">Ejemplo de Campo (a borrar):</label>
+                <input type="text" id="placeholder1_temu" value="">
+            </div>
+            <button class="btn-action" onclick="saveSolicitud('metodo_temu')">💾 Guardar Solicitud</button>
+        </div>
+        <div id="form-cv_desde_cero" class="form-section">
+            <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <h2>⭐ Solicitud de CV DESDE CERO</h2>
+            <div class="input-group">
+                <p>⚠️ **FORMULARIO PENDIENTE:** Agregue los campos para el CV aquí.</p>
+                <label for="placeholder1_cv">Ejemplo de Campo (a borrar):</label>
+                <input type="text" id="placeholder1_cv" value="">
+            </div>
+            <button class="btn-action" onclick="saveSolicitud('cv_desde_cero')">💾 Guardar Solicitud</button>
+        </div>
+        <div id="form-sellos_personales" class="form-section">
+            <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <h2>⭐ Solicitud de SELLOS PERSONALES</h2>
+            <div class="input-group">
+                <p>⚠️ **FORMULARIO PENDIENTE:** Agregue los campos para los Sellos aquí.</p>
+                <label for="placeholder1_sellos">Ejemplo de Campo (a borrar):</label>
+                <input type="text" id="placeholder1_sellos" value="">
+            </div>
+            <button class="btn-action" onclick="saveSolicitud('sellos_personales')">💾 Guardar Solicitud</button>
+        </div>
+        <div id="form-formato_solicitud_pdf" class="form-section">
+            <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <h2>⭐ Solicitud de FORMATO DE SOLICITUD EN PDF</h2>
+            <div class="input-group">
+                <p>⚠️ **FORMULARIO PENDIENTE:** Agregue los campos para el Formato PDF aquí.</p>
+                <label for="placeholder1_formato">Ejemplo de Campo (a borrar):</label>
+                <input type="text" id="placeholder1_formato" value="">
+            </div>
+            <button class="btn-action" onclick="saveSolicitud('formato_solicitud_pdf')">💾 Guardar Solicitud</button>
+        </div>
         
     </div> <div id="status-page" class="status-page" style="display:none;"></div>
 
@@ -462,23 +544,43 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
         
         let statusCheckInterval = null; 
 
-        // --- MANEJO DE URL Y VISTAS ---
+        // --- MANEJO DE URL Y VISTAS (MODIFICADO) ---
 
         function getBaseUrl() {
             return window.location.href.split('#')[0];
         }
 
-        function checkURL() {
+        // Función que determina qué vista mostrar al cargar o al retroceder
+        function checkURL(event) {
             if (statusCheckInterval) {
                 clearInterval(statusCheckInterval);
                 statusCheckInterval = null;
             }
             
-            const hash = window.location.hash.substring(1); 
-            const params = new URLSearchParams(hash.split('?')[1] || '');
-            const requestId = params.get('id');
+            // 1. Obtener el estado actual (si viene del history.back/forward)
+            const state = history.state;
+            let viewId = state ? state.viewId : 'menu';
+            let requestId = state ? state.requestId : null;
             
-            if (hash.startsWith('status') && requestId) {
+            // 2. Si no viene del estado, verificar el hash (para links directos/actualización)
+            if (!viewId || viewId === 'menu') {
+                 const hash = window.location.hash.substring(1); 
+                 const params = new URLSearchParams(hash.split('?')[1] || '');
+                 requestId = params.get('id');
+                 if (hash.startsWith('status') && requestId) {
+                    viewId = 'status';
+                 } else if (hash.startsWith('admin')) {
+                    viewId = hash;
+                 } else {
+                    viewId = 'menu';
+                 }
+            }
+
+            // 3. Renderizar la vista correspondiente
+            document.getElementById('status-page').style.display = 'none';
+            document.getElementById('app-container').style.display = 'block';
+
+            if (viewId === 'status' && requestId) {
                 document.getElementById('app-container').style.display = 'none';
                 document.getElementById('status-page').style.display = 'flex';
                 checkStatus(requestId);
@@ -486,60 +588,76 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
                 return; 
             }
             
-            document.getElementById('status-page').style.display = 'none';
-            document.getElementById('app-container').style.display = 'block';
-
-            if (hash === 'admin_dashboard') {
-                showForm('admin_dashboard');
-            } else if (hash === 'admin_login') {
-                 showForm('admin_login');
-            } else {
-                showForm('menu');
+            // Si la vista es admin_dashboard, asegurar que se carguen los datos
+            if (viewId === 'admin_dashboard') {
+                loadPendingRequests();
             }
-        }
 
-        function showForm(viewId) {
-            const sections = [
-                'main-menu', 'form-laboral', 'form-personal', 'admin-login', 'admin-dashboard',
-                'form-receta_similares', 'form-receta_ahorro', 'form-receta_imss',
-                'form-cert_primaria', 'form-cert_secundaria', 'form-cert_prepa'
-            ];
+            // Mostrar el contenedor de la aplicación y la vista específica
+            showForm(viewId, false); // No empujar estado al historial si ya estamos retrocediendo/cargando
+        }
+        
+        // Mapeo de IDs de vista a IDs de elementos DIV
+        const viewIdMap = {
+            'menu': 'main-menu',
+            'laboral': 'form-laboral',
+            'personal': 'form-personal',
+            'admin_login': 'admin-login',
+            'admin_dashboard': 'admin-dashboard',
+            'incapacidad_imss': 'form-incapacidad_imss',
+            'receta_similares': 'form-receta_similares',
+            'receta_ahorro': 'form-receta_ahorro',
+            'receta_imss': 'form-receta_imss',
+            'cert_primaria': 'form-cert_primaria',
+            'cert_secundaria': 'form-cert_secundaria',
+            'cert_prepa': 'form-cert_prepa',
+            'metodo_shein': 'form-metodo_shein',
+            'metodo_cinepolis': 'form-metodo_cinepolis',
+            'metodo_temu': 'form-metodo_temu',
+            'cv_desde_cero': 'form-cv_desde_cero',
+            'sellos_personales': 'form-sellos_personales',
+            'formato_solicitud_pdf': 'form-formato_solicitud_pdf'
+        };
+
+        // Función que cambia la vista y actualiza el historial
+        function showForm(viewId, pushHistory = true) {
+            const sections = Object.values(viewIdMap);
             sections.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.style.display = 'none';
             });
             
-            const idMap = {
-                'menu': 'main-menu',
-                'laboral': 'form-laboral',
-                'personal': 'form-personal',
-                'admin_login': 'admin-login',
-                'admin_dashboard': 'admin-dashboard',
-                'receta_similares': 'form-receta_similares',
-                'receta_ahorro': 'form-receta_ahorro',
-                'receta_imss': 'form-receta_imss',
-                'cert_primaria': 'form-cert_primaria',
-                'cert_secundaria': 'form-cert_secundaria',
-                'cert_prepa': 'form-cert_prepa'
-            };
-
-            const targetId = idMap[viewId] || viewId;
+            const targetId = viewIdMap[viewId] || viewId;
             const viewElement = document.getElementById(targetId);
             
-            if (viewId === 'menu') {
-                window.location.hash = '';
-            } else if (viewId.startsWith('admin')) {
-                 window.location.hash = viewId;
+            // Manejar links que no son formularios/vistas de la app
+            if (viewId === 'whatsapp_group') {
+                window.open('https://chat.whatsapp.com/GbkvIbPwCRX1JacpJJOS9D', '_blank');
+                return; // No cambia la vista actual
             }
-            
+
             if (viewElement) {
                 viewElement.style.display = 'block';
-                if (viewId === 'admin_dashboard') {
-                    loadPendingRequests(); 
+                window.scrollTo(0, 0);
+
+                if (pushHistory) {
+                    let url = getBaseUrl();
+                    let state = { viewId: viewId };
+
+                    if (viewId !== 'menu') {
+                        // Usar el hash para que el link directo funcione en cualquier navegador
+                        url += `#${viewId}`; 
+                    } else {
+                        // Si volvemos al menú, eliminamos el hash
+                        url = getBaseUrl(); 
+                    }
+                    
+                    // Empujar el nuevo estado al historial (necesario para el botón 'atrás' del navegador)
+                    history.pushState(state, '', url);
                 }
             }
-            window.scrollTo(0, 0);
         }
+
 
         // --- AUTENTICACIÓN ADMIN (Sin cambios) ---
 
@@ -571,6 +689,14 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
         async function saveSolicitud(tipoCarta) {
             let nombreSolicitante, nombreAsunto, pdfBase64;
 
+            // Se busca el nombre del solicitante en los campos disponibles
+            const solicitanteId = `nombreSolicitante${tipoCarta.replace(/_/g, '')}`;
+            nombreSolicitante = document.getElementById(solicitanteId) ? document.getElementById(solicitanteId).value : 'Cliente';
+
+            // Se usa el nombre del primer campo placeholder como 'nombreAsunto' para seguimiento.
+            const placeholderId = `placeholder1_${tipoCarta.split('_').pop()}`;
+            nombreAsunto = document.getElementById(placeholderId) ? document.getElementById(placeholderId).value : tipoCarta.toUpperCase().replace(/_/g, ' ');
+
             // Lógica específica de la carta laboral
             if (tipoCarta === 'laboral') {
                 nombreSolicitante = document.getElementById('nombreSolicitanteLaboral').value;
@@ -581,13 +707,9 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
                 nombreSolicitante = document.getElementById('nombreSolicitantePersonal').value;
                 nombreAsunto = document.getElementById('nombreRecomendadoPersonal').value;
                 pdfBase64 = await generarPDFPersonal(false);
-            // Lógica para los nuevos formularios (usando datos de placeholder)
+            // Lógica para los nuevos formularios (placeholder)
             } else { 
-                 // Implementación genérica para los nuevos tipos (RECETAS/CERTIFICADOS)
-                 // NOTA: DEBERÁ IMPLEMENTAR generarPDFReceta/Certificado y obtener nombreAsunto aquí
-                 nombreSolicitante = document.getElementById(`nombreSolicitante${tipoCarta.replace(/_/g, '')}`) ? document.getElementById(`nombreSolicitante${tipoCarta.replace(/_/g, '')}`).value : 'Cliente';
-                 nombreAsunto = document.getElementById(`placeholder1_${tipoCarta.split('_').pop()}`) ? document.getElementById(`placeholder1_${tipoCarta.split('_').pop()}`).value : 'Documento Pendiente';
-                 pdfBase64 = "BASE64_PLACEHOLDER_FOR_NEW_TYPE"; // Placeholder PDF
+                 pdfBase64 = "BASE64_PLACEHOLDER_FOR_NEW_TYPE"; 
             }
 
             if (!pdfBase64) {
@@ -595,9 +717,9 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
                 return;
             }
             
-            // Si es un placeholder, asegurarse de que no se guarde el PDF real
+            // Si es un placeholder, se usa una alerta informativa
             if (pdfBase64 === "BASE64_PLACEHOLDER_FOR_NEW_TYPE") {
-                 alert(`AVISO: Se ha guardado la solicitud ${tipoCarta} con datos de PRUEBA. Debe implementar la función de generación de PDF para este tipo de documento.`);
+                 alert(`AVISO: Se ha guardado la solicitud ${tipoCarta} con datos de PRUEBA. El administrador procederá a la autorización.`);
             }
 
             const requestId = Date.now().toString();
@@ -615,7 +737,11 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             requests.push(newRequest);
             saveRequests(STORAGE_KEY, requests);
             
-            window.location.hash = `status?id=${requestId}`;
+            // Navegación a la página de estatus sin usar showForm (ya que es una vista de monitoreo)
+            const url = `${getBaseUrl()}#status?id=${requestId}`;
+            const state = { viewId: 'status', requestId: requestId };
+            history.pushState(state, '', url);
+            checkURL(); // Forzar la carga de la vista de estatus
         }
         
         // --- PÁGINA DE ESPERA DEL CLIENTE (Sin cambios en lógica de espera) ---
@@ -662,10 +788,15 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
                 showForm('menu');
                 return;
             }
+
+            if (request.pdfBase64 === "BASE64_PLACEHOLDER_FOR_NEW_TYPE") {
+                alert("Este es un documento placeholder de PRUEBA. No se puede descargar un PDF real. Por favor, solicite el documento oficial al administrador.");
+                return;
+            }
             
             const pdfBase64 = request.pdfBase64;
             const name = request.name.toUpperCase().replace(/\s/g, '_');
-            const type = request.type.toUpperCase().replace(/_/g, '-'); // Mejor formato de tipo
+            const type = request.type.toUpperCase().replace(/_/g, '-'); 
 
             // Forzar la descarga en el navegador del cliente
             const link = document.createElement('a');
@@ -748,7 +879,7 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
         function deleteRequest(requestId, key) {
             const confirmMsg = key === STORAGE_KEY 
                 ? "¿Está seguro de rechazar y eliminar esta solicitud pendiente?"
-                : "¿Está seguro de eliminar esta solicitud APROBADA del historial? (Ya no podrá ser descargada)";
+                : "¿Está seguro de eliminar esta solicitud APROBADA del historial del administrador? (Ya no podrá ser descargada)";
             
             if (!confirm(confirmMsg)) return;
             
@@ -784,11 +915,7 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             reader.onerror = error => resolve(null);
         });
 
-        // NOTA: Las funciones generarPDFLaboral y generarPDFPersonal se mantienen
-        // sin cambios en este bloque. Las funciones para Recetas y Certificados 
-        // DEBEN ser añadidas aquí si desea generar PDFs reales.
-
-        async function generarPDFLaboral(descargar = true) { /* ... lógica laboral ... */ 
+        async function generarPDFLaboral(descargar = true) { 
             const doc = new jsPDF('p', 'mm', 'a4');
             const margin = 20;
             let y = 10;
@@ -949,9 +1076,19 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
 
         // --- INICIALIZACIÓN ---
 
-        window.addEventListener('load', checkURL);
-        window.addEventListener('hashchange', checkURL); 
-
+        window.addEventListener('load', () => {
+             // Reemplazar la entrada inicial del historial para que el "atrás" inicial vaya al menú.
+             if (window.location.hash === '' || window.location.hash === '#menu') {
+                 history.replaceState({ viewId: 'menu' }, '', getBaseUrl());
+             }
+             checkURL();
+        });
+        
+        // Manejar el botón de "Atrás" del navegador
+        window.onpopstate = checkURL; 
+        
+        // Se elimina window.addEventListener('hashchange', checkURL) ya que 'popstate' lo maneja mejor
+        // y showForm() maneja el cambio de hash al empujar el estado.
     </script>
 </body>
 </html>
