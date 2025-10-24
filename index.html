@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador Profesional de Carta de Recomendación</title>
+    <title>Generador de Cartas de Recomendación</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <style>
-        /* Estilos de la página */
+        /* Estilos generales */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 850px; margin: 0 auto; padding: 25px; background-color: #f4f4f9; }
         h1 { color: #2c3e50; text-align: center; margin-bottom: 25px; }
-        .input-group { background-color: #ffffff; padding: 20px; margin-bottom: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+        .input-group, .form-section { background-color: #ffffff; padding: 20px; margin-bottom: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
         h2 { color: #34495e; border-bottom: 2px solid #3498db; padding-bottom: 5px; margin-bottom: 15px; }
         label { display: block; margin-top: 10px; font-weight: bold; color: #555; }
         input[type="text"], input[type="date"], textarea, input[type="file"] {
@@ -26,8 +26,9 @@
         .date-container { display: flex; justify-content: space-between; gap: 10px; }
         .date-container input { width: 100%; }
         textarea { height: 120px; resize: vertical; }
-        button {
-            background-color: #2ecc71;
+        
+        /* Estilos de botones de navegación/acción */
+        .btn-action, .btn-menu {
             color: white;
             padding: 15px 20px;
             border: none;
@@ -35,115 +36,277 @@
             cursor: pointer;
             font-size: 1.1em;
             width: 100%;
+            margin-top: 10px;
             transition: background-color 0.3s;
         }
-        button:hover { background-color: #27ae60; }
+        .btn-action { /* Botón de Solicitud de Aprobación */
+            background-color: #e67e22; 
+        }
+        .btn-action:hover { background-color: #d35400; }
+
+        /* Estilos del menú principal */
+        #main-menu .btn-menu {
+            background-color: #3498db; /* Azul para opciones */
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+        #main-menu .btn-menu:hover {
+            background-color: #2980b9;
+        }
+        .back-button {
+            background-color: #95a5a6; 
+            width: auto;
+            padding: 10px 15px;
+            font-size: 1em;
+        }
+        .back-button:hover { background-color: #7f8c8d; }
+
+        /* Ocultar secciones de formulario al inicio */
+        .form-section { display: none; }
     </style>
 </head>
 <body>
 
-    <h1>📝 Generador de Carta de Recomendación Laboral</h1>
+    <h1>📝 Generador de Cartas de Recomendación</h1>
 
-    <div class="input-group">
-        <h2>📂 Logo y Firma</h2>
-        <label for="logoInput">Insertar Logo de la Empresa (Esquina superior izquierda del PDF):</label>
-        <input type="file" id="logoInput" accept="image/*">
-        
-        <label for="firmaInput">Insertar Firma (Alineada al centro):</label>
-        <input type="file" id="firmaInput" accept="image/*">
+    <div id="main-menu">
+        <h2>Seleccione el tipo de carta que desea generar:</h2>
+        <button class="btn-menu" onclick="showForm('laboral')">Carta de Recomendación LABORAL</button>
+        <button class="btn-menu" onclick="showForm('personal')">Carta de Recomendación PERSONAL</button>
     </div>
 
-    <div class="input-group">
-        <h2>👤 Datos del Empleado</h2>
-        <label for="fechaEmision">Fecha de Emisión de la Carta (Hoy):</label>
-        <input type="date" id="fechaEmision" value="2025-10-24">
-        
-        <label for="nombreEmpleado">Nombre Completo del Empleado:</label>
-        <input type="text" id="nombreEmpleado" value="Antonio Galván Guardado">
+    <div id="form-laboral" class="form-section">
+        <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+        <h2>💼 Formulario de Carta Laboral</h2>
 
-        <label for="puestoDesempenado">Puesto Desempeñado:</label>
-        <input type="text" id="puestoDesempenado" value="Ayudante General">
+        <div class="input-group">
+            <h2>📧 Solicitud de Aprobación</h2>
+            <p>⚠️ **Aviso:** El PDF NO se descargará automáticamente. Al presionar el botón, se enviará una solicitud de correo con los datos al administrador para su aprobación y envío. **¡Asegúrate de llenar tu correo correctamente!**</p>
+            <label for="emailSolicitanteLaboral">Tu Correo Electrónico (Donde te enviaremos el PDF aprobado):</label>
+            <input type="text" id="emailSolicitanteLaboral" value="solicitante@ejemplo.com">
+        </div>
         
-        <div class="date-container">
-            <div>
-                <label for="fechaInicio">Fecha de Inicio Laboral:</label>
-                <input type="date" id="fechaInicio" value="2024-08-10">
-            </div>
-            <div>
-                <label for="fechaFin">Fecha de Término Laboral:</label>
-                <input type="date" id="fechaFin" value="2025-09-12">
+        <div class="input-group">
+            <h2>📂 Logo y Firma</h2>
+            <label for="logoInputLaboral">Insertar Logo de la Empresa:</label>
+            <input type="file" id="logoInputLaboral" accept="image/*">
+            
+            <label for="firmaInputLaboral">Insertar Firma:</label>
+            <input type="file" id="firmaInputLaboral" accept="image/*">
+        </div>
+
+        <div class="input-group">
+            <h2>👤 Datos del Empleado</h2>
+            <label for="fechaEmisionLaboral">Fecha de Emisión de la Carta:</label>
+            <input type="date" id="fechaEmisionLaboral" value="2025-10-24">
+            
+            <label for="nombreEmpleadoLaboral">Nombre Completo del Empleado:</label>
+            <input type="text" id="nombreEmpleadoLaboral" value="JAIME LEONARDO GARCIA MENDEZ">
+
+            <label for="puestoDesempenadoLaboral">Puesto Desempeñado:</label>
+            <input type="text" id="puestoDesempenadoLaboral" value="ANALISTA DE MANTENIMIENTO">
+            
+            <div class="date-container">
+                <div>
+                    <label for="fechaInicioLaboral">Fecha de Inicio Laboral:</label>
+                    <input type="date" id="fechaInicioLaboral" value="2024-09-08">
+                </div>
+                <div>
+                    <label for="fechaFinLaboral">Fecha de Término Laboral:</label>
+                    <input type="date" id="fechaFinLaboral" value="2025-11-09">
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="input-group">
-        <h2>📝 Contenido de la Carta</h2>
-        <label for="nombreEmpresa">Nombre de la Empresa (Encabezado y Cuerpo):</label>
-        <input type="text" id="nombreEmpresa" value="GRUPO VELAS CONSTRUCTORA">
-        
-        <label for="cuerpoPersonalidad">Párrafo de Personalidad y Habilidades (Use **[nombre]** para el nombre del empleado):</label>
-        <textarea id="cuerpoPersonalidad">Durante el tiempo que trabajó con nosotros, [nombre] demostró ser una persona responsable, proactiva y comprometida con su trabajo. Su disposición para aprender y colaborar fue excelente, adaptándose de forma eficaz a las exigencias de los diferentes proyectos. Su desempeño siempre fue satisfactorio y su actitud de trabajo en equipo fue un gran aporte.</textarea>
-        
-        <label for="tareas">Tareas Principales (Una por línea. Se enlistarán con viñetas en el PDF):</label>
-        <textarea id="tareas">Preparación de materiales: Ayudó a organizar y preparar cemento, mezcla y otros materiales esenciales para las labores de construcción.
+        <div class="input-group">
+            <h2>📝 Contenido de la Carta</h2>
+            <label for="nombreEmpresaLaboral">Nombre de la Empresa:</label>
+            <input type="text" id="nombreEmpresaLaboral" value="LARMEX">
+            
+            <label for="cuerpoPersonalidadLaboral">Párrafo de Personalidad y Habilidades:</label>
+            <textarea id="cuerpoPersonalidadLaboral">Durante el tiempo que trabajó con nosotros, [nombre] demostró ser una persona responsable, proactiva y comprometida con su trabajo. Su disposición para aprender y colaborar fue excelente, adaptándose de forma eficaz a las exigencias de los diferentes proyectos. Su desempeño siempre fue satisfactorio y su actitud de trabajo en equipo fue un gran aporte.</textarea>
+            
+            <label for="tareasLaboral">Tareas Principales (una por línea):</label>
+            <textarea id="tareasLaboral">Preparación de materiales: Ayudó a organizar y preparar cemento, mezcla y otros materiales esenciales para las labores de construcción.
 Asistencia en albañilería: Apoyó a los maestros de obra en la preparación y colocación de ladrillos, bloques y otros elementos estructurales.
 Mantenimiento del área de trabajo: Colaboró activamente en la limpieza y el orden de la obra, asegurando un ambiente de trabajo seguro y eficiente.
 Traslado de equipo y herramientas: Ayudó a mover y distribuir herramientas y equipo pesado, demostrando fuerza y precaución.</textarea>
-        
-        <label for="cuerpoCierre">Párrafo de Recomendación y Cierre (Use **[nombre]** para el nombre del empleado):</label>
-        <textarea id="cuerpoCierre">Considero que [nombre] es un empleado valioso, con la capacidad y el deseo de crecer profesionalmente. Recomiendo su contratación para cualquier puesto que se ajuste a su perfil, pues estoy seguro que será un gran activo para cualquier equipo.
+            
+            <label for="cuerpoCierreLaboral">Párrafo de Recomendación y Cierre:</label>
+            <textarea id="cuerpoCierreLaboral">Considero que [nombre] es un empleado valioso, con la capacidad y el deseo de crecer profesionalmente. Recomiendo su contratación para cualquier puesto que se ajuste a su perfil, pues estoy seguro que será un gran activo para cualquier equipo.
 
 Para cualquier duda o aclaración, estoy a su disposición.</textarea>
+        </div>
+
+        <div class="input-group">
+            <h2>✍️ Datos del Firmante</h2>
+            <label for="nombreFirmanteLaboral">Nombre Completo del Firmante:</label>
+            <input type="text" id="nombreFirmanteLaboral" value="JOSE GARCIA CHAIDEZ">
+
+            <label for="cargoFirmanteLaboral">Cargo del Firmante:</label>
+            <input type="text" id="cargoFirmanteLaboral" value="Director de Recursos Humanos">
+
+            <label for="telefonoFirmanteLaboral">Teléfono de Contacto:</label>
+            <input type="text" id="telefonoFirmanteLaboral" value="T. (442) 880 1675">
+        </div>
+
+        <button class="btn-action" onclick="solicitarAprobacion('laboral')">📩 Enviar Solicitud de Aprobación (Laboral)</button>
     </div>
 
-    <div class="input-group">
-        <h2>✍️ Datos del Firmante</h2>
-        <label for="nombreFirmante">Nombre Completo del Firmante:</label>
-        <input type="text" id="nombreFirmante" value="[Nombre del Director/Gerente]">
+    <div id="form-personal" class="form-section">
+        <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+        <h2>🏠 Formulario de Carta Personal</h2>
 
-        <label for="cargoFirmante">Cargo del Firmante:</label>
-        <input type="text" id="cargoFirmante" value="Director de Recursos Humanos">
+        <div class="input-group">
+            <h2>📧 Solicitud de Aprobación</h2>
+            <p>⚠️ **Aviso:** El PDF NO se descargará automáticamente. Al presionar el botón, se enviará una solicitud de correo con los datos al administrador para su aprobación y envío.</p>
+            <label for="emailSolicitantePersonal">Tu Correo Electrónico (Donde te enviaremos el PDF aprobado):</label>
+            <input type="text" id="emailSolicitantePersonal" value="solicitante@ejemplo.com">
+        </div>
+        
+        <div class="input-group">
+            <h2>✍️ Datos del Firmante (Recomendador)</h2>
+            <label for="fechaEmisionPersonal">Fecha de Emisión de la Carta:</label>
+            <input type="date" id="fechaEmisionPersonal" value="2025-10-24">
 
-        <label for="telefonoFirmante">Teléfono de Contacto:</label>
-        <input type="text" id="telefonoFirmante" value="T. (442) 880 1675">
+            <label for="nombreFirmantePersonal">Nombre Completo del Recomendador:</label>
+            <input type="text" id="nombreFirmantePersonal" value="MARIA ISABEL LÓPEZ PÉREZ">
+            
+            <label for="firmaInputPersonal">Insertar Firma del Recomendador:</label>
+            <input type="file" id="firmaInputPersonal" accept="image/*">
+        </div>
+
+        <div class="input-group">
+            <h2>👤 Datos de la Persona Recomendada</h2>
+            <label for="nombreRecomendadoPersonal">Nombre Completo de la Persona Recomendada:</label>
+            <input type="text" id="nombreRecomendadoPersonal" value="JUAN CARLOS RAMÍREZ SOTO">
+
+            <label for="tiempoConocidoPersonal">Tiempo que conoce a la persona (Ej: 5 años):</label>
+            <input type="text" id="tiempoConocidoPersonal" value="Desde hace 8 años">
+        </div>
+
+        <div class="input-group">
+            <h2>📝 Contenido de la Carta</h2>
+            
+            <label for="cuerpoPersonalidadPersonal">Párrafo de Cualidades y Personalidad (Use **[nombre]** para la persona recomendada):</label>
+            <textarea id="cuerpoPersonalidadPersonal">Conozco a [nombre] desde hace 8 años en un contexto social y comunitario. Siempre ha demostrado ser una persona de gran integridad, honesta y de palabra. Destaca por su madurez, su compromiso en las actividades que realiza y su excelente trato interpersonal. Es alguien en quien se puede confiar plenamente.</textarea>
+            
+            <label for="cuerpoRecomendacionPersonal">Párrafo de Recomendación y Cierre:</label>
+            <textarea id="cuerpoRecomendacionPersonal">Recomiendo a [nombre] sin ninguna reserva para cualquier propósito que requiera de una persona con sólidos valores y ética. Estoy seguro/a de que su carácter y responsabilidad serán de gran valor.
+
+Para cualquier duda o aclaración, estoy a su disposición.</textarea>
+        </div>
+
+        <button class="btn-action" onclick="solicitarAprobacion('personal')">📩 Enviar Solicitud de Aprobación (Personal)</button>
     </div>
-
-    <button onclick="generarPDF()">✅ Generar y Descargar Carta en PDF</button>
 
     <script>
         const { jsPDF } = window.jspdf;
 
-        // Función auxiliar para convertir archivo de imagen a Base64 con manejo de errores
-        const fileToBase64 = (file) => new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = error => {
-                console.error("Error al cargar la imagen:", error);
-                resolve(null); // Resuelve con null si hay error para no detener el script
-            };
-        });
+        // --- FUNCIONES AUXILIARES ---
 
-        // **FUNCIÓN CLAVE: Justificación manual** (Mantiene la corrección de la versión anterior)
+        // Función de Navegación: Muestra el formulario seleccionado y oculta los demás
+        function showForm(formId) {
+            document.getElementById('main-menu').style.display = 'none';
+            document.getElementById('form-laboral').style.display = 'none';
+            document.getElementById('form-personal').style.display = 'none';
+
+            if (formId === 'menu') {
+                document.getElementById('main-menu').style.display = 'block';
+            } else if (formId === 'laboral') {
+                document.getElementById('form-laboral').style.display = 'block';
+            } else if (formId === 'personal') {
+                document.getElementById('form-personal').style.display = 'block';
+            }
+            window.scrollTo(0, 0); // Vuelve al inicio de la página
+        }
+        
+        // **FUNCIÓN CLAVE: Justificación manual**
         function drawJustifiedText(doc, text, x, y, maxWidth, lineHeight) {
             let currentY = y;
             const splitText = doc.splitTextToSize(text, maxWidth);
             
             splitText.forEach((line, index) => {
                 if (index < splitText.length - 1) {
-                    // Para todas las líneas excepto la última, aplica justificación
                     doc.text(line, x, currentY, { align: 'justify' });
                 } else {
-                    // La última línea de un párrafo no se justifica, se alinea a la izquierda
                     doc.text(line, x, currentY);
                 }
                 currentY += lineHeight;
             });
-            return currentY; // Devuelve la nueva posición 'y'
+            return currentY; 
+        }
+        
+        // Función auxiliar para convertir archivo de imagen a Base64
+        const fileToBase64 = (file) => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => resolve(null);
+        });
+
+        // --- FUNCIÓN PRINCIPAL DE SOLICITUD DE APROBACIÓN ---
+        async function solicitarAprobacion(tipoCarta) {
+            let emailSolicitante;
+            let nombreAsunto;
+            let pdfData;
+            let docType;
+
+            // 1. Recolección de datos y generación de PDF base64
+            if (tipoCarta === 'laboral') {
+                emailSolicitante = document.getElementById('emailSolicitanteLaboral').value;
+                nombreAsunto = document.getElementById('nombreEmpleadoLaboral').value.toUpperCase();
+                pdfData = await generarPDFLaboral(false);
+                docType = "Laboral";
+            } else if (tipoCarta === 'personal') {
+                emailSolicitante = document.getElementById('emailSolicitantePersonal').value;
+                nombreAsunto = document.getElementById('nombreRecomendadoPersonal').value.toUpperCase();
+                pdfData = await generarPDFPersonal(false);
+                docType = "Personal";
+            }
+
+            if (!pdfData) {
+                alert(`Error al generar el contenido de la Carta ${docType}. Por favor, revisa que todos los campos estén llenos y los archivos de imagen sean válidos.`);
+                return;
+            }
+
+            // 2. Preparar el correo (mailto)
+            // *** IMPORTANTE: CAMBIA ESTE CORREO POR EL TUYO ***
+            const correoAdministrador = "tucorreo@tuempresa.com"; 
+            const asunto = encodeURIComponent(`SOLICITUD DE APROBACIÓN (${docType}): Carta para ${nombreAsunto}`);
+
+            const cuerpo = `Hola Administrador,
+            
+Se ha generado una solicitud de Carta de Recomendación ${docType} para: ${nombreAsunto}.
+
+- Tipo de Carta: ${docType}
+- Correo del Solicitante (para reenvío): ${emailSolicitante}
+
+El archivo PDF generado está incluido en el enlace mailto (sujeto a límites de tamaño de tu cliente de correo).
+
+--- INSTRUCCIONES PARA TI ---
+1. Revisa el archivo PDF adjunto (o el archivo base64 si tu cliente de correo no lo maneja).
+2. Si apruebas la solicitud, reenvía el PDF original al solicitante: ${emailSolicitante}.`;
+            
+            const fileName = `Carta_Recomendacion_${nombreAsunto.replace(/\s/g, '_')}_${docType}.pdf`;
+            const mailtoLink = `mailto:${correoAdministrador}?subject=${asunto}&body=${encodeURIComponent(cuerpo)}&attachment=${encodeURIComponent(fileName)};base64,${pdfData}`;
+            
+            // 3. Crear el enlace mailto y alertar sobre el límite de tamaño
+            if (mailtoLink.length > 2000) {
+                 alert(`Advertencia: El tamaño de los datos es muy grande para enviarse por mailto. La solicitud se enviará sin el adjunto. Por favor, revisa la Consola (F12) para obtener los datos de la carta en base64 para envío manual.`);
+                 console.log(`Base64 del PDF (para envío manual de ${fileName}): ${pdfData}`);
+                 // Abrimos un correo simple sin adjunto para notificar.
+                 window.location.href = `mailto:${correoAdministrador}?subject=${asunto}&body=${encodeURIComponent(`Solicitud de ${nombreAsunto}. Por favor, consulta la consola del navegador del solicitante para obtener los datos base64 y generar la carta.`)}`;
+            } else {
+                 window.location.href = mailtoLink;
+            }
+
+            alert(`Solicitud enviada a ${correoAdministrador}. Por favor, revisa tu cliente de correo para completar el envío.`);
         }
 
-        // Función principal para generar el PDF
-        async function generarPDF() {
+
+        // --- FUNCIÓN DE GENERACIÓN PDF LABORAL (ADAPTADA) ---
+        async function generarPDFLaboral(descargar = true) {
             const doc = new jsPDF('p', 'mm', 'a4');
             const margin = 20;
             let y = 10;
@@ -151,73 +314,63 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             const pageWidth = doc.internal.pageSize.getWidth();
             const textWidth = 170; 
 
-            // --- 1. Recolección de Datos ---
-            const fechaEmision = document.getElementById('fechaEmision').value;
-            const nombreEmpleado = document.getElementById('nombreEmpleado').value.toUpperCase();
+            // Recolección de datos específicos de la carta laboral
+            const fechaEmision = document.getElementById('fechaEmisionLaboral').value;
+            const nombreEmpleado = document.getElementById('nombreEmpleadoLaboral').value.toUpperCase();
             const primerNombreEmpleado = nombreEmpleado.split(' ')[0]; 
-            const puesto = document.getElementById('puestoDesempenado').value.toUpperCase();
-            const inicio = document.getElementById('fechaInicio').value;
-            const fin = document.getElementById('fechaFin').value;
-            const empresa = document.getElementById('nombreEmpresa').value.toUpperCase();
+            const puesto = document.getElementById('puestoDesempenadoLaboral').value.toUpperCase();
+            const inicio = document.getElementById('fechaInicioLaboral').value;
+            const fin = document.getElementById('fechaFinLaboral').value;
+            const empresa = document.getElementById('nombreEmpresaLaboral').value.toUpperCase();
             
-            const personalidad = document.getElementById('cuerpoPersonalidad').value.replace(/\[nombre\]/g, primerNombreEmpleado);
-            const tareas = document.getElementById('tareas').value.trim();
-            const cierre = document.getElementById('cuerpoCierre').value.replace(/\[nombre\]/g, primerNombreEmpleado);
+            const personalidad = document.getElementById('cuerpoPersonalidadLaboral').value.replace(/\[nombre\]/g, primerNombreEmpleado);
+            const tareas = document.getElementById('tareasLaboral').value.trim();
+            const cierre = document.getElementById('cuerpoCierreLaboral').value.replace(/\[nombre\]/g, primerNombreEmpleado);
             
-            const nombreFirmante = document.getElementById('nombreFirmante').value.toUpperCase();
-            const cargoFirmante = document.getElementById('cargoFirmante').value;
-            const telefonoFirmante = document.getElementById('telefonoFirmante').value;
+            const nombreFirmante = document.getElementById('nombreFirmanteLaboral').value.toUpperCase();
+            const cargoFirmante = document.getElementById('cargoFirmanteLaboral').value;
+            const telefonoFirmante = document.getElementById('telefonoFirmanteLaboral').value;
             
-            // Procesamiento de archivos con manejo de errores
-            const logoFile = document.getElementById('logoInput').files[0];
-            const firmaFile = document.getElementById('firmaInput').files[0];
+            const logoFile = document.getElementById('logoInputLaboral').files[0];
+            const firmaFile = document.getElementById('firmaInputLaboral').files[0];
             const logoBase64 = logoFile ? await fileToBase64(logoFile) : null;
             const firmaBase64 = firmaFile ? await fileToBase64(firmaFile) : null;
             
             const f_emision = new Date(fechaEmision).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
             const f_inicio = new Date(inicio).toLocaleDateString('es-ES');
             const f_fin = new Date(fin).toLocaleDateString('es-ES');
+            
+            // --- CÓDIGO DE GENERACIÓN DE PDF (LABORAL) ---
 
-            // --- 2. Inserción del Logo (Superior Izquierda) ---
-            if (logoBase64) {
-                doc.addImage(logoBase64, 'PNG', margin, y, 50, 20); 
-                y += 15; 
-            }
+            if (logoBase64) { doc.addImage(logoBase64, 'PNG', margin, y, 50, 20); y += 15; }
             y = Math.max(y, 35); 
 
-            // --- 3. Encabezado de la Empresa (CENTRO) ---
             doc.setFontSize(14);
             doc.setFont(undefined, 'bold');
-            doc.text(empresa, pageWidth / 2, y, { align: 'center' }); // CENTRADO
+            doc.text(empresa, pageWidth / 2, y, { align: 'center' }); 
             y += lineHeight * 1.5;
 
-            // --- 4. Fecha de Emisión (Derecha) ---
             doc.setFontSize(11);
             doc.setFont(undefined, 'normal');
             doc.text(f_emision, pageWidth - margin, y, { align: 'right' });
             y += lineHeight * 2;
             
-            // --- 5. Saludo ---
             doc.text("A quien corresponda:", margin, y);
             y += lineHeight * 1.5;
             
-            // --- 6. Primer Párrafo (Presentación) - JUSTIFICADO ---
             doc.setFontSize(11);
             doc.setFont(undefined, 'normal');
             const presentacion = `Por medio de la presente, me permito recomendar ampliamente al Sr. ${nombreEmpleado} quien se desempeñó como ${puesto} en ${empresa} desde el ${f_inicio} hasta el ${f_fin}.`;
             y = drawJustifiedText(doc, presentacion, margin, y, textWidth, lineHeight);
             y += lineHeight;
 
-            // --- 7. Párrafo de Personalidad - JUSTIFICADO ---
             y = drawJustifiedText(doc, personalidad, margin, y, textWidth, lineHeight);
             y += lineHeight;
             
-            // --- 8. Título de Tareas ---
             doc.setFont(undefined, 'bold');
             doc.text("Sus principales tareas incluyeron:", margin, y);
             y += lineHeight;
 
-            // --- 9. Tareas (Lista de puntos) - JUSTIFICADO ---
             doc.setFont(undefined, 'normal');
             const listaTareas = tareas.split('\n').filter(t => t.trim() !== '');
             listaTareas.forEach(tarea => {
@@ -226,37 +379,114 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             });
             y += lineHeight;
 
-            // --- 10. Párrafo de Recomendación y Cierre - JUSTIFICADO ---
             y = drawJustifiedText(doc, cierre, margin, y, textWidth, lineHeight);
             y += lineHeight; 
             
-            // --- 11. Despedida (CENTRO) ---
-            doc.text("Atentamente,", pageWidth / 2, y, { align: 'center' }); // CENTRADO
+            doc.text("Atentamente,", pageWidth / 2, y, { align: 'center' }); 
             y += lineHeight * 2;
 
-            // --- 12. Firma (CENTRO) ---
             if (firmaBase64) {
                 const imgWidth = 50; 
                 const xFirma = (pageWidth / 2) - (imgWidth / 2);
                 doc.addImage(firmaBase64, 'PNG', xFirma, y, imgWidth, 20);
                 y += 25; 
-            } else {
-                 y += 20; // Espacio para la firma
-            }
+            } else { y += 20; }
 
-            // --- 13. Datos del Firmante (CENTRO) ---
             doc.setFont(undefined, 'bold');
-            doc.text(nombreFirmante, pageWidth / 2, y, { align: 'center' }); // CENTRADO
+            doc.text(nombreFirmante, pageWidth / 2, y, { align: 'center' }); 
             y += lineHeight;
             doc.setFont(undefined, 'normal');
-            doc.text(cargoFirmante, pageWidth / 2, y, { align: 'center' }); // CENTRADO
+            doc.text(cargoFirmante, pageWidth / 2, y, { align: 'center' }); 
             y += lineHeight;
-            doc.text(telefonoFirmante, pageWidth / 2, y, { align: 'center' }); // CENTRADO
+            doc.text(telefonoFirmante, pageWidth / 2, y, { align: 'center' }); 
 
 
-            // --- 14. Descarga del PDF ---
-            doc.save(`Carta_Recomendacion_${nombreEmpleado.replace(/\s/g, '_')}.pdf`);
+            if (descargar) {
+                 doc.save(`Carta_Recomendacion_${nombreEmpleado.replace(/\s/g, '_')}_LABORAL.pdf`);
+                 return true;
+            } else {
+                 return doc.output('datauristring').split(',')[1];
+            }
         }
+
+
+        // --- FUNCIÓN DE GENERACIÓN PDF PERSONAL (NUEVA) ---
+        async function generarPDFPersonal(descargar = true) {
+            const doc = new jsPDF('p', 'mm', 'a4');
+            const margin = 20;
+            let y = 30; // Empieza más abajo por ser personal
+            const lineHeight = 6;
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const textWidth = 170; 
+
+            // Recolección de datos específicos de la carta personal
+            const fechaEmision = document.getElementById('fechaEmisionPersonal').value;
+            const nombreRecomendado = document.getElementById('nombreRecomendadoPersonal').value.toUpperCase();
+            const primerNombreRecomendado = nombreRecomendado.split(' ')[0];
+            const tiempoConocido = document.getElementById('tiempoConocidoPersonal').value;
+
+            const personalidad = document.getElementById('cuerpoPersonalidadPersonal').value.replace(/\[nombre\]/g, primerNombreRecomendado);
+            const recomendacion = document.getElementById('cuerpoRecomendacionPersonal').value.replace(/\[nombre\]/g, primerNombreRecomendado);
+            
+            const nombreFirmante = document.getElementById('nombreFirmantePersonal').value.toUpperCase();
+            const firmaFile = document.getElementById('firmaInputPersonal').files[0];
+            const firmaBase64 = firmaFile ? await fileToBase64(firmaFile) : null;
+            
+            const f_emision = new Date(fechaEmision).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            // --- CÓDIGO DE GENERACIÓN DE PDF (PERSONAL) ---
+
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'normal');
+            doc.text(f_emision, pageWidth - margin, y, { align: 'right' });
+            y += lineHeight * 2;
+            
+            doc.text("A quien corresponda:", margin, y);
+            y += lineHeight * 1.5;
+
+            // Párrafo de Presentación
+            const presentacion = `Por medio de la presente, yo, ${nombreFirmante}, extiendo esta carta de recomendación personal para ${nombreRecomendado}, a quien conozco ${tiempoConocido}.`;
+            y = drawJustifiedText(doc, presentacion, margin, y, textWidth, lineHeight);
+            y += lineHeight;
+
+            // Párrafo de Personalidad
+            y = drawJustifiedText(doc, personalidad, margin, y, textWidth, lineHeight);
+            y += lineHeight * 2;
+            
+            // Párrafo de Recomendación y Cierre
+            y = drawJustifiedText(doc, recomendacion, margin, y, textWidth, lineHeight);
+            y += lineHeight * 2; 
+            
+            // Despedida (CENTRO)
+            doc.text("Atentamente,", pageWidth / 2, y, { align: 'center' }); 
+            y += lineHeight * 2;
+
+            // Firma (CENTRO)
+            if (firmaBase64) {
+                const imgWidth = 50; 
+                const xFirma = (pageWidth / 2) - (imgWidth / 2);
+                doc.addImage(firmaBase64, 'PNG', xFirma, y, imgWidth, 20);
+                y += 25; 
+            } else { y += 20; }
+
+            // Datos del Firmante (CENTRO)
+            doc.setFont(undefined, 'bold');
+            doc.text(nombreFirmante, pageWidth / 2, y, { align: 'center' }); 
+
+
+            if (descargar) {
+                 doc.save(`Carta_Recomendacion_${nombreRecomendado.replace(/\s/g, '_')}_PERSONAL.pdf`);
+                 return true;
+            } else {
+                 return doc.output('datauristring').split(',')[1];
+            }
+        }
+
+
+        // Muestra el menú al cargar la página
+        window.onload = function() {
+            showForm('menu');
+        };
     </script>
 </body>
 </html>
