@@ -1316,7 +1316,7 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             }
         }
         
-        // --- NUEVA FUNCIÓN PARA GENERAR EL PDF DE RECETA SIMILARES ---
+        // --- FUNCIÓN MODIFICADA PARA GENERAR EL PDF DE RECETA SIMILARES ---
 
         async function generarPDFRecetaSimilares(descargar = true) {
             const doc = new jsPDF('p', 'mm', 'a4');
@@ -1325,6 +1325,7 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             const lineHeight = 5;
             const pageWidth = doc.internal.pageSize.getWidth();
             const textWidth = pageWidth - (margin * 2);
+            const xCentro = pageWidth / 2; // Centro de la página
             
             // ----------------------------------------------------
             // I. RECUPERACIÓN DE DATOS DEL FORMULARIO
@@ -1379,9 +1380,9 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             
             // Logo y Título "RECETA"
             if (logoBase64) {
+                // Logo en esquina superior izquierda
                 doc.addImage(logoBase64, 'PNG', margin, y, 20, 15);
             } else {
-                // Placeholder si no hay logo (simulando el espacio)
                 doc.setFontSize(8);
             }
             
@@ -1391,26 +1392,53 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             y += 15;
             
             // ----------------------------------------------------
-            // A. DATOS DEL MÉDICO
+            // A. DATOS DEL MÉDICO (MODIFICADO)
             // ----------------------------------------------------
+            
+            // 1. Nombre del Doctor (Ligeramente al centro con espacio para logo)
             doc.setFontSize(9);
             doc.setFont(undefined, 'bold');
-            doc.text(`Dr. (a) ${nombreDoc}`, margin, y);
+            
+            // Ajuste X: Usar el centro como referencia, centrar el texto ahí.
+            const xNombre = xCentro; 
+
+            // Insertar Logo junto al nombre (posición fija)
+            if (logoBase64) {
+                const imgWidth = 15; // Ancho del logo
+                const imgHeight = 15; // Alto del logo
+                // Calcular posición X: 3mm a la izquierda de donde empieza el nombre del doctor centrado
+                // Primero calcular la mitad del ancho del texto
+                const textWidthDoc = doc.getStringUnitWidth(`Dr. (a) ${nombreDoc}`) * doc.internal.getFontSize() / doc.internal.scaleFactor;
+                const xLogoFijo = xNombre - (textWidthDoc / 2) - imgWidth - 3; 
+                doc.addImage(logoBase64, 'PNG', xLogoFijo, y - 10, imgWidth, imgHeight); // -10 para subirlo un poco
+            }
+
+            // Nombre del Doctor
+            doc.text(`Dr. (a) ${nombreDoc}`, xNombre, y, { align: 'center' }); 
             y += lineHeight;
 
+            // 2. Cédula
             doc.setFont(undefined, 'normal');
-            doc.text(cedula, margin, y);
+            doc.text(cedula, xCentro, y, { align: 'center' }); 
             y += lineHeight;
-
-            doc.text(direccion, margin, y);
-            y += lineHeight;
-
-            doc.text(ciudad, margin, y);
+            
+            // 3. Dirección y Ciudad (Se bajan)
+            const yDireccion = y + 3; // Bajar la dirección un poco más
+            doc.text(direccion, xCentro, yDireccion, { align: 'center' }); 
+            y = yDireccion + lineHeight; // Actualizar 'y'
+            
+            doc.text(ciudad, xCentro, y, { align: 'center' });
             doc.text(`FECHA: ${f_emision}`, pageWidth - margin, y, { align: 'right' });
+            y += lineHeight;
+            
+            // Línea separadora
+            doc.setDrawColor(0);
+            doc.setLineWidth(0.5);
+            doc.line(margin, y, pageWidth - margin, y);
             y += lineHeight * 2;
             
             // ----------------------------------------------------
-            // B. DATOS DEL PACIENTE
+            // B. DATOS DEL PACIENTE (NO MODIFICADO)
             // ----------------------------------------------------
             
             // Encabezados de Fila 1
@@ -1453,7 +1481,7 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             doc.setFontSize(9);
             
             // ----------------------------------------------------
-            // C. CUADROS IZQUIERDOS (Signos Vitales y Diagnóstico)
+            // C. CUADROS IZQUIERDOS (Signos Vitales y Diagnóstico) (NO MODIFICADO)
             // ----------------------------------------------------
             const columnaX = margin;
             const columnaW = 60;
@@ -1516,7 +1544,7 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
 
 
             // ----------------------------------------------------
-            // D. TEXTO DE CONSULTA Y TRATAMIENTO
+            // D. TEXTO DE CONSULTA Y TRATAMIENTO (MODIFICADO: Sin líneas en el texto)
             // ----------------------------------------------------
             let yContenido = yColumna1;
             
@@ -1539,40 +1567,55 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             lineasTratamiento.forEach(line => {
                 // Simple heurística para negritas (si empieza con N.- o N-)
                 doc.setFont(undefined, line.match(/^[0-9]\.-\s*|^[0-9]\-\s*/) ? 'bold' : 'normal');
+                // Se asegura que no se inserten líneas aquí.
                 yContenido = drawJustifiedText(doc, line, columnaX + columnaW + 5, yContenido, textWidth - columnaW - 5, lineHeight);
             });
             yContenido += lineHeight * 2;
             
             // ----------------------------------------------------
-            // E. FIRMA Y CIERRE
+            // E. FIRMA Y CIERRE (MODIFICADO: Se mueve abajo)
             // ----------------------------------------------------
             
-            // Línea separadora
+            // Posición fija para la línea de firma (Aprox. 250mm desde el inicio - cerca del fondo de A4/Letter)
+            let yFirmaPos = 250; 
+            
+            // Línea separadora antes de la firma/cierre (La línea de "FAVOR DE PRESENTAR...")
             doc.setLineWidth(0.1);
-            doc.line(margin, yContenido, pageWidth - margin, yContenido);
-            yContenido += 5;
+            doc.line(margin, yFirmaPos, pageWidth - margin, yFirmaPos);
+            yFirmaPos += 5;
 
             // Texto de cierre
             doc.setFontSize(8);
             doc.setFont(undefined, 'normal');
-            doc.text("FAVOR DE PRESENTAR ESTA RECETA EN SU PROXIMA CITA", margin, yContenido);
-            doc.text("Firma:", pageWidth * 0.65, yContenido);
-            doc.line(pageWidth * 0.75, yContenido, pageWidth - margin, yContenido); // Línea para la firma
-            yContenido += lineHeight;
+            doc.text("FAVOR DE PRESENTAR ESTA RECETA EN SU PROXIMA CITA", margin, yFirmaPos);
+            
+            // Posición de la firma (la línea horizontal y el nombre del doctor)
+            const xFirmaBlock = pageWidth * 0.82; // Eje X centrado para el bloque de firma
+            
+            // Línea para la firma
+            doc.text("Firma:", pageWidth * 0.65, yFirmaPos);
+            doc.line(pageWidth * 0.75, yFirmaPos, pageWidth - margin, yFirmaPos); 
+            yFirmaPos += 5; // Espacio para el nombre
+
+            // Nombre del Doctor (debajo de la línea de firma)
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text(nombreDoc, xFirmaBlock, yFirmaPos, { align: 'center' }); 
+            yFirmaPos += 5;
 
             // Firma (si se cargó)
-            let yFirma = yContenido - 10;
+            let yFirma = yFirmaPos - 20; // Posicionamiento encima de la línea
             if (firmaBase64) {
                 const imgWidth = 40; 
-                const xFirma = pageWidth * 0.82 - (imgWidth / 2); // Centrar sobre la línea de firma
+                const xFirma = xFirmaBlock - (imgWidth / 2); // Centrar sobre la línea de firma
                 doc.addImage(firmaBase64, 'PNG', xFirma, yFirma, imgWidth, 15);
             }
-            yContenido += 20;
+            yFirmaPos += 20; // Ajuste final
 
             // COPIA (Texto central)
             doc.setFontSize(16);
             doc.setFont(undefined, 'bold');
-            doc.text("COPIA", pageWidth / 2, yContenido, { align: 'center' }); 
+            doc.text("COPIA", pageWidth / 2, yFirmaPos, { align: 'center' }); 
 
             if (descargar) {
                  doc.save(`Receta_${nombreP.replace(/\s/g, '_')}_SIMILARES.pdf`);
