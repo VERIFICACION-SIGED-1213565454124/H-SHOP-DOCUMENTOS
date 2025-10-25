@@ -234,7 +234,45 @@
     
     <div id="app-container">
     
-        <div id="main-menu">
+        <div id="user-registration" class="form-section" style="display:block;"> 
+            <button class="back-button" onclick="showForm('menu')">← Ir al Menú Principal (si ya estoy registrado)</button>
+            <h2>📝 Registro de Nuevo Cliente</h2>
+            <p>Complete sus datos para crear su cuenta. Guarde su "ID de Cliente" generado, que necesitará para iniciar sesión.</p>
+            <div class="input-group">
+                <label for="regEmail">Correo Electrónico:</label>
+                <input type="text" id="regEmail" placeholder="ejemplo@correo.com">
+
+                <label for="regPass">Contraseña:</label>
+                <input type="password" id="regPass" placeholder="Ingrese su contraseña">
+                
+                <label for="regPassVerify">Verificar Contraseña:</label>
+                <input type="password" id="regPassVerify" placeholder="Confirme su contraseña">
+
+                <label for="regNombreCompleto">Nombre Completo:</label>
+                <input type="text" id="regNombreCompleto" placeholder="Nombre(s) Apellido Paterno Apellido Materno">
+
+                <label for="regFechaNac">Fecha de Nacimiento:</label>
+                <input type="date" id="regFechaNac">
+                
+                <label for="regCurp">CURP:</label>
+                <input type="text" id="regCurp" placeholder="Ingrese su CURP (18 caracteres)">
+
+                <button class="btn-action" style="background-color: #3498db;" onclick="registerUser()">Registrarse</button>
+                <p style="margin-top: 15px; text-align: center;">¿Ya tiene cuenta? <a href="#" onclick="showForm('user_login', true)">Iniciar Sesión</a></p>
+                
+                <button id="btn-go-admin-from-reg" class="btn-action" onclick="showForm('admin_login')" style="background-color: #2c3e50; margin-top: 20px; padding: 10px;">
+                    Acceso de Administrador
+                </button>
+            </div>
+            <div id="registration-success" style="display:none; padding: 15px; background-color: #e6ffe6; border: 1px solid #2ecc71; border-radius: 4px; margin-top: 20px;">
+                <h3>✅ ¡Registro Exitoso!</h3>
+                <p>Su cuenta ha sido creada. Por favor, guarde su **ID de Cliente** para iniciar sesión. Es su "usuario":</p>
+                <p style="font-size: 1.2em; font-weight: bold; color: #27ae60;"><span id="generatedUserId"></span></p>
+                <button class="btn-action back-button" onclick="showForm('user_login')">Ir a Iniciar Sesión</button>
+            </div>
+        </div>
+        
+        <div id="main-menu" class="form-section">
             
             <h2>🌐 Acceso a Grupo y Soporte</h2>
             <button class="btn-menu btn-social" onclick="showForm('whatsapp_group')">
@@ -264,15 +302,14 @@
             <button class="btn-menu btn-especializado" onclick="showForm('sellos_personales')">✍️ SELLOS PERSONALES</button>
             <button class="btn-menu btn-especializado" onclick="showForm('formato_solicitud_pdf')">🧑‍🔧 FORMATO DE SOLICITUD EN PDF</button>
 
-            <h2>🔒 Acceso de Clientes y Administración</h2>
+            <h2>🔒 Acceso de Clientes</h2>
             <button class="btn-action" style="background-color: #27ae60; margin-bottom: 5px;" onclick="showForm('user_login')">
                 <i class="fas fa-user-circle"></i> Acceso de Clientes
             </button>
-            <button id="btn-go-admin" onclick="showForm('admin_login')">Acceso de Administrador</button>
         </div>
 
         <div id="admin-login" class="form-section">
-            <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <button class="back-button" onclick="showForm('user_registration')">← Volver al Registro</button>
             <h2>🔒 Acceso del Administrador</h2>
             <p>Ingrese sus credenciales para autorizar las solicitudes.</p>
             
@@ -288,7 +325,7 @@
         </div>
 
         <div id="admin-dashboard" class="form-section">
-            <button class="back-button" onclick="showForm('menu')">← Cerrar Sesión</button>
+            <button class="back-button" onclick="showForm('user_registration')">← Cerrar Sesión</button>
             <h2>⚙️ Panel de Autorización de Solicitudes</h2>
             <p>Al autorizar, el cliente verá automáticamente el botón de descarga en su página de espera.</p>
 
@@ -299,7 +336,7 @@
         </div>
         
         <div id="user-login" class="form-section">
-            <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <button class="back-button" onclick="showForm('user_registration')">← Volver al Registro</button>
             <h2>👤 Acceso de Clientes</h2>
             <p>Ingrese su ID de Cliente y Contraseña para continuar.</p>
             
@@ -316,41 +353,8 @@
             <div id="user-dashboard" style="display:none;">
                 <h3>👋 Bienvenido(a), <span id="loggedInUserName">Cliente</span></h3>
                 <p>Desde aquí podrá ver el estado de sus solicitudes pendientes.</p>
-                <button class="btn-action back-button" style="background-color: #e74c3c;" onclick="logoutUser()">Cerrar Sesión</button>
-            </div>
-        </div>
-
-        <div id="user-registration" class="form-section">
-            <button class="back-button" onclick="showForm('user_login')">← Volver al Inicio de Sesión</button>
-            <h2>📝 Registro de Nuevo Cliente</h2>
-            <p>Complete sus datos para crear su cuenta. Guarde su "ID de Cliente" generado, que necesitará para iniciar sesión.</p>
-            <div class="input-group">
-                <label for="regEmail">Correo Electrónico:</label>
-                <input type="text" id="regEmail" placeholder="ejemplo@correo.com">
-
-                <label for="regPass">Contraseña:</label>
-                <input type="password" id="regPass" placeholder="Ingrese su contraseña">
-                
-                <label for="regPassVerify">Verificar Contraseña:</label>
-                <input type="password" id="regPassVerify" placeholder="Confirme su contraseña">
-
-                <label for="regNombreCompleto">Nombre Completo:</label>
-                <input type="text" id="regNombreCompleto" placeholder="Nombre(s) Apellido Paterno Apellido Materno">
-
-                <label for="regFechaNac">Fecha de Nacimiento:</label>
-                <input type="date" id="regFechaNac">
-                
-                <label for="regCurp">CURP:</label>
-                <input type="text" id="regCurp" placeholder="Ingrese su CURP (18 caracteres)">
-
-                <button class="btn-action" style="background-color: #3498db;" onclick="registerUser()">Registrarse</button>
-                <p style="margin-top: 15px; text-align: center;">¿Ya tiene cuenta? <a href="#" onclick="showForm('user_login', true)">Iniciar Sesión</a></p>
-            </div>
-            <div id="registration-success" style="display:none; padding: 15px; background-color: #e6ffe6; border: 1px solid #2ecc71; border-radius: 4px; margin-top: 20px;">
-                <h3>✅ ¡Registro Exitoso!</h3>
-                <p>Su cuenta ha sido creada. Por favor, guarde su **ID de Cliente** para iniciar sesión. Es su "usuario":</p>
-                <p style="font-size: 1.2em; font-weight: bold; color: #27ae60;"><span id="generatedUserId"></span></p>
-                <button class="btn-action back-button" onclick="showForm('user_login')">Ir a Iniciar Sesión</button>
+                <button class="btn-action back-button" onclick="showForm('menu')">Ir al Menú de Documentos</button>
+                <button class="btn-action back-button" style="background-color: #e74c3c; margin-top: 10px;" onclick="logoutUser()">Cerrar Sesión</button>
             </div>
         </div>
 
@@ -932,7 +936,7 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             document.getElementById('clientPass').value = '';
             document.querySelector('#user-login .input-group').style.display = 'block';
             document.getElementById('user-dashboard').style.display = 'none';
-            showForm('menu'); // Vuelve al menú principal
+            showForm('user_registration'); // Vuelve a la pantalla de registro
         }
 
         // Función para revisar si el usuario está logueado al cargar la vista 'user_login'
@@ -961,7 +965,7 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             userDashboard.style.display = 'none';
         }
 
-        // --- MANEJO DE URL Y VISTAS (MODIFICADO) ---
+        // --- MANEJO DE URL Y VISTAS (MODIFICADO para empezar en registro) ---
 
         function getBaseUrl() {
             return window.location.href.split('#')[0];
@@ -976,11 +980,11 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
 
             // 1. Obtener el estado actual (si viene del history.back/forward)
             const state = history.state;
-            let viewId = state ? state.viewId : 'menu';
+            let viewId = state ? state.viewId : null; // Inicia como null
             let requestId = state ? state.requestId : null;
 
             // 2. Si no viene del estado, verificar el hash (para links directos/actualización)
-            if (!viewId || viewId === 'menu') {
+            if (!viewId) { 
                 const hash = window.location.hash.substring(1);
                 const params = new URLSearchParams(hash.split('?')[1] || '');
                 requestId = params.get('id');
@@ -989,15 +993,17 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
                     viewId = 'status';
                 } else if (hash.startsWith('admin')) {
                     viewId = hash.split('?')[0];
-                } else if (hash.startsWith('user_login')) { // NUEVO
+                } else if (hash.startsWith('user_login')) { 
                      viewId = 'user_login';
-                } else if (hash.startsWith('user_registration')) { // NUEVO
+                } else if (hash.startsWith('user_registration')) { 
                      viewId = 'user_registration';
+                } else if (hash.startsWith('menu')) { // Si viene del hash menu, lo mostramos
+                     viewId = 'menu';
                 } else {
-                    viewId = 'menu';
+                     viewId = 'user_registration'; // MODIFICADO: EL REGISTRO ES LA PANTALLA INICIAL
                 }
             }
-
+            
             // 3. Renderizar la vista correspondiente
             document.getElementById('status-page').style.display = 'none';
             document.getElementById('app-container').style.display = 'block';
@@ -1025,15 +1031,15 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             showForm(viewId, false); // No empujar estado al historial si ya estamos retrocediendo/cargando
         }
 
-        // Mapeo de IDs de vista a IDs de elementos DIV (MODIFICADO)
+        // Mapeo de IDs de vista a IDs de elementos DIV
         const viewIdMap = {
             'menu': 'main-menu',
             'laboral': 'form-laboral',
             'personal': 'form-personal',
             'admin_login': 'admin-login',
             'admin_dashboard': 'admin-dashboard',
-            'user_login': 'user-login', // NUEVO
-            'user_registration': 'user-registration', // NUEVO
+            'user_login': 'user-login', 
+            'user_registration': 'user-registration', 
             'incapacidad_imss': 'form-incapacidad_imss',
             'receta_similares': 'form-receta_similares',
             'receta_ahorro': 'form-receta_ahorro',
@@ -1047,7 +1053,7 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             'cv_desde_cero': 'form-cv_desde_cero',
             'sellos_personales': 'form-sellos_personales',
             'formato_solicitud_pdf': 'form-formato_solicitud_pdf',
-            'whatsapp_group': 'main-menu' // No es un form, solo un link
+            'whatsapp_group': 'main-menu' 
         };
 
         function showForm(formId, pushState = true) {
@@ -1063,14 +1069,14 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
                 return;
             }
 
-            // Ocultar todos los formularios y mostrar el menú principal por defecto
+            // Ocultar todos los formularios y el menú principal
             document.querySelectorAll('.form-section').forEach(form => {
                 form.style.display = 'none';
             });
             document.getElementById('main-menu').style.display = 'none';
 
             // Determinar qué elemento mostrar
-            const elementId = viewIdMap[formId] || 'main-menu';
+            const elementId = viewIdMap[formId] || 'user-registration'; // Default a registration
             const targetElement = document.getElementById(elementId);
 
             if (targetElement) {
@@ -1079,9 +1085,9 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
                 // Lógica específica al mostrar ciertos formularios
                 if (formId === 'admin_dashboard') {
                     loadPendingRequests();
-                } else if (formId === 'user_login') { // NUEVO
+                } else if (formId === 'user_login') { 
                     checkUserLoginStatus();
-                } else if (formId === 'user_registration') { // NUEVO
+                } else if (formId === 'user_registration') { 
                      document.querySelector('#user-registration .input-group').style.display = 'block';
                      document.getElementById('registration-success').style.display = 'none';
                 }
@@ -1091,10 +1097,10 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
                     history.pushState({ viewId: formId }, '', `${getBaseUrl()}#${formId}`);
                 }
             } else {
-                // Si el ID del formulario no se encuentra, volver al menú
-                document.getElementById('main-menu').style.display = 'block';
+                // Si el ID del formulario no se encuentra, volver al REGISTRO (nueva pantalla inicial)
+                document.getElementById('user-registration').style.display = 'block';
                 if (pushState) {
-                    history.pushState({ viewId: 'menu' }, '', getBaseUrl());
+                    history.pushState({ viewId: 'user_registration' }, '', `${getBaseUrl()}#user_registration`);
                 }
             }
         }
@@ -1758,12 +1764,13 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             return btoa("Documento de Solicitud Recibida.");
         }
 
-        // --- INICIALIZACIÓN ---
+        // --- INICIALIZACIÓN (MODIFICADO) ---
 
         window.addEventListener('load', () => {
-             // Reemplazar la entrada inicial del historial para que el "atrás" inicial vaya al menú.
+             // Reemplazar la entrada inicial del historial para que el "atrás" inicial vaya al REGISTRO.
              if (window.location.hash === '' || window.location.hash === '#menu') {
-                 history.replaceState({ viewId: 'menu' }, '', getBaseUrl());
+                 // MODIFICADO: El registro es la pantalla inicial
+                 history.replaceState({ viewId: 'user_registration' }, '', `${getBaseUrl()}#user_registration`); 
              }
              checkURL();
         });
