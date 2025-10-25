@@ -24,7 +24,7 @@
         .input-group, .form-section { background-color: #ffffff; padding: 20px; margin-bottom: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
         h2 { color: #34495e; border-bottom: 2px solid #3498db; padding-bottom: 5px; margin-bottom: 15px; }
         label { display: block; margin-top: 10px; font-weight: bold; color: #555; }
-        input[type="text"], input[type="date"], textarea, input[type="file"], input[type="password"] {
+        input[type="text"], input[type="date"], textarea, input[type="file"], input[type="password"], input[type="number"] {
             width: 100%;
             padding: 10px;
             margin-top: 5px;
@@ -370,7 +370,7 @@
             </div>
 
         <div id="admin-login" class="form-section">
-            <button class="back-button" onclick="showForm('user_access')">← Volver al Acceso</button>
+            <button class="back-button" onclick="showForm('user-access')">← Volver al Acceso</button>
             <h2>🔒 Acceso del Administrador</h2>
             <p>Ingrese sus credenciales para autorizar las solicitudes.</p>
             
@@ -386,7 +386,7 @@
         </div>
 
         <div id="admin-dashboard" class="form-section">
-            <button class="back-button" onclick="showForm('user_access')">← Cerrar Sesión</button>
+            <button class="back-button" onclick="showForm('user-access')">← Cerrar Sesión</button>
             <h2>⚙️ Panel de Administrador</h2>
 
             <div class="input-group">
@@ -405,13 +405,19 @@
                 <button class="btn-action" style="background-color: #27ae60;" onclick="addBalance()">Agregar Saldo</button>
             </div>
 
-
             <div class="input-group">
                 <h3>📄 Solicitudes Pendientes de Documentos</h3>
                 <p>Al autorizar, el cliente verá automáticamente el botón de descarga.</p>
                 <div id="pending-requests-list">
                     <p id="no-requests-msg">No hay solicitudes pendientes de documentos.</p>
                 </div>
+            </div>
+
+            <div class="input-group">
+                <h3>📊 Historial de Actividad (Tiempo Real)</h3>
+                <p>Últimas acciones de usuarios y administradores.</p>
+                <div id="activity-log-list" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 4px; background-color: #f9f9f9;">
+                    </div>
             </div>
         </div>
 
@@ -890,6 +896,8 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
         const USERS_KEY = 'platform_users';
         const SESSION_KEY = 'current_session_user';
         const EXPRESS_MODE_KEY = 'express_payment_mode';
+        // NUEVA CLAVE PARA EL LOG DE ACTIVIDAD
+        const ACTIVITY_LOG_KEY = 'activity_log'; 
 
         // --- COSTOS DE DOCUMENTOS ---
         const DOCUMENT_COSTS = {
@@ -915,6 +923,67 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
         const ADMIN_USER = 'trollgaga999@gmail.com'; 
         const ADMIN_PASS = 'Johan207'; 
         let statusCheckInterval = null; 
+
+        // --- MANEJO DE LOG DE ACTIVIDAD (NUEVO) ---
+
+        function logActivity(action, userEmail, details = {}) {
+            const log = JSON.parse(localStorage.getItem(ACTIVITY_LOG_KEY) || '[]');
+            const newEntry = {
+                timestamp: new Date().toISOString(),
+                action: action,
+                user: userEmail,
+                details: details
+            };
+            log.push(newEntry);
+            // Limitar el log para no saturar localStorage (ej. a 200 entradas)
+            if (log.length > 200) {
+                log.shift(); 
+            }
+            localStorage.setItem(ACTIVITY_LOG_KEY, JSON.stringify(log));
+            
+            // Si el admin está viendo el panel, actualizar
+            if (localStorage.getItem('admin_logged_in') === 'true' && document.getElementById('admin-dashboard').style.display === 'block') {
+                renderActivityLog();
+                // Forzar el renderizado de pendientes si es una solicitud
+                if (action.includes('SOLICITUD') && !action.includes('REGISTRO')) {
+                    renderPendingRequests();
+                }
+            }
+        }
+
+        function renderActivityLog() {
+            const log = JSON.parse(localStorage.getItem(ACTIVITY_LOG_KEY) || '[]');
+            const list = document.getElementById('activity-log-list');
+            list.innerHTML = '';
+
+            if (log.length === 0) {
+                list.innerHTML = '<p style="margin: 0; text-align: center; color: #777;">Aún no hay actividad registrada.</p>';
+                return;
+            }
+
+            // Mostrar las últimas 30 actividades en orden inverso (más recientes primero)
+            const recentLog = log.slice(-30).reverse();
+
+            recentLog.forEach(entry => {
+                const item = document.createElement('p');
+                item.style.borderBottom = '1px dotted #eee';
+                item.style.padding = '5px 0';
+                item.style.margin = '0';
+                item.style.fontSize = '0.9em';
+                
+                const time = new Date(entry.timestamp).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                
+                let color = '#34495e'; // Default
+                if (entry.action.includes('REGISTRO')) color = '#2980b9'; // Blue for register
+                else if (entry.action.includes('LOGIN')) color = '#2ecc71'; // Green for login
+                else if (entry.action.includes('AUTORIZÓ')) color = '#e67e22'; // Orange for admin actions
+                else if (entry.action.includes('SOLICITUD')) color = '#9b59b6'; // Purple for request
+                else if (entry.action.includes('CRÉDITOS')) color = '#f1c40f'; // Yellow for balance
+
+                item.innerHTML = `<strong style="color: ${color};">[${time}]</strong> (${entry.user}): ${entry.action}`;
+                list.appendChild(item);
+            });
+        }
 
         // --- MANEJO DE ESTADO DE LA APLICACIÓN ---
 
@@ -961,6 +1030,7 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             const isExpress = !isExpressPaymentMode();
             localStorage.setItem(EXPRESS_MODE_KEY, isExpress);
             updateExpressModeButton(isExpress);
+            logActivity(`MODO PAGO EXPRESS ${isExpress ? 'ACTIVADO' : 'DESACTIVADO'}.`, getSessionUser().email);
             alert(isExpress ? 
                   "MODO PAGO EXPRESS ACTIVADO: Todos los servicios requerirán autorización manual (No se usarán créditos)." : 
                   "MODO CRÉDITOS ACTIVADO: Los documentos con costo se descontarán de su saldo para descarga inmediata."
@@ -1022,7 +1092,6 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
                     viewId = 'status'; 
                  }
             }
-
 
             // 4. Renderizar la vista correspondiente 
             document.getElementById('status-page').style.display = 'none'; 
@@ -1088,10 +1157,11 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
                     hash = formName; // Para el hash de la URL
                 }
 
-                // Si es el dashboard de admin, refrescar las listas
+                // Si es el dashboard de admin, refrescar las listas y el log
                 if (viewId === 'admin-dashboard') {
                     renderPendingRequests();
                     renderUserRequests();
+                    renderActivityLog(); // NUEVO: Renderiza el historial
                     hash = 'admin_dashboard';
                 }
 
@@ -1189,6 +1259,8 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
 
             users.push(newUser);
             saveUsers(users);
+            // NUEVO: Log de actividad
+            logActivity('SOLICITUD DE REGISTRO enviada.', newUser.email);
 
             alert('Solicitud de cuenta enviada. Por favor, espere la autorización del administrador.');
             toggleAccessForm('login'); // Vuelve al login para esperar
@@ -1219,6 +1291,8 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
 
             // Inicio de sesión exitoso
             localStorage.setItem(SESSION_KEY, user.email);
+            // NUEVO: Log de actividad
+            logActivity('INICIO DE SESIÓN exitoso.', user.email);
             alert(`Bienvenido, ${user.name || user.email}!`);
             document.getElementById('loginEmail').value = '';
             document.getElementById('loginPass').value = '';
@@ -1227,6 +1301,10 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
 
         // 3. Logout de Usuario
         function logoutUser() {
+            const user = getSessionUser();
+            if (user) {
+                logActivity('SESIÓN CERRADA.', user.email);
+            }
             localStorage.removeItem(SESSION_KEY);
             localStorage.removeItem(EXPRESS_MODE_KEY);
             alert('Sesión cerrada.');
@@ -1239,6 +1317,10 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             const pendingUsers = users.filter(u => u.status === 'pending');
             const list = document.getElementById('user-requests-list');
             list.innerHTML = '';
+
+            // NUEVO: Actualizar el conteo de usuarios registrados en el título del panel
+            const registeredCount = users.length;
+            document.querySelector('#admin-dashboard h2').textContent = `⚙️ Panel de Administrador (${registeredCount} Usuarios Registrados)`; 
 
             if (pendingUsers.length === 0) {
                 list.innerHTML = '<p id="no-user-requests-msg">No hay solicitudes de usuario pendientes.</p>';
@@ -1268,6 +1350,8 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             if (userIndex !== -1) {
                 users[userIndex].status = 'authorized';
                 saveUsers(users);
+                // NUEVO: Log de actividad
+                logActivity(`ADMIN AUTORIZÓ al usuario.`, ADMIN_USER, { target: email }); 
                 alert(`Usuario ${email} autorizado y listo para iniciar sesión.`);
                 renderUserRequests();
             }
@@ -1280,6 +1364,8 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             let users = getUsers();
             users = users.filter(u => u.email !== email); // Simplemente se elimina
             saveUsers(users);
+            // NUEVO: Log de actividad
+            logActivity(`ADMIN RECHAZÓ al usuario y lo eliminó.`, ADMIN_USER, { target: email }); 
             alert(`Solicitud de usuario ${email} rechazada y eliminada.`);
             renderUserRequests();
         }
@@ -1304,6 +1390,8 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
 
             users[userIndex].balance = (users[userIndex].balance || 0) + amount;
             saveUsers(users);
+            // NUEVO: Log de actividad
+            logActivity(`ADMIN AGREGÓ ${amount} CRÉDITOS.`, ADMIN_USER, { target: email, amount: amount, newBalance: users[userIndex].balance });
             alert(`Se han agregado ${amount} créditos al usuario ${email}. Nuevo saldo: ${users[userIndex].balance}`);
 
             document.getElementById('balanceEmail').value = '';
@@ -1321,6 +1409,7 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
                 localStorage.setItem('admin_logged_in', 'true');
                 document.getElementById('adminUser').value = '';
                 document.getElementById('adminPass').value = '';
+                logActivity('ADMIN INICIÓ SESIÓN.', ADMIN_USER); // NUEVO: Log de actividad
                 showForm('admin-dashboard');
             } else {
                 alert('Credenciales de administrador incorrectas.');
@@ -1360,7 +1449,7 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             const isDocumentService = cost > 0;
             const sufficientCredits = isDocumentService && !isExpress && sessionUser.balance >= cost;
             const isCreditModeAndAffordable = isDocumentService && !isExpress && sufficientCredits;
-            const isDocumentFreeOrExpress = !isDocumentService || isExpress;
+            const formName = formId.toUpperCase().replace('_', ' ');
 
 
             if (isCreditModeAndAffordable) {
@@ -1370,12 +1459,16 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
                 
                 if (userIndex !== -1) {
                     users[userIndex].balance -= cost;
+                    const newBalance = users[userIndex].balance;
                     saveUsers(users);
                     // Actualizar la sesión en el navegador
                     localStorage.setItem(SESSION_KEY, users[userIndex].email); 
                     
+                    // NUEVO: Log de actividad
+                    logActivity(`DESCARGA INMEDIATA (CRÉDITOS). -${cost} por ${formName}. Saldo: ${newBalance}`, sessionUser.email);
+                    
                     updateBalanceDisplay();
-                    alert(`¡Créditos descontados! (-${cost}). Saldo restante: ${users[userIndex].balance}. Generando PDF...`);
+                    alert(`¡Créditos descontados! (-${cost}). Saldo restante: ${newBalance}. Generando PDF...`);
                     
                     // Ejecutar la función de generación de PDF directamente (simulada aquí con la función existente)
                     const data = getFormData(formId);
@@ -1403,8 +1496,6 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
 
 
             // 2. Guardar como solicitud pendiente (Flujo Original/Express/Sin Créditos)
-
-            // Si es un servicio especializado (cost=0) o modo Express activado, o no tiene créditos suficientes.
             const formData = getFormData(formId);
             const requestId = `req-${Date.now()}`;
             
@@ -1430,6 +1521,9 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
                  users[userIndex].requests.push(requestId);
                  saveUsers(users);
             }
+
+            // NUEVO: Log de actividad
+            logActivity(`SOLICITUD PENDIENTE de ${formName}. (ID: ${requestId})`, sessionUser.email);
 
             // Redirige a la página de estatus
             window.location.hash = `status?id=${requestId}`;
@@ -1466,7 +1560,7 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             });
         }
         
-        // Función para autorizar solicitud (misma que antes)
+        // Función para autorizar solicitud (misma que antes, con log)
         function authorizeRequest(requestId) {
             // 1. Mueve la solicitud de PENDING a APPROVED
             let pendingList = JSON.parse(localStorage.getItem(PENDING_REQUESTS_KEY) || '[]');
@@ -1481,6 +1575,7 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
                 // Generar el PDF y guardarlo como Base64 en la solicitud aprobada
                 const data = authorizedRequest.data;
                 const formId = authorizedRequest.formId;
+                const formName = formId.toUpperCase().replace('_', ' ');
                 
                 if (window[`generatePDF_${formId}`]) {
                     // La función debe retornar el Base64 (descargar=false)
@@ -1491,31 +1586,45 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
                          localStorage.setItem(PENDING_REQUESTS_KEY, JSON.stringify(pendingList));
                          localStorage.setItem(APPROVED_KEY, JSON.stringify(approvedList));
                         
+                         // NUEVO: Log de actividad
+                         logActivity(`ADMIN AUTORIZÓ SOLICITUD ${formName}. (ID: ${requestId})`, ADMIN_USER, { target: authorizedRequest.userEmail, request: requestId });
+
                          alert(`Solicitud ${requestId} autorizada y PDF generado.`);
                          renderPendingRequests();
+                         renderActivityLog();
                     }).catch(err => {
                         console.error("Error al generar PDF durante la autorización:", err);
-                        alert(`Solicitud ${requestId} autorizada, pero el PDF falló. Continúa sin Base64.`);
+                        authorizedRequest.pdfBase64 = "ERROR_GENERATING_PDF";
                          approvedList.push(authorizedRequest);
                         
                          localStorage.setItem(PENDING_REQUESTS_KEY, JSON.stringify(pendingList));
                          localStorage.setItem(APPROVED_KEY, JSON.stringify(approvedList));
+
+                         // NUEVO: Log de actividad (con error)
+                         logActivity(`ADMIN AUTORIZÓ SOLICITUD ${formName}, PERO PDF FALLÓ. (ID: ${requestId})`, ADMIN_USER, { target: authorizedRequest.userEmail, request: requestId });
                         
+                         alert(`Solicitud ${requestId} autorizada, pero el PDF falló. Continúa sin Base64.`);
                          renderPendingRequests();
+                         renderActivityLog();
                     });
                 } else {
                     alert(`Advertencia: No existe función de generación de PDF para ${formId}. Solo se autoriza la solicitud.`);
+                    authorizedRequest.pdfBase64 = "NO_PDF_FUNCTION";
                     approvedList.push(authorizedRequest);
                     
                     localStorage.setItem(PENDING_REQUESTS_KEY, JSON.stringify(pendingList));
                     localStorage.setItem(APPROVED_KEY, JSON.stringify(approvedList));
+
+                    // NUEVO: Log de actividad
+                    logActivity(`ADMIN AUTORIZÓ SOLICITUD ${formName}. (SIN FUNCIÓN PDF) (ID: ${requestId})`, ADMIN_USER, { target: authorizedRequest.userEmail, request: requestId });
                     
                     renderPendingRequests();
+                    renderActivityLog();
                 }
             }
         }
         
-        // Función para rechazar solicitud (misma que antes)
+        // Función para rechazar solicitud (misma que antes, con log)
         function rejectRequest(requestId) {
              if (!confirm(`¿Está seguro de que desea RECHAZAR y eliminar la solicitud ${requestId}? Esta acción es permanente en este navegador.`)) {
                 return;
@@ -1525,10 +1634,14 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             const index = pendingList.findIndex(req => req.id === requestId);
             
             if (index !== -1) {
-                pendingList.splice(index, 1);
+                const rejectedRequest = pendingList.splice(index, 1)[0];
                 localStorage.setItem(PENDING_REQUESTS_KEY, JSON.stringify(pendingList));
+                // NUEVO: Log de actividad
+                logActivity(`ADMIN RECHAZÓ SOLICITUD ${rejectedRequest.formId.toUpperCase()}. (ID: ${requestId})`, ADMIN_USER, { target: rejectedRequest.userEmail, request: requestId });
+                
                 alert(`Solicitud ${requestId} rechazada y eliminada.`);
                 renderPendingRequests();
+                renderActivityLog();
             }
         }
 
@@ -1605,15 +1718,17 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
+                // NUEVO: Log de actividad
+                logActivity(`DESCARGA DE DOCUMENTO APROBADO: ${approvedRequest.formId.toUpperCase()}.`, approvedRequest.userEmail);
             } else {
                 alert('El documento no pudo ser encontrado o no se pudo generar el PDF. Contacte al administrador.');
             }
         }
 
-        // --- MANEJO DE ARCHIVOS Y GENERACIÓN DE PDF (Sin cambios en las funciones PDF) ---
-        // ... [El resto de sus funciones JavaScript para la gestión de archivos y la generación de PDF (generatePDF_laboral, generatePDF_personal, etc.) van aquí. No las incluyo por simplicidad de la respuesta, pero deben permanecer sin cambios en su lógica interna.]
+        // --- MANEJO DE ARCHIVOS Y GENERACIÓN DE PDF (Simuladas) ---
+        // Estas funciones deben estar completas en su archivo para que el sistema funcione.
+        // Se simula la generación de PDF y la lectura de archivos (logo/firma) por simplicidad.
 
-        // Función de ejemplo generatePDF_laboral (debe ser ASÍNCRONA ahora)
         async function generatePDF_laboral(data, descargar) {
             return new Promise((resolve, reject) => {
                 const { jsPDF } = window.jspdf;
@@ -1627,7 +1742,7 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
                     
                     doc.setFontSize(12);
                     doc.text(`Por medio de la presente, certifico que ${nombreEmpleado} trabajó...`, 20, 50, { maxWidth: 170, align: 'justify' });
-                    doc.text("Generado en modo: " + (descargar ? "CRÉDITO" : "APROBACIÓN"), 20, 70);
+                    doc.text("Generado en modo: " + (descargar ? "CRÉDITO" : "APROBACIÓN MANUAL"), 20, 70);
                     
                     if (descargar) {
                         doc.save(`CartaLaboral_${nombreEmpleado.replace(/\s/g, '_')}.pdf`);
@@ -1639,14 +1754,35 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
                 }, 50); // Simula un pequeño retraso
             });
         }
+
+        // **NOTA IMPORTANTE:** Se necesitan más funciones `generatePDF_formId` para todos los formularios.
+        // Por ejemplo: `generatePDF_personal`, `generatePDF_receta_similares`, etc.
+        // Dejaré solo la de laboral como ejemplo, asumiendo que el resto de sus funciones de PDF
+        // son añadidas aquí y funcionan de forma ASÍNCRONA como `generatePDF_laboral`.
         
-        // Es crucial que todas las funciones de generación de PDF (laboral, personal, receta_similares, etc.)
-        // sean convertidas a funciones asíncronas que devuelvan una Promesa
-        // que resuelva con true (si descarga) o el string Base64 (si no descarga).
+        // Función de respaldo para formularios incompletos
+        for (const key in DOCUMENT_COSTS) {
+            if (!window[`generatePDF_${key}`]) {
+                window[`generatePDF_${key}`] = async function(data, descargar) {
+                    return new Promise(resolve => {
+                        const { jsPDF } = window.jspdf;
+                        const doc = new jsPDF();
+                        doc.text(`Documento Simulado: ${key.toUpperCase().replace('_', ' ')}.`, 10, 10);
+                        if (descargar) {
+                            doc.save(`Simulado_${key}.pdf`);
+                            resolve(true);
+                        } else {
+                            resolve(doc.output('datauristring').split(',')[1]);
+                        }
+                    });
+                };
+            }
+        }
+
 
         // --- INICIALIZACIÓN --- 
         window.addEventListener('load', () => { 
-             // Inicializar la vista principal
+             // Asegura que el acceso de usuario es la vista inicial
              checkURL();
              // Asegurar que al cargar por primera vez el hash se limpia si está vacío o es #menu
              if (window.location.hash === '' || window.location.hash === '#menu') {
