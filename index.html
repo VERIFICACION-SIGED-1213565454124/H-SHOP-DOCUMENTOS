@@ -737,17 +737,18 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             </div>
             <button class="btn-action" onclick="saveSolicitud('formato_solicitud_pdf')">💾 Guardar Solicitud</button>
         </div>
-        
-    </div> <div id="status-page" class="status-page" style="display:none;">
+
+    </div>
+
+    <div id="status-page" class="status-page" style="display:none;">
         <div class="disclaimer-notice">
             *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
         </div>
-        </div>
+    </div>
 
     <a href="https://wa.me/message/AZLK65CETSPQL1" class="whatsapp-float" target="_blank">
         <i class="fab fa-whatsapp"></i>
     </a>
-    
     <div class="fixed-payment-info">
         <p>⚠️ **PAGO**</p>
         <p>*PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*</p>
@@ -755,14 +756,24 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
 
     <script>
         const { jsPDF } = window.jspdf;
-        const STORAGE_KEY = 'pending_requests_list'; 
-        const APPROVED_KEY = 'approved_requests_list'; 
+        const STORAGE_KEY = 'pending_requests_list';
+        const APPROVED_KEY = 'approved_requests_list';
 
         // --- CREDENCIALES FIJAS DEL ADMINISTRADOR ---
         const ADMIN_USER = 'trollgaga999@gmail.com';
         const ADMIN_PASS = 'Johan207';
         
-        let statusCheckInterval = null; 
+        let statusCheckInterval = null;
+
+        // Función auxiliar para convertir File a Base64
+        async function convertImageToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
 
         // --- MANEJO DE URL Y VISTAS (MODIFICADO) ---
 
@@ -776,25 +787,26 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
                 clearInterval(statusCheckInterval);
                 statusCheckInterval = null;
             }
-            
+
             // 1. Obtener el estado actual (si viene del history.back/forward)
             const state = history.state;
             let viewId = state ? state.viewId : 'menu';
             let requestId = state ? state.requestId : null;
-            
+
             // 2. Si no viene del estado, verificar el hash (para links directos/actualización)
             if (!viewId || viewId === 'menu') {
-                 const hash = window.location.hash.substring(1); 
-                 const params = new URLSearchParams(hash.split('?')[1] || '');
-                 requestId = params.get('id');
-                 if (hash.startsWith('status') && requestId) {
+                const hash = window.location.hash.substring(1);
+                const params = new URLSearchParams(hash.split('?')[1] || '');
+                requestId = params.get('id');
+
+                if (hash.startsWith('status') && requestId) {
                     viewId = 'status';
-                 } else if (hash.startsWith('admin')) {
+                } else if (hash.startsWith('admin')) {
                     // Limpiar el hash para que coincida con el viewId (ej: 'admin_login' o 'admin_dashboard')
-                    viewId = hash.split('?')[0]; 
-                 } else {
+                    viewId = hash.split('?')[0];
+                } else {
                     viewId = 'menu';
-                 }
+                }
             }
 
             // 3. Renderizar la vista correspondiente
@@ -807,10 +819,10 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
                 // Asegurar que el disclaimer se muestre antes de actualizar el contenido dinámico
                 document.getElementById('status-page').innerHTML = '<div class="disclaimer-notice">*NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*</div>';
                 checkStatus(requestId);
-                statusCheckInterval = setInterval(() => checkStatus(requestId), 5000); 
-                return; 
+                statusCheckInterval = setInterval(() => checkStatus(requestId), 5000);
+                return;
             }
-            
+
             // Si la vista es admin_dashboard, asegurar que se carguen los datos
             if (viewId === 'admin_dashboard') {
                 loadPendingRequests();
@@ -819,7 +831,7 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             // Mostrar el contenedor de la aplicación y la vista específica
             showForm(viewId, false); // No empujar estado al historial si ya estamos retrocediendo/cargando
         }
-        
+
         // Mapeo de IDs de vista a IDs de elementos DIV
         const viewIdMap = {
             'menu': 'main-menu',
@@ -840,743 +852,601 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             'cv_desde_cero': 'form-cv_desde_cero',
             'sellos_personales': 'form-sellos_personales',
             'formato_solicitud_pdf': 'formato_solicitud_pdf'
+            // 'whatsapp_group': Special case handled in showForm, no corresponding div is needed.
         };
 
-        // Función que cambia la vista y actualiza el historial
-        function showForm(viewId, pushHistory = true) {
-            const sections = Object.values(viewIdMap);
-            sections.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.style.display = 'none';
-            });
-            
-            const targetId = viewIdMap[viewId] || viewId;
-            const viewElement = document.getElementById(targetId);
-            
-            // Manejar links que no son formularios/vistas de la app
+        function showForm(viewId, pushState = true) {
+            // Caso especial para WhatsApp
             if (viewId === 'whatsapp_group') {
-                window.open('https://chat.whatsapp.com/GbkvIbPwCRX1JacpJJOS9D', '_blank');
-                return; // No cambia la vista actual
+                window.open('https://wa.me/message/AZLK65CETSPQL1', '_blank');
+                // Intentar volver al menú principal sin cambiar la vista visible
+                viewId = 'menu';
             }
 
-            if (viewElement) {
-                viewElement.style.display = 'block';
-                window.scrollTo(0, 0);
+            // Ocultar todos los formularios y el dashboard/login, mostrar solo el menú o el formulario específico.
+            Object.keys(viewIdMap).forEach(key => {
+                const element = document.getElementById(viewIdMap[key]);
+                if (element) {
+                    element.style.display = 'none';
+                }
+            });
 
-                if (pushHistory) {
-                    let url = getBaseUrl();
-                    let state = { viewId: viewId };
+            // Mostrar la vista solicitada (si existe)
+            const targetElementId = viewIdMap[viewId];
+            if (targetElementId) {
+                document.getElementById(targetElementId).style.display = 'block';
+            }
 
-                    if (viewId !== 'menu') {
-                        // Usar el hash para que el link directo funcione en cualquier navegador
-                        url += `#${viewId}`; 
-                    } else {
-                        // Si volvemos al menú, eliminamos el hash
-                        url = getBaseUrl(); 
-                    }
-                    
-                    // Empujar el nuevo estado al historial (necesario para el botón 'atrás' del navegador)
-                    history.pushState(state, '', url);
+            // Si es un cambio de vista normal, actualizar el historial del navegador.
+            if (pushState) {
+                // Si es el menú, limpiar el hash
+                const newUrl = (viewId === 'menu') ? getBaseUrl() : getBaseUrl() + '#' + viewId;
+                history.pushState({ viewId: viewId }, '', newUrl);
+
+                if (statusCheckInterval) {
+                    clearInterval(statusCheckInterval);
+                    statusCheckInterval = null;
                 }
             }
         }
 
-
-        // --- AUTENTICACIÓN ADMIN (Sin cambios) ---
+        // --- MANEJO DEL ADMINISTRADOR ---
 
         function authenticateAdmin() {
             const user = document.getElementById('adminUser').value;
             const pass = document.getElementById('adminPass').value;
-            
+
             if (user === ADMIN_USER && pass === ADMIN_PASS) {
-                alert("¡Bienvenido, Administrador! Accediendo al Panel de Autorización.");
                 showForm('admin_dashboard');
             } else {
-                alert("Usuario o Contraseña incorrectos. Inténtalo de nuevo.");
+                alert('Credenciales de administrador incorrectas.');
             }
         }
 
-        // --- GESTIÓN DE ALMACENAMIENTO (Sin cambios) ---
+        function loadPendingRequests() {
+            const requests = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            const listContainer = document.getElementById('pending-requests-list');
+            listContainer.innerHTML = '';
 
-        function getRequests(key) {
-            const data = localStorage.getItem(key);
-            return data ? JSON.parse(data) : [];
-        }
-
-        function saveRequests(key, requests) {
-            localStorage.setItem(key, JSON.stringify(requests));
-        }
-
-        // --- FUNCIÓN DEL CLIENTE: GUARDAR SOLICITUD (Modificada para nuevos tipos) ---
-
-        async function saveSolicitud(tipoCarta) {
-            let nombreSolicitante, nombreAsunto, pdfBase64;
-
-            // Se busca el nombre del solicitante en los campos disponibles
-            const solicitanteId = `nombreSolicitante${tipoCarta.replace(/_/g, '')}`;
-            nombreSolicitante = document.getElementById(solicitanteId) ? document.getElementById(solicitanteId).value : 'Cliente';
-
-            // Se usa el nombre del primer campo placeholder como 'nombreAsunto' para seguimiento.
-            const placeholderId = `placeholder1_${tipoCarta.split('_').pop()}`;
-            nombreAsunto = document.getElementById(placeholderId) ? document.getElementById(placeholderId).value : tipoCarta.toUpperCase().replace(/_/g, ' ');
-
-            // Lógica específica de la carta laboral
-            if (tipoCarta === 'laboral') {
-                nombreSolicitante = document.getElementById('nombreSolicitanteLaboral').value;
-                nombreAsunto = document.getElementById('nombreEmpleadoLaboral').value;
-                pdfBase64 = await generarPDFLaboral(false);
-            // Lógica específica de la carta personal
-            } else if (tipoCarta === 'personal') {
-                nombreSolicitante = document.getElementById('nombreSolicitantePersonal').value;
-                nombreAsunto = document.getElementById('nombreRecomendadoPersonal').value;
-                pdfBase64 = await generarPDFPersonal(false);
-            // Lógica específica para Receta Similares
-            } else if (tipoCarta === 'receta_similares') {
-                nombreSolicitante = document.getElementById('nombrePacienteSimilares').value;
-                nombreAsunto = document.getElementById('nombrePacienteSimilares').value + ' ' + document.getElementById('apellidoPSimilares').value;
-                pdfBase64 = await generarPDFRecetaSimilares(false);
-            // Lógica para los nuevos formularios (placeholder)
-            } else { 
-                 pdfBase64 = "BASE64_PLACEHOLDER_FOR_NEW_TYPE"; 
-            }
-
-            if (!pdfBase64) {
-                alert(`Error al generar el documento ${tipoCarta}. Por favor, revise todos los campos y archivos adjuntos.`);
+            if (requests.length === 0) {
+                listContainer.innerHTML = '<p id="no-requests-msg">No hay solicitudes pendientes en el almacenamiento local de este navegador.</p>';
                 return;
             }
-            
-            // Si es un placeholder, se usa una alerta informativa
-            if (pdfBase64 === "BASE64_PLACEHOLDER_FOR_NEW_TYPE") {
-                 alert(`AVISO: Se ha guardado la solicitud ${tipoCarta} con datos de PRUEBA. El administrador procederá a la autorización.`);
-            }
 
-            const requestId = Date.now().toString();
+            requests.forEach(request => {
+                const item = document.createElement('div');
+                item.className = 'request-item';
+                item.innerHTML = `
+                    <div>
+                        <strong>ID:</strong> ${request.id}<br>
+                        <strong>Tipo:</strong> ${request.type}<br>
+                        <strong>Solicitante:</strong> ${request.data.nombreSolicitante || request.data.nombreSolicitanteLaboral || 'N/A'}<br>
+                        <strong>Email:</strong> ${request.data.emailSolicitante || request.data.emailSolicitanteLaboral || 'N/A'}
+                    </div>
+                    <div class="request-actions">
+                        <button class="btn-action btn-authorize" onclick="authorizeRequest('${request.id}')">Autorizar</button>
+                        <button class="btn-action btn-reject" onclick="rejectRequest('${request.id}')" style="background-color: #c0392b;">Rechazar</button>
+                    </div>
+                `;
+                listContainer.appendChild(item);
+            });
+        }
+
+        function authorizeRequest(requestId) {
+            const requests = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            const approvedRequests = JSON.parse(localStorage.getItem(APPROVED_KEY) || '[]');
+            
+            const index = requests.findIndex(req => req.id === requestId);
+
+            if (index !== -1) {
+                const authorizedRequest = requests.splice(index, 1)[0];
+                authorizedRequest.status = 'approved';
+                
+                // Generar el PDF y obtener el base64
+                generatePDF(authorizedRequest.type, authorizedRequest.data, false).then(pdfBase64 => {
+                    authorizedRequest.pdfBase64 = pdfBase64;
+                    approvedRequests.push(authorizedRequest);
+                    
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(requests));
+                    localStorage.setItem(APPROVED_KEY, JSON.stringify(approvedRequests));
+
+                    alert(`Solicitud ${requestId} autorizada y PDF generado.`);
+                    loadPendingRequests();
+                }).catch(error => {
+                    console.error("Error al generar PDF:", error);
+                    alert("Error al generar el PDF. Revisa la consola.");
+                });
+            }
+        }
+
+        function rejectRequest(requestId) {
+            let requests = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            
+            const index = requests.findIndex(req => req.id === requestId);
+
+            if (index !== -1) {
+                requests.splice(index, 1); // Remover la solicitud
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(requests));
+                alert(`Solicitud ${requestId} rechazada y eliminada.`);
+                loadPendingRequests();
+            }
+        }
+
+        // --- MANEJO DEL ESTATUS DEL CLIENTE ---
+
+        function saveSolicitud(type) {
+            const data = getFormData(type);
+            if (!data) return;
+
+            const newId = `SOL-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
             const newRequest = {
-                id: requestId,
-                type: tipoCarta,
-                name: nombreAsunto,
-                requesterName: nombreSolicitante,
-                pdfBase64: pdfBase64,
-                status: 'pending', 
-                timestamp: new Date().toLocaleString()
+                id: newId,
+                type: type,
+                status: 'pending',
+                data: data,
+                timestamp: new Date().toISOString()
             };
 
-            const requests = getRequests(STORAGE_KEY);
+            let requests = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
             requests.push(newRequest);
-            saveRequests(STORAGE_KEY, requests);
-            
-            // Navegación a la página de estatus sin usar showForm (ya que es una vista de monitoreo)
-            const url = `${getBaseUrl()}#status?id=${requestId}`;
-            const state = { viewId: 'status', requestId: requestId };
-            history.pushState(state, '', url);
-            checkURL(); // Forzar la carga de la vista de estatus
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(requests));
+
+            // Redirigir a la página de estatus
+            window.location.hash = `status?id=${newId}`;
+            checkURL(); // Forzar la recarga de la vista de estatus
         }
-        
-        // --- PÁGINA DE ESPERA DEL CLIENTE (Sin cambios en lógica de espera) ---
-        
+
         function checkStatus(requestId) {
-            const approvedRequests = getRequests(APPROVED_KEY);
-            const request = approvedRequests.find(req => req.id === requestId);
+            const approvedRequests = JSON.parse(localStorage.getItem(APPROVED_KEY) || '[]');
+            const pendingRequests = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+
+            const request = approvedRequests.find(req => req.id === requestId) || pendingRequests.find(req => req.id === requestId);
             const statusPage = document.getElementById('status-page');
-            
-            // Clonar el nodo del disclaimer (ya debe estar ahí)
-            const disclaimer = statusPage.querySelector('.disclaimer-notice').outerHTML;
-            
+
             if (!request) {
-                // Estatus: Pendiente (Cargando)
-                statusPage.innerHTML = disclaimer + `
-                    <h2>⏳ Solicitud Enviada - Esperando Autorización</h2>
-                    <div class="spinner"></div>
-                    <p>Su solicitud de **${requestId}** ha sido recibida.</p>
-                    <p>Estamos esperando que el administrador la apruebe una vez realizado el pago.</p>
-                    <p style="font-size: 0.8em; color: #555;">(Esta página se actualizará automáticamente cada 5 segundos)</p>
-                    <p style="margin-top: 20px;">Puede guardar este enlace: <code>${getBaseUrl()}#status?id=${requestId}</code></p>
+                statusPage.innerHTML = `
+                    <div class="disclaimer-notice">*NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*</div>
+                    <h2>❌ Solicitud No Encontrada</h2>
+                    <p>El ID de solicitud <strong>${requestId}</strong> no existe o fue eliminada.</p>
+                    <button class="btn-action back-button" onclick="showForm('menu')">← Volver al Menú</button>
+                `;
+                if (statusCheckInterval) clearInterval(statusCheckInterval);
+                return;
+            }
+
+            if (request.status === 'approved' && request.pdfBase64) {
+                if (statusCheckInterval) {
+                    clearInterval(statusCheckInterval);
+                    statusCheckInterval = null;
+                }
+
+                statusPage.innerHTML = `
+                    <div class="disclaimer-notice">*NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*</div>
+                    <h2>✅ Solicitud Aprobada y Lista</h2>
+                    <p>Tu documento ha sido procesado y está listo para descargar.</p>
+                    <p>ID: <strong>${request.id}</strong></p>
+                    <button class="btn-action btn-download-now" onclick="downloadPDF('${request.pdfBase64}', '${request.type}', '${request.data.nombreSolicitante || request.data.nombrePacienteSimilares || 'documento'}')">
+                        <i class="fas fa-download"></i> Descargar Documento Ahora
+                    </button>
+                    <button class="btn-action back-button" onclick="showForm('menu')">← Volver al Menú</button>
                 `;
             } else {
-                // Estatus: Aprobado (Botón de descarga)
-                if (statusCheckInterval) {
-                    clearInterval(statusCheckInterval); 
-                }
-                
-                statusPage.innerHTML = disclaimer + `
-                    <h2>✅ ¡Solicitud Aprobada!</h2>
-                    <p>El administrador ha autorizado su documento para **${request.name}**.</p>
-                    <button class="btn-action btn-download-now" onclick="triggerDownload('${request.id}')">
-                        Descargar Documento Ahora
-                    </button>
-                    <p style="margin-top: 30px;"><a href="#" onclick="showForm('menu')">← Volver al Menú Principal</a></p>
+                statusPage.innerHTML = `
+                    <div class="disclaimer-notice">*NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*</div>
+                    <h2>⏳ Solicitud Pendiente de Aprobación</h2>
+                    <div class="spinner"></div>
+                    <p>Tu solicitud (ID: <strong>${request.id}</strong>) está en cola. Esto puede tardar unos minutos.</p>
+                    <p><strong>Por favor, espera en esta página.</strong> Se actualizará automáticamente cuando esté lista.</p>
+                    <div class="payment-notice">
+                        *ASEGÚRATE DE HABER ENVIADO MENSAJE AL WHATSAPP PARA EL PAGO Y APROBACIÓN*
+                    </div>
                 `;
             }
         }
-        
-        // Función para forzar la descarga cuando el cliente hace clic en el botón
-        function triggerDownload(requestId) {
-            const approvedRequests = getRequests(APPROVED_KEY);
-            const request = approvedRequests.find(req => req.id === requestId);
-            
-            if (!request) {
-                alert("Error: Archivo no encontrado. Podría haber sido eliminado.");
-                showForm('menu');
-                return;
-            }
 
-            if (request.pdfBase64 === "BASE64_PLACEHOLDER_FOR_NEW_TYPE") {
-                alert("Este es un documento placeholder de PRUEBA. No se puede descargar un PDF real. Por favor, solicite el documento oficial al administrador.");
-                return;
-            }
-            
-            const pdfBase64 = request.pdfBase64;
-            const name = request.name.toUpperCase().replace(/\s/g, '_');
-            const type = request.type.toUpperCase().replace(/_/g, '-'); 
-
-            // Forzar la descarga en el navegador del cliente
+        function downloadPDF(base64, type, name) {
             const link = document.createElement('a');
-            link.href = `data:application/pdf;base64,${pdfBase64}`;
-            link.download = `Documento_Aprobado_${name}_${type}.pdf`;
+            link.href = 'data:application/pdf;base64,' + base64;
+            link.download = `${type}_${name.replace(/[^a-z0-9]/gi, '_')}.pdf`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            
-            // Mensaje de descarga exitosa
-            const statusPage = document.getElementById('status-page');
-            const disclaimer = statusPage.querySelector('.disclaimer-notice').outerHTML;
-             statusPage.innerHTML = disclaimer + `
-                <div>
-                    <h1>✅ Descarga Exitosa</h1>
-                    <p>Su documento para **${request.name}** ha sido descargado. Por favor, revise su carpeta de descargas.</p>
-                    <p style="margin-top: 30px;"><a href="#" onclick="showForm('menu')">← Volver al Menú Principal</a></p>
-                </div>
-            `;
         }
 
+        // --- EXTRACCIÓN DE DATOS DE FORMULARIO ---
 
-        // --- FUNCIONES DEL ADMINISTRADOR (Sin cambios en lógica de autorización) ---
-
-        function loadPendingRequests() {
-            const requests = getRequests(STORAGE_KEY).filter(req => req.status === 'pending');
-            const listElement = document.getElementById('pending-requests-list');
+        function getFormData(type) {
+            const data = {};
+            let prefix = '';
             
-            listElement.innerHTML = ''; 
-
-            if (requests.length === 0) {
-                 listElement.innerHTML = '<p id="no-requests-msg">No hay solicitudes pendientes en el almacenamiento local de este navegador.</p>';
-                 return;
+            if (type === 'laboral') {
+                prefix = 'Laboral';
+                data.nombreSolicitante = document.getElementById('nombreSolicitanteLaboral').value;
+                data.emailSolicitante = document.getElementById('emailSolicitanteLaboral').value;
+                data.logoFile = document.getElementById('logoInputLaboral').files[0];
+                data.firmaFile = document.getElementById('firmaInputLaboral').files[0];
+            } else if (type === 'personal') {
+                prefix = 'Personal';
+                data.nombreSolicitante = document.getElementById('nombreSolicitantePersonal').value;
+                data.emailSolicitante = document.getElementById('emailSolicitantePersonal').value;
+                data.firmaFile = document.getElementById('firmaInputPersonal').files[0];
+            } else if (type === 'receta_similares') {
+                prefix = 'Similares';
+                data.logoFile = document.getElementById('logoInputSimilares').files[0];
+                data.firmaFile = document.getElementById('firmaInputSimilares').files[0];
+                // No hay campos de solicitante genéricos, se usa el paciente
+                data.nombreSolicitante = document.getElementById('nombrePacienteSimilares').value; 
+            } else {
+                // Para formularios PENDIENTES, sólo guardar datos genéricos de ejemplo
+                const placeholder = document.getElementById(`placeholder1_${type.split('_')[1] || type}`);
+                data.placeholder = placeholder ? placeholder.value : 'No disponible';
+                data.nombreSolicitante = 'Usuario Genérico';
+                return data; 
             }
 
-            requests.forEach(req => {
-                const typeDisplay = req.type.replace(/_/g, ' ').toUpperCase();
-                const item = document.createElement('div');
-                item.id = `request-${req.id}`;
-                item.className = 'request-item';
-                item.innerHTML = `
-                    <div class="request-info">
-                        <strong>${typeDisplay} - ${req.name}</strong>
-                        <p>Solicitante: ${req.requesterName} (ID: ${req.id})</p>
-                        <p style="font-size:0.8em;">URL del Cliente: <code style="word-break: break-all;">${getBaseUrl()}#status?id=${req.id}</code></p>
-                    </div>
-                    <div class="request-actions">
-                        <button class="btn-authorize" onclick="authorizeRequest('${req.id}')">Autorizar</button>
-                        <button class="btn-reject" onclick="deleteRequest('${req.id}', '${STORAGE_KEY}')">Rechazar</button>
-                    </div>
-                `;
-                listElement.appendChild(item);
-            });
-        }
-        
-        function authorizeRequest(requestId) {
-            let pendingRequests = getRequests(STORAGE_KEY);
-            const index = pendingRequests.findIndex(req => req.id === requestId);
-            
-            if (index === -1) {
-                alert("Error: Solicitud no encontrada.");
-                loadPendingRequests();
-                return;
-            }
-
-            const request = pendingRequests[index];
-            request.status = 'approved';
-            
-            const approvedRequests = getRequests(APPROVED_KEY);
-            approvedRequests.push(request);
-            saveRequests(APPROVED_KEY, approvedRequests);
-
-            pendingRequests.splice(index, 1);
-            saveRequests(STORAGE_KEY, pendingRequests);
-
-            alert(`¡Solicitud Autorizada! El cliente ahora puede descargar el archivo usando el enlace de su página de estatus.`);
-            
-            loadPendingRequests();
-        }
-
-        function deleteRequest(requestId, key) {
-            const confirmMsg = key === STORAGE_KEY 
-                ? "¿Está seguro de rechazar y eliminar esta solicitud pendiente?"
-                : "¿Está seguro de eliminar esta solicitud APROBADA del historial del administrador? (Ya no podrá ser descargada)";
-            
-            if (!confirm(confirmMsg)) return;
-            
-            let requests = getRequests(key);
-            const index = requests.findIndex(req => req.id === requestId);
-            if (index > -1) {
-                requests.splice(index, 1);
-                saveRequests(key, requests);
-            }
-            loadPendingRequests();
-        }
-        
-        // --- Funciones Auxiliares PDF (Mantenidas) ---
-
-        function drawJustifiedText(doc, text, x, y, maxWidth, lineHeight) { 
-            let currentY = y;
-            const splitText = doc.splitTextToSize(text, maxWidth);
-            splitText.forEach((line, index) => {
-                if (index < splitText.length - 1) {
-                    doc.text(line, x, currentY, { align: 'justify' });
-                } else {
-                    doc.text(line, x, currentY);
+            // Recoger todos los campos restantes usando el prefijo
+            const inputs = document.querySelectorAll(`[id$="${prefix}"]`);
+            inputs.forEach(input => {
+                // Excluir los files que ya se manejan
+                if (input.type !== 'file') {
+                    const key = input.id.replace(prefix, '');
+                    data[key] = input.value;
                 }
-                currentY += lineHeight;
             });
-            return currentY; 
-        }
-        
-        const fileToBase64 = (file) => new Promise((resolve, reject) => { 
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = error => resolve(null);
-        });
 
-        async function generarPDFLaboral(descargar = true) { 
-            const doc = new jsPDF('p', 'mm', 'a4');
-            const margin = 20;
-            let y = 10;
-            const lineHeight = 6;
-            const pageWidth = doc.internal.pageSize.getWidth();
-            const textWidth = 170; 
-
-            const fechaEmision = document.getElementById('fechaEmisionLaboral').value;
-            const nombreEmpleado = document.getElementById('nombreEmpleadoLaboral').value.toUpperCase();
-            // ACT: Usar nombre completo para reemplazo.
-            const nombreParaReemplazo = nombreEmpleado; 
-            
-            const puesto = document.getElementById('puestoDesempenadoLaboral').value.toUpperCase();
-            const inicio = document.getElementById('fechaInicioLaboral').value;
-            const fin = document.getElementById('fechaFinLaboral').value;
-            const empresa = document.getElementById('nombreEmpresaLaboral').value.toUpperCase();
-            
-            // ACT: Reemplazar con nombre completo.
-            const personalidad = document.getElementById('cuerpoPersonalidadLaboral').value.replace(/\[nombre\]/g, nombreParaReemplazo);
-            const cierre = document.getElementById('cuerpoCierreLaboral').value.replace(/\[nombre\]/g, nombreParaReemplazo);
-            
-            const nombreFirmante = document.getElementById('nombreFirmanteLaboral').value.toUpperCase();
-            const cargoFirmante = document.getElementById('cargoFirmanteLaboral').value;
-            const telefonoFirmante = document.getElementById('telefonoFirmanteLaboral').value;
-            
-            const logoFile = document.getElementById('logoInputLaboral').files[0];
-            const firmaFile = document.getElementById('firmaInputLaboral').files[0];
-            const logoBase64 = logoFile ? await fileToBase64(logoFile) : null;
-            const firmaBase64 = firmaFile ? await fileToBase64(firmaFile) : null;
-            
-            const f_emision = new Date(fechaEmision).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
-            const f_inicio = new Date(inicio).toLocaleDateString('es-ES');
-            const f_fin = new Date(fin).toLocaleDateString('es-ES');
-            
-            // ACT: Posición del Logo, Nombre de Empresa y Fecha (Estilo LARIMEX)
-            if (logoBase64) { 
-                // Colocar logo en la esquina superior izquierda (pequeño)
-                doc.addImage(logoBase64, 'PNG', margin, y, 30, 15); 
-            }
-            
-            doc.setFontSize(14);
-            doc.setFont(undefined, 'bold');
-            // Centrar el nombre de la empresa
-            doc.text(empresa, pageWidth / 2, y + 10, { align: 'center' }); 
-            
-            y = Math.max(y, 35); // Establecer la línea base para el contenido después del logo/empresa
-
-            doc.setFontSize(11);
-            doc.setFont(undefined, 'normal');
-            // Colocar la fecha a la derecha, justo debajo o al lado del nombre de la empresa.
-            doc.text(f_emision, pageWidth - margin, y - 5, { align: 'right' }); 
-            y += lineHeight * 2;
-            // FIN ACT: Posición del Logo, Nombre de Empresa y Fecha
-            
-            doc.text("A quien corresponda:", margin, y);
-            y += lineHeight * 1.5;
-            
-            doc.setFontSize(11);
-            doc.setFont(undefined, 'normal');
-            const presentacion = `Por medio de la presente, me permito recomendar ampliamente al Sr. ${nombreEmpleado} quien se desempeñó como ${puesto} en ${empresa} desde el ${f_inicio} hasta el ${f_fin}.`;
-            y = drawJustifiedText(doc, presentacion, margin, y, textWidth, lineHeight);
-            y += lineHeight;
-
-            y = drawJustifiedText(doc, personalidad, margin, y, textWidth, lineHeight);
-            y += lineHeight;
-            
-            doc.setFont(undefined, 'bold');
-            doc.text("Sus principales tareas incluyeron:", margin, y);
-            y += lineHeight;
-
-            doc.setFont(undefined, 'normal');
-            const listaTareas = document.getElementById('tareasLaboral').value.trim().split('\n').filter(t => t.trim() !== '');
-            listaTareas.forEach(tarea => {
-                const tareaFormato = `• ${tarea.trim()}`;
-                y = drawJustifiedText(doc, tareaFormato, margin + 5, y, textWidth - 10, lineHeight);
-            });
-            y += lineHeight;
-
-            y = drawJustifiedText(doc, cierre, margin, y, textWidth, lineHeight);
-            y += lineHeight; 
-            
-            doc.text("Atentamente,", pageWidth / 2, y, { align: 'center' }); 
-            y += lineHeight * 2;
-
-            if (firmaBase64) {
-                const imgWidth = 50; 
-                const xFirma = (pageWidth / 2) - (imgWidth / 2);
-                doc.addImage(firmaBase64, 'PNG', xFirma, y, imgWidth, 20);
-                y += 25; 
-            } else { y += 20; }
-
-            doc.setFont(undefined, 'bold');
-            doc.text(nombreFirmante, pageWidth / 2, y, { align: 'center' }); 
-            y += lineHeight;
-            doc.setFont(undefined, 'normal');
-            doc.text(cargoFirmante, pageWidth / 2, y, { align: 'center' }); 
-            y += lineHeight;
-            doc.text(telefonoFirmante, pageWidth / 2, y, { align: 'center' }); 
-
-            if (descargar) {
-                 doc.save(`Carta_Recomendacion_${nombreEmpleado.replace(/\s/g, '_')}_LABORAL.pdf`);
-                 return true;
-            } else {
-                 return doc.output('datauristring').split(',')[1];
-            }
+            return data;
         }
 
-        async function generarPDFPersonal(descargar = true) { 
-            const doc = new jsPDF('p', 'mm', 'a4');
-            const margin = 20;
-            let y = 30;
-            const lineHeight = 6;
-            const pageWidth = doc.internal.pageSize.getWidth();
-            const textWidth = 170; 
+        // --- GENERACIÓN DE PDF ---
 
-            const fechaEmision = document.getElementById('fechaEmisionPersonal').value;
-            const nombreRecomendado = document.getElementById('nombreRecomendadoPersonal').value.toUpperCase();
-            const primerNombreRecomendado = nombreRecomendado.split(' ')[0];
-            const tiempoConocido = document.getElementById('tiempoConocidoPersonal').value;
-
-            const personalidad = document.getElementById('cuerpoPersonalidadPersonal').value.replace(/\[nombre\]/g, primerNombreRecomendado);
-            const recomendacion = document.getElementById('cuerpoRecomendacionPersonal').value.replace(/\[nombre\]/g, primerNombreRecomendado);
+        // Función general para llamar al generador específico
+        async function generatePDF(type, data, descargar = true) {
+            if (type === 'laboral') return await generatePDF_Laboral(data, descargar);
+            if (type === 'personal') return await generatePDF_Personal(data, descargar);
+            if (type === 'receta_similares') return await generatePDF_Similares(data, descargar);
             
-            const nombreFirmante = document.getElementById('nombreFirmantePersonal').value.toUpperCase();
-            const firmaFile = document.getElementById('firmaInputPersonal').files[0];
-            const firmaBase64 = firmaFile ? await fileToBase64(firmaFile) : null;
-            
-            const f_emision = new Date(fechaEmision).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
-
-            doc.setFontSize(11);
-            doc.setFont(undefined, 'normal');
-            doc.text(f_emision, pageWidth - margin, y, { align: 'right' });
-            y += lineHeight * 2;
-            
-            doc.text("A quien corresponda:", margin, y);
-            y += lineHeight * 1.5;
-
-            const presentacion = `Por medio de la presente, yo, ${nombreFirmante}, extiendo esta carta de recomendación personal para ${nombreRecomendado}, a quien conozco ${tiempoConocido}.`;
-            y = drawJustifiedText(doc, presentacion, margin, y, textWidth, lineHeight);
-            y += lineHeight;
-
-            y = drawJustifiedText(doc, personalidad, margin, y, textWidth, lineHeight);
-            y += lineHeight * 2;
-            
-            y = drawJustifiedText(doc, recomendacion, margin, y, textWidth, lineHeight);
-            y += lineHeight * 2; 
-            
-            doc.text("Atentamente,", pageWidth / 2, y, { align: 'center' }); 
-            y += lineHeight * 2;
-
-            if (firmaBase64) {
-                const imgWidth = 50; 
-                const xFirma = (pageWidth / 2) - (imgWidth / 2);
-                doc.addImage(firmaBase64, 'PNG', xFirma, y, imgWidth, 20);
-                y += 25; 
-            } else { y += 20; }
-
-            doc.setFont(undefined, 'bold');
-            doc.text(nombreFirmante, pageWidth / 2, y, { align: 'center' }); 
-
-            if (descargar) {
-                 doc.save(`Carta_Recomendacion_${nombreRecomendado.replace(/\s/g, '_')}_PERSONAL.pdf`);
-                 return true;
-            } else {
-                 return doc.output('datauristring').split(',')[1];
-            }
+            // Si el documento está pendiente, no se genera nada (sólo se devuelve true para no-error)
+            return true;
         }
-        
-        // --- FUNCIÓN MODIFICADA PARA GENERAR EL PDF DE RECETA SIMILARES ---
 
-        async function generarPDFRecetaSimilares(descargar = true) {
-            const doc = new jsPDF('p', 'mm', 'a4');
-            const margin = 10;
-            let y = 10;
-            const lineHeight = 5;
-            const pageWidth = doc.internal.pageSize.getWidth();
-            const textWidth = pageWidth - (margin * 2);
-            const xCentro = pageWidth / 2;
-            
-            // ----------------------------------------------------
-            // I. RECUPERACIÓN DE DATOS DEL FORMULARIO
-            // ----------------------------------------------------
-            const nombreDoc = document.getElementById('doctorNombreSimilares').value.toUpperCase();
-            const cedula = document.getElementById('cedulaSimilares').value.toUpperCase();
-            const direccion = document.getElementById('direccionSimilares').value.toUpperCase();
-            const ciudad = document.getElementById('ciudadSimilares').value.toUpperCase();
-            const fechaEmision = document.getElementById('fechaEmisionSimilares').value;
-            
-            const nombreP = document.getElementById('nombrePacienteSimilares').value.toUpperCase();
-            const apellidoP = document.getElementById('apellidoPSimilares').value.toUpperCase();
-            const apellidoM = document.getElementById('apellidoMSimilares').value.toUpperCase();
-            const sexo = document.getElementById('sexoSimilares').value.toUpperCase();
-            const edad = document.getElementById('edadSimilares').value.toUpperCase();
-            const fechaNac = document.getElementById('fechaNacSimilares').value;
-            const alergias = document.getElementById('alergiasSimilares').value.toUpperCase();
+        // Generador de Carta Laboral
+        async function generatePDF_Laboral(data, descargar = true) {
+            const doc = new jsPDF();
+            const xInicio = 20;
+            const xCentro = doc.internal.pageSize.getWidth() / 2;
+            let yActual = 20;
 
-            const spo2 = document.getElementById('spo2Similares').value;
-            const fc = document.getElementById('fcSimilares').value;
-            const fr = document.getElementById('frSimilares').value;
-            const temp = document.getElementById('tempSimilares').value;
-            const peso = document.getElementById('pesoSimilares').value;
-            const talla = document.getElementById('tallaSimilares').value;
-            const dx = document.getElementById('dxSimilares').value.toUpperCase();
-
-            const contenidoConsulta = document.getElementById('contenidoConsultaSimilares').value;
-            const tratamiento = document.getElementById('tratamientoSimilares').value;
-            const indicaciones = document.getElementById('indicacionesGeneralesSimilares').value;
-            const proximaCita = document.getElementById('proximaCitaSimilares').value;
-            
-            const logoFile = document.getElementById('logoInputSimilares').files[0];
-            const firmaFile = document.getElementById('firmaInputSimilares').files[0];
-            const logoBase64 = logoFile ? await fileToBase64(logoFile) : null;
-            const firmaBase64 = firmaFile ? await fileToBase64(firmaFile) : null;
-            
-            const f_emision = new Date(fechaEmision).toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' }).replace(/\//g, '/');
-            const f_nac = new Date(fechaNac).toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' }).replace(/\//g, ' / ');
-
-            // ----------------------------------------------------
-            // II. ESTRUCTURA Y FORMATO DEL PDF
-            // ----------------------------------------------------
-            
-            // 1. Logo (Esquina Superior Izquierda)
+            // --- Logo de la Empresa ---
+            const logoBase64 = data.logoFile ? await convertImageToBase64(data.logoFile) : null;
             if (logoBase64) {
-                const imgWidth = 20; 
-                const imgHeight = 15;
-                doc.addImage(logoBase64, 'PNG', margin, y, imgWidth, imgHeight); 
+                const imgWidth = 50; 
+                const xLogo = xCentro; 
+                doc.addImage(logoBase64, 'PNG', xLogo - (imgWidth / 2), yActual, imgWidth, 15);
             }
-            
-            // Título "RECETA" (como en la imagen: alto, centrado, bold)
-            doc.setFontSize(14);
+            yActual += 20;
+
+            // Título
+            doc.setFontSize(16);
             doc.setFont(undefined, 'bold');
-            doc.text("RECETA", xCentro, y + 5, { align: 'center' });
-            y += 15;
+            doc.text("CARTA DE RECOMENDACIÓN LABORAL", xCentro, yActual, { align: 'center' });
+            yActual += 10;
             
-            // ----------------------------------------------------
-            // A. DATOS DEL MÉDICO (Centrados)
-            // ----------------------------------------------------
-            
-            doc.setFontSize(9);
-            doc.setFont(undefined, 'bold');
-            doc.text(`DR. (A) ${nombreDoc}`, xCentro, y, { align: 'center' }); 
-            y += lineHeight;
-
-            doc.setFont(undefined, 'normal');
-            doc.text(cedula, xCentro, y, { align: 'center' }); 
-            y += lineHeight;
-            
-            doc.text(direccion, xCentro, y, { align: 'center' }); 
-            y += lineHeight;
-            
-            doc.text(ciudad, xCentro, y, { align: 'center' });
-            doc.text(`FECHA: ${f_emision}`, pageWidth - margin, y, { align: 'right' }); 
-            y += lineHeight;
-            
-            // Línea separadora superior
-            doc.setDrawColor(0);
-            doc.setLineWidth(0.5);
-            doc.line(margin, y, pageWidth - margin, y);
-            y += lineHeight * 1.5;
-            
-            // ----------------------------------------------------
-            // B. DATOS DEL PACIENTE (Campos con línea *debajo* del texto)
-            // ----------------------------------------------------
-            
-            doc.setFontSize(9);
-            doc.setFont(undefined, 'normal');
-            doc.setLineWidth(0.1);
-            let y_paciente = y;
-            const offset = 1; // Espacio entre el texto y la línea
-
-            // Función para dibujar campo del paciente con línea debajo del valor
-            const drawPatientField = (label, value, xStart, xEnd) => {
-                doc.setFont(undefined, 'normal');
-                doc.text(label, xStart, y_paciente);
-                
-                // Mide el texto completo (Label + Value) para calcular el inicio de la línea
-                const xText = xStart + doc.getStringUnitWidth(label) * doc.internal.getFontSize() / doc.internal.scaleFactor + 1;
-                doc.setFont(undefined, 'bold');
-                doc.text(value, xText, y_paciente);
-                
-                // Dibuja la línea debajo del *valor* (aproximadamente 1mm más bajo)
-                doc.line(xText - 0.5, y_paciente + offset, xEnd, y_paciente + offset);
-            };
-
-            // Fila 1: Nombre, AP, AM
-            const x1_p = margin;
-            const w1_p = pageWidth * 0.30 - x1_p; 
-            const x2_p = pageWidth * 0.35;
-            const w2_p = pageWidth * 0.65 - x2_p; 
-            const x3_p = pageWidth * 0.70;
-            const w3_p = pageWidth - margin - x3_p; 
-
-            drawPatientField("Nombre (s):", nombreP, x1_p, x2_p - 1); // Nombre
-            drawPatientField("Apellido Paterno:", apellidoP, x2_p, x3_p - 1); // Apellido P
-            drawPatientField("Apellido Materno:", apellidoM, x3_p, pageWidth - margin); // Apellido M
-            
-            y_paciente += lineHeight * 1.5;
-
-            // Fila 2: Sexo, Edad, Fecha Nac
-            const x1_p_f2 = margin;
-            const x2_p_f2 = pageWidth * 0.25;
-            const x3_p_f2 = pageWidth * 0.45;
-            const x4_p_f2 = pageWidth * 0.75;
-
-            drawPatientField("Sexo:", sexo, x1_p_f2, x2_p_f2 - 1); // Sexo
-            drawPatientField("Edad:", edad, x2_p_f2, x3_p_f2 - 1); // Edad
-            drawPatientField("Fecha de Nacimiento:", f_nac, x3_p_f2, x4_p_f2 - 1); // Fecha Nac
-            drawPatientField("Alergias:", alergias, x4_p_f2, pageWidth - margin); // Alergias
-            
-            y_paciente += lineHeight * 1.5;
-            y = y_paciente; // Actualizar y global
-
-            // ----------------------------------------------------
-            // C. CUADROS IZQUIERDOS (Signos Vitales y Diagnóstico)
-            // ----------------------------------------------------
-            const columnaX = margin;
-            const columnaW = 60; // Ancho para la columna de la izquierda
-            const xContenido = columnaX + columnaW + 5; // Inicio del contenido a la derecha
-            const wContenido = textWidth - columnaW - 5; // Ancho del contenido de la derecha
-            
-            let yColumna1 = y; 
-            
-            // Signos Vitales y Medidas con línea de subrayado
-            const fillLine = (label, value) => {
-                doc.setFont(undefined, 'normal');
-                doc.text(label, columnaX, yColumna1);
-                
-                const xText = columnaX + doc.getStringUnitWidth(label) * doc.internal.getFontSize() / doc.internal.scaleFactor + 1;
-                doc.setFont(undefined, 'bold');
-                doc.text(value, xText, yColumna1);
-                
-                // Línea de subrayado
-                doc.line(xText - 0.5, yColumna1 + offset, columnaX + columnaW, yColumna1 + offset);
-                yColumna1 += lineHeight;
-            };
-            
-            fillLine("SpO2:", spo2);
-            fillLine("F.C.:", fc);
-            fillLine("F.R.:", fr);
-            fillLine("Temp:", temp);
-            fillLine("Peso:", peso);
-            fillLine("Talla:", talla);
-            
-            // Diagnóstico
-            doc.setFont(undefined, 'normal');
-            doc.text("*I.D.:", columnaX, yColumna1);
-            
-            const xDx = columnaX + doc.getStringUnitWidth("*I.D.:") * doc.internal.getFontSize() / doc.internal.scaleFactor + 1;
-            doc.setFont(undefined, 'bold');
-            doc.text(dx, xDx, yColumna1);
-            
-            doc.line(xDx - 0.5, yColumna1 + offset, columnaX + columnaW, yColumna1 + offset);
-            yColumna1 += lineHeight * 1.5;
-
-            // Indicaciones Generales
-            doc.setFont(undefined, 'normal');
-            doc.text("Indicaciones Generales:", columnaX, yColumna1);
-            yColumna1 += lineHeight;
-            
-            doc.setFont(undefined, 'bold');
-            const indicacionesLineas = indicaciones.split('\n');
-            indicacionesLineas.forEach(line => {
-                doc.text(line, columnaX + 5, yColumna1);
-                yColumna1 += lineHeight;
-            });
-
-            // Próxima Cita
-            doc.setFont(undefined, 'normal');
-            doc.text("Próxima cita:", columnaX, yColumna1);
-            
-            const xPC = columnaX + doc.getStringUnitWidth("Próxima cita:") * doc.internal.getFontSize() / doc.internal.scaleFactor + 1;
-            doc.text(proximaCita, xPC, yColumna1);
-            doc.line(xPC, yColumna1 + offset, columnaX + columnaW, yColumna1 + offset);
-            
-            // ----------------------------------------------------
-            // D. TEXTO DE CONSULTA Y TRATAMIENTO (A la derecha de la columna C)
-            // ----------------------------------------------------
-            let yContenido = y; // Inicia a la altura de la columna C (Signos Vitales)
-            
-            // Contenido de la Consulta
-            doc.setFontSize(9);
-            doc.setFont(undefined, 'normal');
-            yContenido = drawJustifiedText(doc, contenidoConsulta, xContenido, yContenido, wContenido, lineHeight);
-            yContenido += lineHeight;
-
-            // Título TRATAMIENTO
-            doc.setFontSize(11);
-            doc.setFont(undefined, 'bold');
-            doc.text("TRATAMIENTO", xContenido, yContenido);
-            yContenido += lineHeight;
-            
-            // Tratamiento
-            doc.setFontSize(9);
-            doc.setFont(undefined, 'normal');
-            const lineasTratamiento = tratamiento.split('\n');
-            lineasTratamiento.forEach(line => {
-                doc.setFont(undefined, line.match(/^[0-9]\.-\s*|^[0-9]\-\s*/) ? 'bold' : 'normal');
-                yContenido = drawJustifiedText(doc, line, xContenido, yContenido, wContenido, lineHeight);
-            });
-            
-            // ----------------------------------------------------
-            // E. PIE DE PÁGINA, FIRMA Y COPIA (Ajustado)
-            // ----------------------------------------------------
-            
-            const yBajo = 280; // Posición fija para la línea de pie de página
-            const yFirmaLine = yBajo - 20; // Posición para la línea de firma
-            const yFirmaImage = yFirmaLine - 15; // Posición para la imagen de la firma
-
-            // Línea divisoria inferior
-            doc.setLineWidth(0.5);
-            doc.line(margin, yBajo, pageWidth - margin, yBajo);
-            
-            // Texto de cierre (Izquierda)
-            doc.setFontSize(8);
-            doc.setFont(undefined, 'normal');
-            doc.text("FAVOR DE PRESENTAR ESTA RECETA EN SU PRÓXIMA CITA", margin, yBajo + 4);
-            
-            // Bloque de Firma (Derecha)
-            const xFirmaBlock = pageWidth * 0.82; 
-            
-            // Línea para la firma y texto "Firma:"
+            // Fecha
             doc.setFontSize(10);
-            doc.text("Firma:", pageWidth * 0.70, yFirmaLine);
-            doc.line(pageWidth * 0.75, yFirmaLine, pageWidth - margin, yFirmaLine); // Línea de 25mm
+            doc.setFont(undefined, 'normal');
+            doc.text(`${data.nombreEmpresa}, a ${new Date(data.fechaEmision).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' })}`, 180, yActual, { align: 'right' });
+            yActual += 15;
 
-            // Firma (si se cargó)
+            // Encabezado
+            doc.setFont(undefined, 'bold');
+            doc.text("A QUIEN CORRESPONDA:", xInicio, yActual);
+            yActual += 10;
+
+            // Introducción
+            const nombreEmpresaUpper = data.nombreEmpresa.toUpperCase();
+            const cuerpoIntro = `Por medio de la presente, yo, ${data.nombreFirmante}, en mi carácter de ${data.cargoFirmante} de la empresa ${nombreEmpresaUpper}, hago constar que conozco y recomiendo ampliamente al Sr./Sra./Joven ${data.nombreEmpleado.toUpperCase()}.`;
+            doc.setFont(undefined, 'normal');
+            const splitIntro = doc.splitTextToSize(cuerpoIntro, 170);
+            doc.text(splitIntro, xInicio, yActual, { align: 'justify' });
+            yActual += splitIntro.length * 5 + 5;
+            
+            // Periodo Laboral
+            const fechaInicio = new Date(data.fechaInicio).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' });
+            const fechaFin = new Date(data.fechaFin).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' });
+            const cuerpoPeriodo = `El Sr./Sra./Joven ${data.nombreEmpleado.toUpperCase()} desempeñó el puesto de ${data.puestoDesempenado.toUpperCase()} en nuestra compañía desde el día ${fechaInicio} hasta el día ${fechaFin}.`;
+            const splitPeriodo = doc.splitTextToSize(cuerpoPeriodo, 170);
+            doc.text(splitPeriodo, xInicio, yActual, { align: 'justify' });
+            yActual += splitPeriodo.length * 5 + 5;
+
+            // Personalidad
+            const cuerpoPersonalidad = data.cuerpoPersonalidad.replace('[nombre]', data.nombreEmpleado.toUpperCase());
+            const splitPersonalidad = doc.splitTextToSize(cuerpoPersonalidad, 170);
+            doc.text(splitPersonalidad, xInicio, yActual, { align: 'justify' });
+            yActual += splitPersonalidad.length * 5 + 5;
+
+            // Tareas
+            doc.setFont(undefined, 'bold');
+            doc.text("Tareas y Responsabilidades Principales:", xInicio, yActual);
+            yActual += 5;
+            doc.setFont(undefined, 'normal');
+            const tareas = data.tareas.split('\n').map(t => `• ${t.trim()}`).filter(t => t.trim() !== '•');
+            tareas.forEach(tarea => {
+                const splitTarea = doc.splitTextToSize(tarea, 170);
+                doc.text(splitTarea, xInicio, yActual, { align: 'justify' });
+                yActual += splitTarea.length * 5;
+            });
+            yActual += 5;
+
+            // Cierre y Recomendación
+            const cuerpoCierre = data.cuerpoCierre.replace('[nombre]', data.nombreEmpleado.toUpperCase());
+            const splitCierre = doc.splitTextToSize(cuerpoCierre, 170);
+            doc.text(splitCierre, xInicio, yActual, { align: 'justify' });
+            yActual += splitCierre.length * 5 + 10;
+
+            // Firma
+            const xFirmaBlock = 165; 
+            const yFirmaLine = 240; 
+            const yFirmaImage = yFirmaLine - 18; 
+            
+            // Línea de Firma
+            doc.line(xFirmaBlock - 30, yFirmaLine, xFirmaBlock + 30, yFirmaLine); 
+
+            // Insertar Firma (IMAGEN)
+            const firmaBase64 = data.firmaFile ? await convertImageToBase64(data.firmaFile) : null;
             if (firmaBase64) {
                 const imgWidth = 40; 
                 const xFirma = xFirmaBlock - (imgWidth / 2); // Centrar sobre la línea de firma
+                // MODIFICACIÓN: Cambiado de 'JPEG' a 'PNG' para soporte de transparencia.
+                doc.addImage(firmaBase64, 'PNG', xFirma, yFirmaImage, imgWidth, 15);
+            }
+            
+            // Nombre y Cargo del Firmante (debajo de la línea de firma)
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'bold');
+            doc.text(data.nombreFirmante.toUpperCase(), xFirmaBlock, yFirmaLine + 4, { align: 'center' }); 
+            doc.setFont(undefined, 'normal');
+            doc.text(data.cargoFirmante, xFirmaBlock, yFirmaLine + 8, { align: 'center' }); 
+            doc.text(data.telefonoFirmante, xFirmaBlock, yFirmaLine + 12, { align: 'center' }); 
+
+            if (descargar) {
+                 doc.save(`CartaLaboral_${data.nombreEmpleado.replace(/\s/g, '_')}.pdf`);
+                 return true;
+            } else {
+                 return doc.output('datauristring').split(',')[1];
+            }
+        }
+
+        // Generador de Carta Personal
+        async function generatePDF_Personal(data, descargar = true) {
+            const doc = new jsPDF();
+            const xInicio = 20;
+            const xCentro = doc.internal.pageSize.getWidth() / 2;
+            let yActual = 20;
+
+            // Título
+            doc.setFontSize(16);
+            doc.setFont(undefined, 'bold');
+            doc.text("CARTA DE RECOMENDACIÓN PERSONAL", xCentro, yActual, { align: 'center' });
+            yActual += 10;
+            
+            // Fecha
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text(`A ${new Date(data.fechaEmision).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' })}`, 180, yActual, { align: 'right' });
+            yActual += 15;
+
+            // Encabezado
+            doc.setFont(undefined, 'bold');
+            doc.text("A QUIEN CORRESPONDA:", xInicio, yActual);
+            yActual += 10;
+
+            // Introducción y Cuerpo
+            const cuerpoIntro = `Por medio de la presente, yo, ${data.nombreFirmante.toUpperCase()}, identificado/a con [INDICAR DOCUMENTO DE IDENTIFICACIÓN, EJ: INE], declaro que conozco ampliamente y de forma personal al Sr./Sra./Joven ${data.nombreRecomendado.toUpperCase()}.`;
+            doc.setFont(undefined, 'normal');
+            let splitIntro = doc.splitTextToSize(cuerpoIntro, 170);
+            doc.text(splitIntro, xInicio, yActual, { align: 'justify' });
+            yActual += splitIntro.length * 5 + 5;
+            
+            // Tiempo de Conocimiento
+            const cuerpoTiempo = `Conozco a ${data.nombreRecomendado.toUpperCase()} ${data.tiempoConocido} y siempre ha demostrado ser una persona de bien.`;
+            let splitTiempo = doc.splitTextToSize(cuerpoTiempo, 170);
+            doc.text(splitTiempo, xInicio, yActual, { align: 'justify' });
+            yActual += splitTiempo.length * 5 + 5;
+
+            // Personalidad
+            const cuerpoPersonalidad = data.cuerpoPersonalidad.replace('[nombre]', data.nombreRecomendado.toUpperCase());
+            const splitPersonalidad = doc.splitTextToSize(cuerpoPersonalidad, 170);
+            doc.text(splitPersonalidad, xInicio, yActual, { align: 'justify' });
+            yActual += splitPersonalidad.length * 5 + 5;
+
+            // Cierre y Recomendación
+            const cuerpoCierre = data.cuerpoRecomendacion.replace('[nombre]', data.nombreRecomendado.toUpperCase());
+            const splitCierre = doc.splitTextToSize(cuerpoCierre, 170);
+            doc.text(splitCierre, xInicio, yActual, { align: 'justify' });
+            yActual += splitCierre.length * 5 + 10;
+            
+            // Frase de Agradecimiento
+            doc.setFont(undefined, 'bold');
+            doc.text("ATENTAMENTE,", xCentro, yActual, { align: 'center' });
+            yActual += 15;
+
+            // Firma
+            const xFirmaBlock = xCentro; 
+            const yFirmaLine = 250; 
+            const yFirmaImage = yFirmaLine - 18; 
+            
+            // Línea de Firma
+            doc.line(xFirmaBlock - 30, yFirmaLine, xFirmaBlock + 30, yFirmaLine); 
+
+            // Insertar Firma (IMAGEN)
+            const firmaBase64 = data.firmaFile ? await convertImageToBase64(data.firmaFile) : null;
+            if (firmaBase64) {
+                const imgWidth = 40; 
+                const xFirma = xFirmaBlock - (imgWidth / 2); // Centrar sobre la línea de firma
+                // MODIFICACIÓN: Cambiado de 'JPEG' a 'PNG' para soporte de transparencia.
+                doc.addImage(firmaBase64, 'PNG', xFirma, yFirmaImage, imgWidth, 15);
+            }
+            
+            // Nombre del Firmante (debajo de la línea de firma)
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'bold');
+            doc.text(data.nombreFirmante.toUpperCase(), xFirmaBlock, yFirmaLine + 4, { align: 'center' }); 
+
+            if (descargar) {
+                 doc.save(`CartaPersonal_${data.nombreRecomendado.replace(/\s/g, '_')}.pdf`);
+                 return true;
+            } else {
+                 return doc.output('datauristring').split(',')[1];
+            }
+        }
+
+        // Generador de Receta Médica SIMILARES
+        async function generatePDF_Similares(data, descargar = true) {
+            const doc = new jsPDF();
+            const xInicio = 20;
+            const xCentro = doc.internal.pageSize.getWidth() / 2;
+            const yBajo = 280;
+            let yActual = 15;
+
+            // --- Logo (Imagen de arriba) ---
+            const logoBase64 = data.logoFile ? await convertImageToBase64(data.logoFile) : null;
+
+            if (logoBase64) {
+                const imgWidth = 70; // MODIFICACIÓN: Aumento de tamaño de 50 a 70
+                const imgHeight = 25; // MODIFICACIÓN: Aumento de altura de 15 a 25
+                const xLogo = xCentro; 
+                // MODIFICACIÓN: Cambiado de 'JPEG' a 'PNG' y uso de imgHeight
+                doc.addImage(logoBase64, 'PNG', xLogo - (imgWidth / 2), yActual, imgWidth, imgHeight); 
+            }
+
+            yActual = 45; // El contenido empieza después del logo
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'bold');
+
+            // Recuadro del Doctor/Dirección
+            doc.setDrawColor(0);
+            doc.setLineWidth(0.5);
+            doc.rect(xInicio, yActual, 170, 25); 
+
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'bold');
+            doc.text(data.doctorNombre.toUpperCase(), xCentro, yActual + 5, { align: 'center' });
+
+            doc.setFontSize(8);
+            doc.setFont(undefined, 'normal');
+            doc.text(data.cedula, xCentro, yActual + 9, { align: 'center' });
+            
+            const splitDir = doc.splitTextToSize(data.direccion, 160);
+            doc.text(splitDir, xCentro, yActual + 13, { align: 'center' });
+            
+            doc.setFont(undefined, 'bold');
+            doc.text(data.ciudad.toUpperCase(), xCentro, yActual + 20, { align: 'center' });
+            
+            // Fecha
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            const fechaReceta = new Date(data.fechaEmision);
+            doc.text(`FECHA: ${fechaReceta.toLocaleDateString('es-MX', { day: 'numeric', month: 'numeric', year: 'numeric' })}`, 175, 75, { align: 'right' });
+            yActual += 30; // Posición después del recuadro
+
+            // Recuadro de Datos del Paciente
+            doc.rect(xInicio, yActual, 170, 30); 
+            doc.setFontSize(9);
+            
+            doc.setFont(undefined, 'bold');
+            doc.text("DATOS DEL PACIENTE", xCentro, yActual + 3, { align: 'center' }); 
+            yActual += 5;
+            
+            doc.setFont(undefined, 'normal');
+            const nombreP = `${data.nombrePaciente} ${data.apellidoP} ${data.apellidoM}`.toUpperCase();
+            doc.text(`NOMBRE: ${nombreP}`, xInicio + 5, yActual);
+            
+            doc.text(`SEXO: ${data.sexo.toUpperCase()}`, xInicio + 130, yActual); 
+            yActual += 4;
+            
+            const fechaNac = new Date(data.fechaNac);
+            doc.text(`FECHA DE NACIMIENTO: ${fechaNac.toLocaleDateString('es-MX', { day: 'numeric', month: 'numeric', year: 'numeric' })}`, xInicio + 5, yActual);
+            
+            doc.text(`EDAD: ${data.edad.toUpperCase()}`, xInicio + 130, yActual); 
+            yActual += 4;
+
+            doc.text(`ALERGIAS: ${data.alergias.toUpperCase()}`, xInicio + 5, yActual); 
+            yActual += 4;
+            
+            doc.text(`DIAGNÓSTICO: ${data.dx.toUpperCase()}`, xInicio + 5, yActual); 
+            yActual += 10; 
+
+            // Recuadro de Signos Vitales
+            doc.rect(xInicio, yActual, 170, 10); 
+            doc.setFont(undefined, 'bold');
+            doc.text("SIGNOS VITALES:", xInicio + 5, yActual + 3);
+
+            doc.setFont(undefined, 'normal');
+            doc.text(`SpO2: ${data.spo2}`, xInicio + 40, yActual + 3);
+            doc.text(`F.C.: ${data.fc}`, xInicio + 70, yActual + 3);
+            doc.text(`F.R.: ${data.fr}`, xInicio + 100, yActual + 3);
+            doc.text(`Temp.: ${data.temp}`, xInicio + 130, yActual + 3);
+
+            doc.text(`Peso: ${data.peso}`, xInicio + 40, yActual + 7);
+            doc.text(`Talla: ${data.talla}`, xInicio + 70, yActual + 7);
+            yActual += 15;
+
+            // Recuadro de Contenido de la Consulta
+            doc.rect(xInicio, yActual, 170, 20); 
+            doc.setFont(undefined, 'bold');
+            doc.text("CONTENIDO DE LA CONSULTA:", xInicio + 5, yActual + 3);
+
+            doc.setFontSize(8);
+            doc.setFont(undefined, 'normal');
+            const splitConsulta = doc.splitTextToSize(data.contenidoConsulta, 160);
+            doc.text(splitConsulta, xInicio + 5, yActual + 7, { align: 'justify' });
+            yActual += 25;
+
+            // Recuadro de Tratamiento
+            doc.rect(xInicio, yActual, 170, 80); 
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'bold');
+            doc.text("TRATAMIENTO:", xInicio + 5, yActual + 3);
+
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'normal');
+            const splitTratamiento = doc.splitTextToSize(data.tratamiento.toUpperCase(), 160);
+            doc.text(splitTratamiento, xInicio + 5, yActual + 7);
+            yActual += 85;
+
+            // Recuadro de Indicaciones
+            doc.rect(xInicio, yActual, 170, 15); 
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'bold');
+            doc.text("INDICACIONES GENERALES:", xInicio + 5, yActual + 3);
+
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'normal');
+            const splitIndicaciones = doc.splitTextToSize(data.indicacionesGenerales, 160);
+            doc.text(splitIndicaciones, xInicio + 5, yActual + 7);
+            yActual += 20;
+
+            // Pie de página (Cita)
+            doc.setFontSize(8);
+            doc.setFont(undefined, 'bold');
+            doc.text(`Próxima cita: ${data.proximaCita}`, xInicio, yBajo - 5);
+            doc.text(`Caducidad de receta: 30 días a partir de la fecha de emisión.`, xInicio + 80, yBajo - 5);
+
+            // Firma
+            const xFirmaBlock = 150; 
+            const yFirmaLine = 230; 
+            const yFirmaImage = yFirmaLine - 18; 
+            const nombreDoc = data.doctorNombre.toUpperCase();
+            
+            // Línea de Firma
+            doc.line(xFirmaBlock - 20, yFirmaLine, xFirmaBlock + 20, yFirmaLine); 
+
+            // Insertar Firma (IMAGEN)
+            const firmaBase64 = data.firmaFile ? await convertImageToBase64(data.firmaFile) : null;
+            if (firmaBase64) {
+                const imgWidth = 40; 
+                const xFirma = xFirmaBlock - (imgWidth / 2); // Centrar sobre la línea de firma
+                // Ya estaba en PNG, se mantiene.
                 doc.addImage(firmaBase64, 'PNG', xFirma, yFirmaImage, imgWidth, 15);
             }
             
@@ -1608,10 +1478,14 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
              checkURL();
         });
         
-        // Manejar el botón de "Atrás" del navegador
-        window.onpopstate = checkURL; 
+        // Manejar el botón de "atrás" del navegador
+        window.addEventListener('popstate', checkURL);
         
+        // Asegurar que el menú se muestre al cargar por primera vez si no hay hash
+        if (window.location.hash === '') {
+             window.onload = () => showForm('menu', false);
+        }
+
     </script>
 </body>
 </html>
-       
