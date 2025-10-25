@@ -24,7 +24,7 @@
         .input-group, .form-section { background-color: #ffffff; padding: 20px; margin-bottom: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
         h2 { color: #34495e; border-bottom: 2px solid #3498db; padding-bottom: 5px; margin-bottom: 15px; }
         label { display: block; margin-top: 10px; font-weight: bold; color: #555; }
-        input[type="text"], input[type="date"], textarea, input[type="file"], input[type="password"], input[type="number"] {
+        input[type="text"], input[type="date"], textarea, input[type="file"], input[type="password"] {
             width: 100%;
             padding: 10px;
             margin-top: 5px;
@@ -85,7 +85,7 @@
             background-color: #2c3e50;
             color: white;
             padding: 10px;
-            margin-top: 20px;
+            margin-top: 10px; /* Ajustado */
             border: none;
             border-radius: 5px;
             cursor: pointer;
@@ -94,27 +94,6 @@
         }
         #btn-go-admin:hover {
             background-color: #1f2a36;
-        }
-
-        /* Nuevo estilo para el balance del usuario */
-        #user-balance-display {
-            position: fixed;
-            top: 15px;
-            right: 15px;
-            background-color: #3498db;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 5px;
-            font-weight: bold;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            z-index: 101;
-            display: none; /* Oculto por defecto, se muestra con la sesión */
-            text-align: right;
-            font-size: 0.9em;
-        }
-        #user-balance-display span {
-            font-size: 1.1em;
-            margin-left: 5px;
         }
         
         /* Estilos de la página de estatus */
@@ -243,47 +222,9 @@
             word-break: break-all;
             font-size: 0.9em;
         }
-
-        /* Estilos para el nuevo login/registro de usuarios */
-        #user-access {
-            text-align: center;
-        }
-        #login-form, #register-form {
-            max-width: 400px;
-            margin: 20px auto;
-        }
-        #toggle-register-btn, #toggle-login-btn {
-            background-color: #2ecc71;
-            margin-bottom: 15px;
-            padding: 10px;
-            width: auto;
-            display: inline-block;
-        }
-        .pending-notice {
-            background-color: #f1c40f;
-            color: #c0392b;
-            padding: 10px;
-            border-radius: 4px;
-            margin-top: 15px;
-            font-weight: bold;
-        }
-        .user-request-item {
-            border: 1px solid #3498db;
-            padding: 10px;
-            margin-bottom: 10px;
-            background-color: #f9f9f9;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-radius: 4px;
-        }
     </style>
 </head>
 <body>
-
-    <div id="user-balance-display">
-        Créditos: <span id="user-balance">0</span>
-    </div>
 
     <h1>📝 Generador de Documentos y Solicitudes</h1>
     
@@ -292,53 +233,9 @@
     </div>
     
     <div id="app-container">
-
-        <div id="user-access" class="form-section">
-            <h2 id="access-title">🔒 Acceso a la Plataforma</h2>
-            <p>Seleccione su modo de acceso.</p>
-
-            <div id="login-form" class="input-group">
-                <h3>Iniciar Sesión</h3>
-                <label for="loginEmail">Correo Electrónico:</label>
-                <input type="text" id="loginEmail" placeholder="Ingrese su correo (ej: usuario@ejemplo.com)">
-
-                <label for="loginPass">Contraseña:</label>
-                <input type="password" id="loginPass" placeholder="Ingrese su contraseña">
-                
-                <button class="btn-action" style="background-color: #3498db;" onclick="loginUser()">Iniciar Sesión</button>
-                <p style="margin-top: 15px;">¿No tienes cuenta? <a href="#" onclick="toggleAccessForm('register')">Regístrate aquí</a>.</p>
-            </div>
-
-            <div id="register-form" class="input-group" style="display:none;">
-                <h3>Solicitud de Registro</h3>
-                <p>Su cuenta estará "Pendiente" hasta que el Administrador la autorice.</p>
-                <label for="registerName">Nombre de Usuario (Opcional):</label>
-                <input type="text" id="registerName" placeholder="Ingrese su nombre">
-
-                <label for="registerEmail">Correo Electrónico (Será su Usuario):</label>
-                <input type="text" id="registerEmail" placeholder="Ingrese su correo">
-
-                <label for="registerPass">Contraseña:</label>
-                <input type="password" id="registerPass" placeholder="Cree una contraseña">
-                
-                <button class="btn-action" style="background-color: #2ecc71;" onclick="registerRequest()">Solicitar Cuenta</button>
-                <p style="margin-top: 15px;">¿Ya tienes cuenta? <a href="#" onclick="toggleAccessForm('login')">Inicia Sesión</a>.</p>
-            </div>
-
-            <button id="btn-go-admin" onclick="showForm('admin_login')">Acceso de Administrador</button>
-        </div>
-
-
-        <div id="main-menu" style="display:none;">
-            <button class="btn-action back-button" onclick="logoutUser()" style="width: auto; margin-left: 0; margin-bottom: 20px;">
-                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-            </button>
+    
+        <div id="main-menu">
             
-            <button class="btn-menu" style="background-color: #e74c3c; margin-bottom: 25px;" onclick="toggleExpressPayment()">
-                <i class="fas fa-credit-card"></i> <span id="express-mode-text">Activar Pago Express (Paga y se Autoriza Manualmente)</span>
-            </button>
-
-
             <h2>🌐 Acceso a Grupo y Soporte</h2>
             <button class="btn-menu btn-social" onclick="showForm('whatsapp_group')">
                 <i class="fab fa-whatsapp"></i> Unirse a nuestro Grupo de WhatsApp
@@ -367,10 +264,15 @@
             <button class="btn-menu btn-especializado" onclick="showForm('sellos_personales')">✍️ SELLOS PERSONALES</button>
             <button class="btn-menu btn-especializado" onclick="showForm('formato_solicitud_pdf')">🧑‍🔧 FORMATO DE SOLICITUD EN PDF</button>
 
-            </div>
+            <h2>🔒 Acceso de Clientes y Administración</h2>
+            <button class="btn-action" style="background-color: #27ae60; margin-bottom: 5px;" onclick="showForm('user_login')">
+                <i class="fas fa-user-circle"></i> Acceso de Clientes
+            </button>
+            <button id="btn-go-admin" onclick="showForm('admin_login')">Acceso de Administrador</button>
+        </div>
 
         <div id="admin-login" class="form-section">
-            <button class="back-button" onclick="showForm('user-access')">← Volver al Acceso</button>
+            <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
             <h2>🔒 Acceso del Administrador</h2>
             <p>Ingrese sus credenciales para autorizar las solicitudes.</p>
             
@@ -386,38 +288,69 @@
         </div>
 
         <div id="admin-dashboard" class="form-section">
-            <button class="back-button" onclick="showForm('user-access')">← Cerrar Sesión</button>
-            <h2>⚙️ Panel de Administrador</h2>
+            <button class="back-button" onclick="showForm('menu')">← Cerrar Sesión</button>
+            <h2>⚙️ Panel de Autorización de Solicitudes</h2>
+            <p>Al autorizar, el cliente verá automáticamente el botón de descarga en su página de espera.</p>
 
-            <div class="input-group">
-                <h3>👥 Solicitudes de Creación de Usuario</h3>
-                <div id="user-requests-list">
-                    <p id="no-user-requests-msg">No hay solicitudes de usuario pendientes.</p>
-                </div>
+            <h3>Solicitudes Pendientes:</h3>
+            <div id="pending-requests-list" class="input-group">
+                <p id="no-requests-msg">No hay solicitudes pendientes en el almacenamiento local de este navegador.</p>
             </div>
+        </div>
+        
+        <div id="user-login" class="form-section">
+            <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
+            <h2>👤 Acceso de Clientes</h2>
+            <p>Ingrese su ID de Cliente y Contraseña para continuar.</p>
             
             <div class="input-group">
-                <h3>💰 Agregar Saldo a Usuario</h3>
-                <label for="balanceEmail">Correo del Usuario:</label>
-                <input type="text" id="balanceEmail" placeholder="usuario@ejemplo.com">
-                <label for="balanceAmount">Cantidad de Créditos a Agregar:</label>
-                <input type="number" id="balanceAmount" min="1" value="50" placeholder="Ej: 50">
-                <button class="btn-action" style="background-color: #27ae60;" onclick="addBalance()">Agregar Saldo</button>
-            </div>
+                <label for="clientUserId">ID de Cliente:</label>
+                <input type="text" id="clientUserId" placeholder="Su ID de cliente generado">
 
-            <div class="input-group">
-                <h3>📄 Solicitudes Pendientes de Documentos</h3>
-                <p>Al autorizar, el cliente verá automáticamente el botón de descarga.</p>
-                <div id="pending-requests-list">
-                    <p id="no-requests-msg">No hay solicitudes pendientes de documentos.</p>
-                </div>
+                <label for="clientPass">Contraseña:</label>
+                <input type="password" id="clientPass" placeholder="Su contraseña">
+                
+                <button class="btn-action" style="background-color: #27ae60;" onclick="authenticateUser()">Iniciar Sesión</button>
+                <p style="margin-top: 15px; text-align: center;">¿Aún no tiene cuenta? <a href="#" onclick="showForm('user_registration', true)">Registrarse Aquí</a></p>
             </div>
+            <div id="user-dashboard" style="display:none;">
+                <h3>👋 Bienvenido(a), <span id="loggedInUserName">Cliente</span></h3>
+                <p>Desde aquí podrá ver el estado de sus solicitudes pendientes.</p>
+                <button class="btn-action back-button" style="background-color: #e74c3c;" onclick="logoutUser()">Cerrar Sesión</button>
+            </div>
+        </div>
 
+        <div id="user-registration" class="form-section">
+            <button class="back-button" onclick="showForm('user_login')">← Volver al Inicio de Sesión</button>
+            <h2>📝 Registro de Nuevo Cliente</h2>
+            <p>Complete sus datos para crear su cuenta. Guarde su "ID de Cliente" generado, que necesitará para iniciar sesión.</p>
             <div class="input-group">
-                <h3>📊 Historial de Actividad (Tiempo Real)</h3>
-                <p>Últimas acciones de usuarios y administradores.</p>
-                <div id="activity-log-list" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 4px; background-color: #f9f9f9;">
-                    </div>
+                <label for="regEmail">Correo Electrónico:</label>
+                <input type="text" id="regEmail" placeholder="ejemplo@correo.com">
+
+                <label for="regPass">Contraseña:</label>
+                <input type="password" id="regPass" placeholder="Ingrese su contraseña">
+                
+                <label for="regPassVerify">Verificar Contraseña:</label>
+                <input type="password" id="regPassVerify" placeholder="Confirme su contraseña">
+
+                <label for="regNombreCompleto">Nombre Completo:</label>
+                <input type="text" id="regNombreCompleto" placeholder="Nombre(s) Apellido Paterno Apellido Materno">
+
+                <label for="regFechaNac">Fecha de Nacimiento:</label>
+                <input type="date" id="regFechaNac">
+                
+                <label for="regCurp">CURP:</label>
+                <input type="text" id="regCurp" placeholder="Ingrese su CURP (18 caracteres)">
+
+                <button class="btn-action" style="background-color: #3498db;" onclick="registerUser()">Registrarse</button>
+                <p style="margin-top: 15px; text-align: center;">¿Ya tiene cuenta? <a href="#" onclick="showForm('user_login', true)">Iniciar Sesión</a></p>
+            </div>
+            <div id="registration-success" style="display:none; padding: 15px; background-color: #e6ffe6; border: 1px solid #2ecc71; border-radius: 4px; margin-top: 20px;">
+                <h3>✅ ¡Registro Exitoso!</h3>
+                <p>Su cuenta ha sido creada. Por favor, guarde su **ID de Cliente** para iniciar sesión. Es su "usuario":</p>
+                <p style="font-size: 1.2em; font-weight: bold; color: #27ae60;"><span id="generatedUserId"></span></p>
+                <button class="btn-action back-button" onclick="showForm('user_login')">Ir a Iniciar Sesión</button>
             </div>
         </div>
 
@@ -426,8 +359,8 @@
              <div class="disclaimer-notice">
                 *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
             </div>
-            <div id="payment-notice-laboral" class="payment-notice">
-                *ESTE DOCUMENTO CUESTA 30 CRÉDITOS. SI NO TIENE CRÉDITOS, DEBE ESPERAR AUTORIZACIÓN MANUAL.*
+            <div class="payment-notice">
+                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
             </div>
             <h2>💼 Formulario de Carta Laboral</h2>
             <div class="input-group">
@@ -490,7 +423,7 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
                 <input type="text" id="telefonoFirmanteLaboral" value="T. (442) 880 1675">
             </div>
 
-            <button class="btn-action" onclick="saveSolicitud('laboral')">💾 Guardar Solicitud</button>
+            <button class="btn-action" onclick="saveSolicitud('laboral')">💾 Guardar Solicitud (Esperar Aprobación)</button>
         </div>
 
         <div id="form-personal" class="form-section">
@@ -498,8 +431,8 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             <div class="disclaimer-notice">
                 *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
             </div>
-            <div id="payment-notice-personal" class="payment-notice">
-                *ESTE DOCUMENTO CUESTA 30 CRÉDITOS. SI NO TIENE CRÉDITOS, DEBE ESPERAR AUTORIZACIÓN MANUAL.*
+            <div class="payment-notice">
+                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
             </div>
             <h2>🏠 Formulario de Carta Personal</h2>
 
@@ -543,7 +476,7 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
 Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             </div>
 
-            <button class="btn-action" onclick="saveSolicitud('personal')">💾 Guardar Solicitud</button>
+            <button class="btn-action" onclick="saveSolicitud('personal')">💾 Guardar Solicitud (Esperar Aprobación)</button>
         </div>
         
         <div id="form-receta_similares" class="form-section">
@@ -551,8 +484,8 @@ Para cualquier duda o aclaración, estoy a su disposición.</textarea>
             <div class="disclaimer-notice">
                 *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
             </div>
-            <div id="payment-notice-receta_similares" class="payment-notice">
-                *ESTE DOCUMENTO CUESTA 30 CRÉDITOS. SI NO TIENE CRÉDITOS, DEBE ESPERAR AUTORIZACIÓN MANUAL.*
+            <div class="payment-notice">
+                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
             </div>
             <h2>💊 Formulario de Receta Médica SIMILARES</h2>
             
@@ -665,7 +598,7 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
                 <input type="file" id="firmaInputSimilares" accept="image/*">
             </div>
 
-            <button class="btn-action" onclick="saveSolicitud('receta_similares')">💾 Guardar Solicitud</button>
+            <button class="btn-action" onclick="saveSolicitud('receta_similares')">💾 Guardar Solicitud (Esperar Aprobación)</button>
         </div>
 
 
@@ -674,8 +607,8 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             <div class="disclaimer-notice">
                 *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
             </div>
-            <div id="payment-notice-incapacidad_imss" class="payment-notice">
-                *ESTE DOCUMENTO CUESTA 30 CRÉDITOS. SI NO TIENE CRÉDITOS, DEBE ESPERAR AUTORIZACIÓN MANUAL.*
+            <div class="payment-notice">
+                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
             </div>
             <h2>💊 Formulario de Incapacidad IMSS</h2>
             <div class="input-group">
@@ -691,8 +624,8 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             <div class="disclaimer-notice">
                 *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
             </div>
-            <div id="payment-notice-receta_ahorro" class="payment-notice">
-                *ESTE DOCUMENTO CUESTA 30 CRÉDITOS. SI NO TIENE CRÉDITOS, DEBE ESPERAR AUTORIZACIÓN MANUAL.*
+            <div class="payment-notice">
+                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
             </div>
             <h2>💊 Formulario de Receta Médica DEL AHORRO</h2>
             <div class="input-group">
@@ -707,8 +640,8 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             <div class="disclaimer-notice">
                 *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
             </div>
-            <div id="payment-notice-receta_imss" class="payment-notice">
-                *ESTE DOCUMENTO CUESTA 30 CRÉDITOS. SI NO TIENE CRÉDITOS, DEBE ESPERAR AUTORIZACIÓN MANUAL.*
+            <div class="payment-notice">
+                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
             </div>
             <h2>💊 Formulario de Receta Médica IMSS</h2>
             <div class="input-group">
@@ -724,8 +657,8 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             <div class="disclaimer-notice">
                 *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
             </div>
-            <div id="payment-notice-cert_primaria" class="payment-notice">
-                *ESTE DOCUMENTO CUESTA 30 CRÉDITOS. SI NO TIENE CRÉDITOS, DEBE ESPERAR AUTORIZACIÓN MANUAL.*
+            <div class="payment-notice">
+                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
             </div>
             <h2>🎓 Formulario de Certificado de PRIMARIA</h2>
             <div class="input-group">
@@ -740,8 +673,8 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             <div class="disclaimer-notice">
                 *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
             </div>
-            <div id="payment-notice-cert_secundaria" class="payment-notice">
-                *ESTE DOCUMENTO CUESTA 30 CRÉDITOS. SI NO TIENE CRÉDITOS, DEBE ESPERAR AUTORIZACIÓN MANUAL.*
+            <div class="payment-notice">
+                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
             </div>
             <h2>🎓 Formulario de Certificado de SECUNDARIA</h2>
             <div class="input-group">
@@ -756,8 +689,8 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             <div class="disclaimer-notice">
                 *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
             </div>
-            <div id="payment-notice-cert_prepa" class="payment-notice">
-                *ESTE DOCUMENTO CUESTA 30 CRÉDITOS. SI NO TIENE CRÉDITOS, DEBE ESPERAR AUTORIZACIÓN MANUAL.*
+            <div class="payment-notice">
+                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
             </div>
             <h2>🎓 Formulario de Certificado de PREPARATORIA</h2>
             <div class="input-group">
@@ -773,8 +706,8 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             <div class="disclaimer-notice">
                 *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
             </div>
-            <div id="payment-notice-metodo_shein" class="payment-notice">
-                *ESTE ES UN SERVICIO ESPECIALIZADO Y REQUIERE AUTORIZACIÓN MANUAL (NO USA CRÉDITOS)*
+            <div class="payment-notice">
+                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
             </div>
             <h2>⭐ Solicitud de Metodo Shein</h2>
             <div class="input-group">
@@ -782,15 +715,15 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
                 <label for="placeholder1_shein">Ejemplo de Campo (a borrar):</label>
                 <input type="text" id="placeholder1_shein" value="">
             </div>
-            <button class="btn-action" onclick="saveSolicitud('metodo_shein')">💾 Guardar Solicitud (Esperar Aprobación)</button>
+            <button class="btn-action" onclick="saveSolicitud('metodo_shein')">💾 Guardar Solicitud</button>
         </div>
         <div id="form-metodo_cinepolis" class="form-section">
             <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
             <div class="disclaimer-notice">
                 *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
             </div>
-            <div id="payment-notice-metodo_cinepolis" class="payment-notice">
-                *ESTE ES UN SERVICIO ESPECIALIZADO Y REQUIERE AUTORIZACIÓN MANUAL (NO USA CRÉDITOS)*
+            <div class="payment-notice">
+                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
             </div>
             <h2>⭐ Solicitud de Metodo Cinépolis</h2>
             <div class="input-group">
@@ -798,15 +731,15 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
                 <label for="placeholder1_cinepolis">Ejemplo de Campo (a borrar):</label>
                 <input type="text" id="placeholder1_cinepolis" value="">
             </div>
-            <button class="btn-action" onclick="saveSolicitud('metodo_cinepolis')">💾 Guardar Solicitud (Esperar Aprobación)</button>
+            <button class="btn-action" onclick="saveSolicitud('metodo_cinepolis')">💾 Guardar Solicitud</button>
         </div>
         <div id="form-metodo_temu" class="form-section">
             <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
             <div class="disclaimer-notice">
                 *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
             </div>
-            <div id="payment-notice-metodo_temu" class="payment-notice">
-                *ESTE ES UN SERVICIO ESPECIALIZADO Y REQUIERE AUTORIZACIÓN MANUAL (NO USA CRÉDITOS)*
+            <div class="payment-notice">
+                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
             </div>
             <h2>⭐ Solicitud de Metodo TEMU</h2>
             <div class="input-group">
@@ -814,15 +747,15 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
                 <label for="placeholder1_temu">Ejemplo de Campo (a borrar):</label>
                 <input type="text" id="placeholder1_temu" value="">
             </div>
-            <button class="btn-action" onclick="saveSolicitud('metodo_temu')">💾 Guardar Solicitud (Esperar Aprobación)</button>
+            <button class="btn-action" onclick="saveSolicitud('metodo_temu')">💾 Guardar Solicitud</button>
         </div>
         <div id="form-cv_desde_cero" class="form-section">
             <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
             <div class="disclaimer-notice">
                 *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
             </div>
-            <div id="payment-notice-cv_desde_cero" class="payment-notice">
-                *ESTE ES UN SERVICIO ESPECIALIZADO Y REQUIERE AUTORIZACIÓN MANUAL (NO USA CRÉDITOS)*
+            <div class="payment-notice">
+                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
             </div>
             <h2>⭐ Solicitud de CV DESDE CERO</h2>
             <div class="input-group">
@@ -830,15 +763,15 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
                 <label for="placeholder1_cv">Ejemplo de Campo (a borrar):</label>
                 <input type="text" id="placeholder1_cv" value="">
             </div>
-            <button class="btn-action" onclick="saveSolicitud('cv_desde_cero')">💾 Guardar Solicitud (Esperar Aprobación)</button>
+            <button class="btn-action" onclick="saveSolicitud('cv_desde_cero')">💾 Guardar Solicitud</button>
         </div>
         <div id="form-sellos_personales" class="form-section">
             <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
             <div class="disclaimer-notice">
                 *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
             </div>
-            <div id="payment-notice-sellos_personales" class="payment-notice">
-                *ESTE ES UN SERVICIO ESPECIALIZADO Y REQUIERE AUTORIZACIÓN MANUAL (NO USA CRÉDITOS)*
+            <div class="payment-notice">
+                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
             </div>
             <h2>⭐ Solicitud de SELLOS PERSONALES</h2>
             <div class="input-group">
@@ -846,15 +779,15 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
                 <label for="placeholder1_sellos">Ejemplo de Campo (a borrar):</label>
                 <input type="text" id="placeholder1_sellos" value="">
             </div>
-            <button class="btn-action" onclick="saveSolicitud('sellos_personales')">💾 Guardar Solicitud (Esperar Aprobación)</button>
+            <button class="btn-action" onclick="saveSolicitud('sellos_personales')">💾 Guardar Solicitud</button>
         </div>
         <div id="form-formato_solicitud_pdf" class="form-section">
             <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
             <div class="disclaimer-notice">
                 *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
             </div>
-            <div id="payment-notice-formato_solicitud_pdf" class="payment-notice">
-                *ESTE ES UN SERVICIO ESPECIALIZADO Y REQUIERE AUTORIZACIÓN MANUAL (NO USA CRÉDITOS)*
+            <div class="payment-notice">
+                *PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*
             </div>
             <h2>⭐ Solicitud de FORMATO DE SOLICITUD EN PDF</h2>
             <div class="input-group">
@@ -862,938 +795,981 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
                 <label for="placeholder1_formato">Ejemplo de Campo (a borrar):</label>
                 <input type="text" id="placeholder1_formato" value="">
             </div>
-            <button class="btn-action" onclick="saveSolicitud('formato_solicitud_pdf')">💾 Guardar Solicitud (Esperar Aprobación)</button>
-        </div>
-        
-        <div id="form-whatsapp_group" class="form-section">
-             <button class="back-button" onclick="showForm('menu')">← Volver al Menú</button>
-            <h2>🌐 Unirse al Grupo de WhatsApp</h2>
-            <p>Haz clic en el botón para unirte a nuestro grupo de soporte y anuncios.</p>
-            <a href="https://wa.me/message/AZLK65CETSPQL1" target="_blank" class="btn-action btn-social" style="background-color: #25d366; text-decoration: none; display: block;">
-                <i class="fab fa-whatsapp"></i> Unirse al Grupo Ahora
-            </a>
+            <button class="btn-action" onclick="saveSolicitud('formato_solicitud_pdf')">💾 Guardar Solicitud</button>
         </div>
     </div>
 
-    <div id="status-page" class="status-page" style="display:none;"> 
-        <div class="disclaimer-notice"> 
+    <div id="status-page" class="status-page" style="display:none;">
+        <div class="disclaimer-notice">
             *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
-        </div> 
+        </div>
     </div>
 
-    <a href="https://wa.me/message/AZLK65CETSPQL1" class="whatsapp-float" target="_blank"> 
-        <i class="fab fa-whatsapp"></i> 
-    </a> 
-    <div class="fixed-payment-info"> 
-        <p>⚠️ **PAGO**</p> 
-        <p>*PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*</p> 
-    </div> 
-    
-    <script> 
-        const { jsPDF } = window.jspdf; 
-        const PENDING_REQUESTS_KEY = 'pending_requests_list'; 
-        const APPROVED_KEY = 'approved_requests_list'; 
-        const USERS_KEY = 'platform_users';
-        const SESSION_KEY = 'current_session_user';
-        const EXPRESS_MODE_KEY = 'express_payment_mode';
-        // NUEVA CLAVE PARA EL LOG DE ACTIVIDAD
-        const ACTIVITY_LOG_KEY = 'activity_log'; 
+    <a href="https://wa.me/message/AZLK65CETSPQL1" class="whatsapp-float" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
 
-        // --- COSTOS DE DOCUMENTOS ---
-        const DOCUMENT_COSTS = {
-            laboral: 30,
-            personal: 30,
-            receta_similares: 30,
-            incapacidad_imss: 30,
-            receta_ahorro: 30,
-            receta_imss: 30,
-            cert_primaria: 30,
-            cert_secundaria: 30,
-            cert_prepa: 30,
-            // Servicios especializados que siempre requieren autorización manual
-            metodo_shein: 0,
-            metodo_cinepolis: 0,
-            metodo_temu: 0,
-            cv_desde_cero: 0,
-            sellos_personales: 0,
-            formato_solicitud_pdf: 0,
-        };
+    <div class="fixed-payment-info">
+        <p>⚠️ **PAGO**</p>
+        <p>*PARA CONTINUAR CON EL PAGO ENVIA MENSAJE AL WHATSAPP*</p>
+    </div>
 
-        // --- CREDENCIALES FIJAS DEL ADMINISTRADOR --- 
-        const ADMIN_USER = 'trollgaga999@gmail.com'; 
-        const ADMIN_PASS = 'Johan207'; 
-        let statusCheckInterval = null; 
+    <script>
+        const { jsPDF } = window.jspdf;
+        
+        // --- CONSTANTES DE ALMACENAMIENTO ---
+        const STORAGE_KEY = 'pending_requests_list';
+        const APPROVED_KEY = 'approved_requests_list';
+        const USER_STORAGE_KEY = 'registered_users'; // NUEVO: Clave para usuarios registrados
+        const LOGGED_IN_USER_KEY = 'logged_in_user_id'; // NUEVO: Clave para la sesión activa
 
-        // --- MANEJO DE LOG DE ACTIVIDAD (NUEVO) ---
+        // --- CREDENCIALES FIJAS DEL ADMINISTRADOR ---
+        const ADMIN_USER = 'trollgaga999@gmail.com';
+        const ADMIN_PASS = 'Johan207';
+        
+        let statusCheckInterval = null;
 
-        function logActivity(action, userEmail, details = {}) {
-            const log = JSON.parse(localStorage.getItem(ACTIVITY_LOG_KEY) || '[]');
-            const newEntry = {
-                timestamp: new Date().toISOString(),
-                action: action,
-                user: userEmail,
-                details: details
-            };
-            log.push(newEntry);
-            // Limitar el log para no saturar localStorage (ej. a 200 entradas)
-            if (log.length > 200) {
-                log.shift(); 
-            }
-            localStorage.setItem(ACTIVITY_LOG_KEY, JSON.stringify(log));
-            
-            // Si el admin está viendo el panel, actualizar
-            if (localStorage.getItem('admin_logged_in') === 'true' && document.getElementById('admin-dashboard').style.display === 'block') {
-                renderActivityLog();
-                // Forzar el renderizado de pendientes si es una solicitud
-                if (action.includes('SOLICITUD') && !action.includes('REGISTRO')) {
-                    renderPendingRequests();
-                }
-            }
+        // --- FUNCIONES DE REGISTRO Y AUTENTICACIÓN DE CLIENTES (NUEVO) ---
+
+        // Función para generar un ID de usuario único simple (el "user" que pide el cliente)
+        function generateUserId(nombreCompleto) {
+            const nameParts = nombreCompleto.split(' ').filter(p => p.length > 0);
+            let nameAcronym = nameParts.length > 0 ? nameParts.map(p => p.charAt(0)).join('').toUpperCase() : 'CLT';
+            // Limitar a 4 letras y agregar un número aleatorio para hacerlo único
+            nameAcronym = nameAcronym.substring(0, 4);
+            const randomPart = Math.floor(1000 + Math.random() * 9000); // Número de 4 dígitos
+            return `${nameAcronym}-${randomPart}`;
         }
 
-        function renderActivityLog() {
-            const log = JSON.parse(localStorage.getItem(ACTIVITY_LOG_KEY) || '[]');
-            const list = document.getElementById('activity-log-list');
-            list.innerHTML = '';
+        function registerUser() {
+            const email = document.getElementById('regEmail').value.trim();
+            const pass = document.getElementById('regPass').value;
+            const passVerify = document.getElementById('regPassVerify').value;
+            const nombre = document.getElementById('regNombreCompleto').value.trim();
+            const fechaNac = document.getElementById('regFechaNac').value;
+            const curp = document.getElementById('regCurp').value.trim().toUpperCase();
 
-            if (log.length === 0) {
-                list.innerHTML = '<p style="margin: 0; text-align: center; color: #777;">Aún no hay actividad registrada.</p>';
+            // 1. Validaciones
+            if (!email || !pass || !passVerify || !nombre || !fechaNac || !curp) {
+                alert('Por favor, complete todos los campos.');
+                return;
+            }
+            if (pass.length < 6) {
+                alert('La contraseña debe tener al menos 6 caracteres.');
+                return;
+            }
+            if (pass !== passVerify) {
+                alert('La contraseña y su verificación no coinciden. Por favor, verifique.');
+                return;
+            }
+            // Simple CURP validation (18 chars)
+            if (curp.length !== 18) {
+                 alert('El CURP debe tener 18 caracteres.');
+                 return;
+            }
+
+            // 2. Cargar usuarios existentes y verificar duplicidad de email
+            const users = JSON.parse(localStorage.getItem(USER_STORAGE_KEY) || '{}');
+            const existingUser = Object.values(users).find(user => user.email.toLowerCase() === email.toLowerCase());
+            if (existingUser) {
+                alert('Ya existe una cuenta registrada con este correo electrónico.');
                 return;
             }
 
-            // Mostrar las últimas 30 actividades en orden inverso (más recientes primero)
-            const recentLog = log.slice(-30).reverse();
-
-            recentLog.forEach(entry => {
-                const item = document.createElement('p');
-                item.style.borderBottom = '1px dotted #eee';
-                item.style.padding = '5px 0';
-                item.style.margin = '0';
-                item.style.fontSize = '0.9em';
-                
-                const time = new Date(entry.timestamp).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                
-                let color = '#34495e'; // Default
-                if (entry.action.includes('REGISTRO')) color = '#2980b9'; // Blue for register
-                else if (entry.action.includes('LOGIN')) color = '#2ecc71'; // Green for login
-                else if (entry.action.includes('AUTORIZÓ')) color = '#e67e22'; // Orange for admin actions
-                else if (entry.action.includes('SOLICITUD')) color = '#9b59b6'; // Purple for request
-                else if (entry.action.includes('CRÉDITOS')) color = '#f1c40f'; // Yellow for balance
-
-                item.innerHTML = `<strong style="color: ${color};">[${time}]</strong> (${entry.user}): ${entry.action}`;
-                list.appendChild(item);
-            });
-        }
-
-        // --- MANEJO DE ESTADO DE LA APLICACIÓN ---
-
-        function getBaseUrl() { 
-            return window.location.href.split('#')[0]; 
-        } 
-
-        // Función para cambiar entre login y registro
-        function toggleAccessForm(formId) {
-            document.getElementById('login-form').style.display = (formId === 'login' ? 'block' : 'none');
-            document.getElementById('register-form').style.display = (formId === 'register' ? 'block' : 'none');
-            document.getElementById('access-title').textContent = (formId === 'login' ? '🔒 Acceso a la Plataforma' : '📝 Solicitud de Registro');
-        }
-
-        // Obtener el usuario de la sesión actual
-        function getSessionUser() {
-            const session = localStorage.getItem(SESSION_KEY);
-            if (session) {
-                const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
-                return users.find(u => u.email === session);
+            // 3. Generar ID de Cliente (el "user" para el cliente)
+            const userId = generateUserId(nombre);
+            // Verificar si el ID ya existe (en caso de colisión rara)
+            if (users[userId]) {
+                 alert('Error al generar ID. Intente registrarse de nuevo.');
+                 return;
             }
-            return null;
+
+            // 4. Crear objeto de usuario (ADVERTENCIA: Contraseña en texto plano para el ejemplo)
+            const newUser = {
+                userId: userId,
+                email: email,
+                password: pass, 
+                nombreCompleto: nombre,
+                fechaNacimiento: fechaNac,
+                curp: curp
+            };
+
+            // 5. Almacenar el nuevo usuario
+            users[userId] = newUser;
+            localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(users));
+
+            // 6. Mostrar mensaje de éxito y el ID de Cliente
+            document.getElementById('generatedUserId').textContent = userId;
+            document.querySelector('#user-registration .input-group').style.display = 'none'; // Ocultar form
+            document.getElementById('registration-success').style.display = 'block';
         }
 
-        // Actualizar el display de créditos
-        function updateBalanceDisplay() {
-            const user = getSessionUser();
-            const display = document.getElementById('user-balance-display');
-            if (user && user.status === 'authorized') {
-                document.getElementById('user-balance').textContent = user.balance !== undefined ? user.balance : 0;
-                display.style.display = 'block';
-            } else {
-                display.style.display = 'none';
-            }
-        }
-
-        // Obtener el estado del modo Pago Express
-        function isExpressPaymentMode() {
-             return localStorage.getItem(EXPRESS_MODE_KEY) === 'true';
-        }
-
-        // Alternar el modo Pago Express
-        function toggleExpressPayment() {
-            const isExpress = !isExpressPaymentMode();
-            localStorage.setItem(EXPRESS_MODE_KEY, isExpress);
-            updateExpressModeButton(isExpress);
-            logActivity(`MODO PAGO EXPRESS ${isExpress ? 'ACTIVADO' : 'DESACTIVADO'}.`, getSessionUser().email);
-            alert(isExpress ? 
-                  "MODO PAGO EXPRESS ACTIVADO: Todos los servicios requerirán autorización manual (No se usarán créditos)." : 
-                  "MODO CRÉDITOS ACTIVADO: Los documentos con costo se descontarán de su saldo para descarga inmediata."
-            );
-        }
-
-        // Actualizar el texto del botón Pago Express
-        function updateExpressModeButton(isExpress) {
-            const button = document.getElementById('express-mode-text');
-            const menu = document.getElementById('main-menu');
-            if (menu.style.display !== 'none') {
-                 if (isExpress === undefined) {
-                    isExpress = isExpressPaymentMode();
-                 }
-                 button.textContent = isExpress ? 
-                                       "✅ Pago Express ACTIVADO (Paga y se Autoriza Manualmente)" : 
-                                       "💳 Activar Pago Express (Paga y se Autoriza Manualmente)";
-                 document.querySelector('.btn-menu[style*="e74c3c"]').style.backgroundColor = isExpress ? '#e74c3c' : '#f39c12';
-            }
-        }
-
-        // Función que determina qué vista mostrar al cargar o al retroceder 
-        function checkURL(event) { 
-            if (statusCheckInterval) { 
-                clearInterval(statusCheckInterval); 
-                statusCheckInterval = null; 
-            } 
-
-            // 1. Obtener el estado de la sesión
-            const sessionUser = getSessionUser();
-            let viewId = 'user-access';
-            let requestId = null;
-
-            // 2. Comprobar si hay una sesión de usuario activa
-            if (sessionUser) {
-                viewId = 'menu';
-                updateBalanceDisplay();
-            } else {
-                 // 3. Comprobar si se está intentando acceder a la dashboard de admin o una solicitud de estatus
-                 const hash = window.location.hash.substring(1);
-                 const params = new URLSearchParams(hash.split('?')[1] || '');
-                 requestId = params.get('id');
-
-                 if (hash.startsWith('status') && requestId) { 
-                    viewId = 'status'; 
-                 } else if (hash.startsWith('admin')) { 
-                    viewId = hash.split('?')[0]; // admin_login o admin_dashboard
-                 } else {
-                     viewId = 'user-access'; // Por defecto, va a la pantalla de acceso
-                 }
-            }
+        function authenticateUser() {
+            const userId = document.getElementById('clientUserId').value.trim().toUpperCase();
+            const pass = document.getElementById('clientPass').value;
             
-            // Si la vista es 'status' o 'admin_dashboard', no debe reescribirse
-            if (viewId === 'menu' || viewId === 'status') {
-                 const hash = window.location.hash.substring(1);
-                 const params = new URLSearchParams(hash.split('?')[1] || '');
-                 requestId = params.get('id');
-                 if (hash.startsWith('status') && requestId) { 
-                    viewId = 'status'; 
-                 }
+            const users = JSON.parse(localStorage.getItem(USER_STORAGE_KEY) || '{}');
+            const user = users[userId];
+
+            if (user && user.password === pass) {
+                // Login exitoso
+                localStorage.setItem(LOGGED_IN_USER_KEY, userId);
+                
+                // Actualizar vista del dashboard de usuario
+                document.getElementById('loggedInUserName').textContent = user.nombreCompleto.split(' ')[0];
+                document.querySelector('#user-login .input-group').style.display = 'none';
+                document.getElementById('user-dashboard').style.display = 'block';
+                
+            } else {
+                alert('ID de Cliente o Contraseña incorrectos.');
             }
-
-            // 4. Renderizar la vista correspondiente 
-            document.getElementById('status-page').style.display = 'none'; 
-            document.getElementById('app-container').style.display = 'block'; 
-
-            if (viewId === 'status' && requestId) { 
-                document.getElementById('app-container').style.display = 'none'; 
-                document.getElementById('status-page').style.display = 'flex'; 
-                document.getElementById('status-page').innerHTML = '<div class="disclaimer-notice">*NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*</div>'; 
-                checkStatus(requestId); 
-                statusCheckInterval = setInterval(() => checkStatus(requestId), 5000); 
-                return; 
-            } else if (viewId === 'admin_dashboard') {
-                 // Solo si ya está logueado como admin
-                 if (localStorage.getItem('admin_logged_in') === 'true') {
-                     showForm(viewId);
-                     return;
-                 } else {
-                     viewId = 'admin_login';
-                 }
-            }
-
-            // Muestra la vista principal si no es status
-            showForm(viewId);
         }
 
-        // Función principal para mostrar secciones
-        function showForm(viewId) {
+        function logoutUser() {
+            localStorage.removeItem(LOGGED_IN_USER_KEY);
+            // Recargar vista de login
+            document.getElementById('clientUserId').value = '';
+            document.getElementById('clientPass').value = '';
+            document.querySelector('#user-login .input-group').style.display = 'block';
+            document.getElementById('user-dashboard').style.display = 'none';
+            showForm('menu'); // Vuelve al menú principal
+        }
+
+        // Función para revisar si el usuario está logueado al cargar la vista 'user_login'
+        function checkUserLoginStatus() {
+            const loggedInUserId = localStorage.getItem(LOGGED_IN_USER_KEY);
+            const loginFormGroup = document.querySelector('#user-login .input-group');
+            const userDashboard = document.getElementById('user-dashboard');
+
+            // Limpiar inputs del login al entrar
+            document.getElementById('clientUserId').value = '';
+            document.getElementById('clientPass').value = '';
+
+
+            if (loggedInUserId) {
+                const users = JSON.parse(localStorage.getItem(USER_STORAGE_KEY) || '{}');
+                const user = users[loggedInUserId];
+                if (user) {
+                    document.getElementById('loggedInUserName').textContent = user.nombreCompleto.split(' ')[0];
+                    loginFormGroup.style.display = 'none';
+                    userDashboard.style.display = 'block';
+                    return;
+                }
+            }
+            // Si no está logueado o el ID no es válido
+            loginFormGroup.style.display = 'block';
+            userDashboard.style.display = 'none';
+        }
+
+        // --- MANEJO DE URL Y VISTAS (MODIFICADO) ---
+
+        function getBaseUrl() {
+            return window.location.href.split('#')[0];
+        }
+
+        // Función que determina qué vista mostrar al cargar o al retroceder
+        function checkURL(event) {
             if (statusCheckInterval) {
                 clearInterval(statusCheckInterval);
                 statusCheckInterval = null;
             }
 
+            // 1. Obtener el estado actual (si viene del history.back/forward)
+            const state = history.state;
+            let viewId = state ? state.viewId : 'menu';
+            let requestId = state ? state.requestId : null;
+
+            // 2. Si no viene del estado, verificar el hash (para links directos/actualización)
+            if (!viewId || viewId === 'menu') {
+                const hash = window.location.hash.substring(1);
+                const params = new URLSearchParams(hash.split('?')[1] || '');
+                requestId = params.get('id');
+
+                if (hash.startsWith('status') && requestId) {
+                    viewId = 'status';
+                } else if (hash.startsWith('admin')) {
+                    viewId = hash.split('?')[0];
+                } else if (hash.startsWith('user_login')) { // NUEVO
+                     viewId = 'user_login';
+                } else if (hash.startsWith('user_registration')) { // NUEVO
+                     viewId = 'user_registration';
+                } else {
+                    viewId = 'menu';
+                }
+            }
+
+            // 3. Renderizar la vista correspondiente
             document.getElementById('status-page').style.display = 'none';
             document.getElementById('app-container').style.display = 'block';
 
-            // Ocultar todas las secciones excepto admin-dashboard (si es necesario)
-            document.querySelectorAll('.form-section, #main-menu').forEach(section => {
-                section.style.display = 'none';
-            });
-            
-            // Lógica de navegación y hash
-            let hash = viewId;
-            if (viewId === 'menu') {
-                viewId = 'main-menu';
-                hash = '';
+            if (viewId === 'status' && requestId) {
+                document.getElementById('app-container').style.display = 'none';
+                document.getElementById('status-page').style.display = 'flex'; 
+                document.getElementById('status-page').innerHTML = '<div class="disclaimer-notice">*NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*</div>';
+                checkStatus(requestId);
+                statusCheckInterval = setInterval(() => checkStatus(requestId), 5000);
+                return;
             }
 
-            // Mostrar la sección solicitada
-            const targetElement = document.getElementById(viewId);
+            // Si la vista es admin_dashboard, asegurar que se carguen los datos
+            if (viewId === 'admin_dashboard') {
+                loadPendingRequests();
+            }
+            
+            // Si la vista es user_login, verificar el estado del cliente
+            if (viewId === 'user_login') {
+                checkUserLoginStatus();
+            }
+
+            // Mostrar el contenedor de la aplicación y la vista específica
+            showForm(viewId, false); // No empujar estado al historial si ya estamos retrocediendo/cargando
+        }
+
+        // Mapeo de IDs de vista a IDs de elementos DIV (MODIFICADO)
+        const viewIdMap = {
+            'menu': 'main-menu',
+            'laboral': 'form-laboral',
+            'personal': 'form-personal',
+            'admin_login': 'admin-login',
+            'admin_dashboard': 'admin-dashboard',
+            'user_login': 'user-login', // NUEVO
+            'user_registration': 'user-registration', // NUEVO
+            'incapacidad_imss': 'form-incapacidad_imss',
+            'receta_similares': 'form-receta_similares',
+            'receta_ahorro': 'form-receta_ahorro',
+            'receta_imss': 'form-receta_imss',
+            'cert_primaria': 'form-cert_primaria',
+            'cert_secundaria': 'form-cert_secundaria',
+            'cert_prepa': 'form-cert_prepa',
+            'metodo_shein': 'form-metodo_shein',
+            'metodo_cinepolis': 'form-metodo_cinepolis',
+            'metodo_temu': 'form-metodo_temu',
+            'cv_desde_cero': 'form-cv_desde_cero',
+            'sellos_personales': 'form-sellos_personales',
+            'formato_solicitud_pdf': 'form-formato_solicitud_pdf',
+            'whatsapp_group': 'main-menu' // No es un form, solo un link
+        };
+
+        function showForm(formId, pushState = true) {
+            // Detener la verificación de estatus si estaba activa
+            if (statusCheckInterval) {
+                clearInterval(statusCheckInterval);
+                statusCheckInterval = null;
+            }
+
+            // Caso especial para el link de WhatsApp
+            if (formId === 'whatsapp_group') {
+                window.open('https://wa.me/message/AZLK65CETSPQL1', '_blank');
+                return;
+            }
+
+            // Ocultar todos los formularios y mostrar el menú principal por defecto
+            document.querySelectorAll('.form-section').forEach(form => {
+                form.style.display = 'none';
+            });
+            document.getElementById('main-menu').style.display = 'none';
+
+            // Determinar qué elemento mostrar
+            const elementId = viewIdMap[formId] || 'main-menu';
+            const targetElement = document.getElementById(elementId);
+
             if (targetElement) {
                 targetElement.style.display = 'block';
                 
-                // Si estamos en el menú, actualizamos el botón de Pago Express
-                if (viewId === 'main-menu') {
-                    updateExpressModeButton();
+                // Lógica específica al mostrar ciertos formularios
+                if (formId === 'admin_dashboard') {
+                    loadPendingRequests();
+                } else if (formId === 'user_login') { // NUEVO
+                    checkUserLoginStatus();
+                } else if (formId === 'user_registration') { // NUEVO
+                     document.querySelector('#user-registration .input-group').style.display = 'block';
+                     document.getElementById('registration-success').style.display = 'none';
                 }
 
-                // Lógica especial para formularios de documentos
-                if (viewId.startsWith('form-')) {
-                    const formName = viewId.split('form-')[1];
-                    updateFormPaymentNotice(formName);
-                    hash = formName; // Para el hash de la URL
+                // Si se debe agregar al historial (usualmente sí, a menos que se indique lo contrario)
+                if (pushState) {
+                    history.pushState({ viewId: formId }, '', `${getBaseUrl()}#${formId}`);
                 }
-
-                // Si es el dashboard de admin, refrescar las listas y el log
-                if (viewId === 'admin-dashboard') {
-                    renderPendingRequests();
-                    renderUserRequests();
-                    renderActivityLog(); // NUEVO: Renderiza el historial
-                    hash = 'admin_dashboard';
-                }
-
-                // Ajustar hash y estado del historial
-                history.pushState({ viewId: viewId }, '', hash ? `#${hash}` : getBaseUrl());
-            }
-
-            // Manejo de la pantalla de acceso
-            if (viewId === 'user-access') {
-                 toggleAccessForm('login');
-                 history.pushState({ viewId: 'user-access' }, '', getBaseUrl());
-            }
-
-            // Actualizar el balance después de cada cambio de vista
-            updateBalanceDisplay();
-        }
-        
-        // Función para actualizar el aviso de pago/créditos en los formularios
-        function updateFormPaymentNotice(formName) {
-            const noticeId = `payment-notice-${formName}`;
-            const noticeElement = document.getElementById(noticeId);
-            const cost = DOCUMENT_COSTS[formName] || 0;
-            const isExpress = isExpressPaymentMode();
-
-            if (noticeElement) {
-                if (isExpress) {
-                    noticeElement.textContent = '*PAGO EXPRESS ACTIVADO: Este servicio requiere su pago y AUTORIZACIÓN MANUAL del administrador.';
-                    noticeElement.style.backgroundColor = '#e74c3c20'; 
-                    noticeElement.style.borderColor = '#e74c3c'; 
-                    noticeElement.style.color = '#c0392b';
-                } else if (cost > 0) {
-                    const user = getSessionUser();
-                    const balance = user ? user.balance : 0;
-                    const sufficientCredits = balance >= cost;
-
-                    noticeElement.textContent = sufficientCredits 
-                        ? `*ESTE DOCUMENTO CUESTA ${cost} CRÉDITOS. Se descontarán al Guardar para descarga inmediata.*`
-                        : `*ESTE DOCUMENTO CUESTA ${cost} CRÉDITOS. Saldo insuficiente. Se guardará como solicitud pendiente de autorización (flujo de pago manual).*`;
-                    
-                    if (sufficientCredits) {
-                         noticeElement.style.backgroundColor = '#27ae6020';
-                         noticeElement.style.borderColor = '#27ae60';
-                         noticeElement.style.color = '#27ae60';
-                    } else {
-                         noticeElement.style.backgroundColor = '#f1c40f20';
-                         noticeElement.style.borderColor = '#f1c40f';
-                         noticeElement.style.color = '#e67e22';
-                    }
-
-                } else {
-                    noticeElement.textContent = '*ESTE ES UN SERVICIO ESPECIALIZADO Y REQUIERE AUTORIZACIÓN MANUAL (NO USA CRÉDITOS)*';
-                    noticeElement.style.backgroundColor = '#eaf7ff';
-                    noticeElement.style.borderColor = '#3498db';
-                    noticeElement.style.color = '#2980b9';
+            } else {
+                // Si el ID del formulario no se encuentra, volver al menú
+                document.getElementById('main-menu').style.display = 'block';
+                if (pushState) {
+                    history.pushState({ viewId: 'menu' }, '', getBaseUrl());
                 }
             }
         }
-
-
-        // --- MANEJO DE USUARIOS Y CRÉDITOS ---
-
-        function getUsers() {
-             return JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
-        }
-
-        function saveUsers(users) {
-             localStorage.setItem(USERS_KEY, JSON.stringify(users));
-        }
-
-        // 1. Registro de Solicitud de Usuario
-        function registerRequest() {
-            const name = document.getElementById('registerName').value.trim();
-            const email = document.getElementById('registerEmail').value.trim().toLowerCase();
-            const password = document.getElementById('registerPass').value.trim();
-
-            if (!email || !password) {
-                alert('Por favor, ingrese un correo y contraseña válidos.');
-                return;
-            }
-
-            let users = getUsers();
-            if (users.some(u => u.email === email)) {
-                alert('El correo ya está registrado. Por favor, inicie sesión o use otro correo.');
-                return;
-            }
-
-            const newUser = {
-                name: name,
-                email: email,
-                password: password, // En un entorno real, la contraseña debe ser hasheada
-                status: 'pending',
-                balance: 0,
-                requests: []
-            };
-
-            users.push(newUser);
-            saveUsers(users);
-            // NUEVO: Log de actividad
-            logActivity('SOLICITUD DE REGISTRO enviada.', newUser.email);
-
-            alert('Solicitud de cuenta enviada. Por favor, espere la autorización del administrador.');
-            toggleAccessForm('login'); // Vuelve al login para esperar
-
-            // Limpiar campos
-            document.getElementById('registerName').value = '';
-            document.getElementById('registerEmail').value = '';
-            document.getElementById('registerPass').value = '';
-        }
-
-        // 2. Login de Usuario
-        function loginUser() {
-            const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-            const password = document.getElementById('loginPass').value.trim();
-
-            const users = getUsers();
-            const user = users.find(u => u.email === email && u.password === password);
-
-            if (!user) {
-                alert('Credenciales incorrectas o usuario no encontrado.');
-                return;
-            }
-
-            if (user.status === 'pending') {
-                alert('Su cuenta está pendiente de autorización. Por favor, espere a que el administrador la apruebe.');
-                return;
-            }
-
-            // Inicio de sesión exitoso
-            localStorage.setItem(SESSION_KEY, user.email);
-            // NUEVO: Log de actividad
-            logActivity('INICIO DE SESIÓN exitoso.', user.email);
-            alert(`Bienvenido, ${user.name || user.email}!`);
-            document.getElementById('loginEmail').value = '';
-            document.getElementById('loginPass').value = '';
-            showForm('menu');
-        }
-
-        // 3. Logout de Usuario
-        function logoutUser() {
-            const user = getSessionUser();
-            if (user) {
-                logActivity('SESIÓN CERRADA.', user.email);
-            }
-            localStorage.removeItem(SESSION_KEY);
-            localStorage.removeItem(EXPRESS_MODE_KEY);
-            alert('Sesión cerrada.');
-            showForm('user-access');
-        }
-
-        // 4. Autorizar/Rechazar Usuario (Admin)
-        function renderUserRequests() {
-            const users = getUsers();
-            const pendingUsers = users.filter(u => u.status === 'pending');
-            const list = document.getElementById('user-requests-list');
-            list.innerHTML = '';
-
-            // NUEVO: Actualizar el conteo de usuarios registrados en el título del panel
-            const registeredCount = users.length;
-            document.querySelector('#admin-dashboard h2').textContent = `⚙️ Panel de Administrador (${registeredCount} Usuarios Registrados)`; 
-
-            if (pendingUsers.length === 0) {
-                list.innerHTML = '<p id="no-user-requests-msg">No hay solicitudes de usuario pendientes.</p>';
-                return;
-            }
-
-            pendingUsers.forEach(user => {
-                const item = document.createElement('div');
-                item.className = 'user-request-item';
-                item.innerHTML = `
-                    <div>
-                        <strong>Usuario:</strong> ${user.name || 'N/A'} (${user.email})
-                    </div>
-                    <div class="request-actions">
-                        <button class="btn-authorize" onclick="authorizeUser('${user.email}')">Autorizar</button>
-                        <button class="btn-reject" onclick="rejectUser('${user.email}')">Rechazar</button>
-                    </div>
-                `;
-                list.appendChild(item);
-            });
-        }
-
-        function authorizeUser(email) {
-            let users = getUsers();
-            const userIndex = users.findIndex(u => u.email === email);
-
-            if (userIndex !== -1) {
-                users[userIndex].status = 'authorized';
-                saveUsers(users);
-                // NUEVO: Log de actividad
-                logActivity(`ADMIN AUTORIZÓ al usuario.`, ADMIN_USER, { target: email }); 
-                alert(`Usuario ${email} autorizado y listo para iniciar sesión.`);
-                renderUserRequests();
-            }
-        }
-
-        function rejectUser(email) {
-            if (!confirm(`¿Está seguro de que desea RECHAZAR y eliminar la solicitud de ${email}?`)) {
-                return;
-            }
-            let users = getUsers();
-            users = users.filter(u => u.email !== email); // Simplemente se elimina
-            saveUsers(users);
-            // NUEVO: Log de actividad
-            logActivity(`ADMIN RECHAZÓ al usuario y lo eliminó.`, ADMIN_USER, { target: email }); 
-            alert(`Solicitud de usuario ${email} rechazada y eliminada.`);
-            renderUserRequests();
-        }
-
-        // 5. Agregar Saldo (Admin)
-        function addBalance() {
-            const email = document.getElementById('balanceEmail').value.trim().toLowerCase();
-            const amount = parseInt(document.getElementById('balanceAmount').value);
-
-            if (!email || isNaN(amount) || amount <= 0) {
-                alert('Por favor, ingrese un correo válido y una cantidad de saldo positiva.');
-                return;
-            }
-
-            let users = getUsers();
-            const userIndex = users.findIndex(u => u.email === email && u.status === 'authorized');
-
-            if (userIndex === -1) {
-                alert('Usuario no encontrado o no autorizado.');
-                return;
-            }
-
-            users[userIndex].balance = (users[userIndex].balance || 0) + amount;
-            saveUsers(users);
-            // NUEVO: Log de actividad
-            logActivity(`ADMIN AGREGÓ ${amount} CRÉDITOS.`, ADMIN_USER, { target: email, amount: amount, newBalance: users[userIndex].balance });
-            alert(`Se han agregado ${amount} créditos al usuario ${email}. Nuevo saldo: ${users[userIndex].balance}`);
-
-            document.getElementById('balanceEmail').value = '';
-            document.getElementById('balanceAmount').value = '50';
-        }
-
 
         // --- MANEJO DE ADMINISTRADOR ---
-
+        
         function authenticateAdmin() {
-            const user = document.getElementById('adminUser').value;
-            const pass = document.getElementById('adminPass').value;
+            const user = document.getElementById('adminUser').value.trim();
+            const pass = document.getElementById('adminPass').value.trim();
 
             if (user === ADMIN_USER && pass === ADMIN_PASS) {
-                localStorage.setItem('admin_logged_in', 'true');
                 document.getElementById('adminUser').value = '';
                 document.getElementById('adminPass').value = '';
-                logActivity('ADMIN INICIÓ SESIÓN.', ADMIN_USER); // NUEVO: Log de actividad
-                showForm('admin-dashboard');
+                showForm('admin_dashboard');
             } else {
                 alert('Credenciales de administrador incorrectas.');
             }
         }
 
-        // --- LÓGICA DE SOLICITUDES Y CRÉDITOS (saveSolicitud modificado) ---
+        function loadPendingRequests() {
+            const listContainer = document.getElementById('pending-requests-list');
+            const noRequestsMsg = document.getElementById('no-requests-msg');
+            const pendingRequests = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            
+            listContainer.innerHTML = ''; // Limpiar lista
+            
+            if (pendingRequests.length === 0) {
+                noRequestsMsg.style.display = 'block';
+                listContainer.appendChild(noRequestsMsg);
+                return;
+            }
+            
+            noRequestsMsg.style.display = 'none';
 
-        // Función auxiliar para obtener datos de formularios
-        function getFormData(formId) {
-            const formInputs = document.querySelectorAll(`#form-${formId} input, #form-${formId} textarea`);
-            const data = {};
-            formInputs.forEach(input => {
-                // Para simplificar, solo guardamos el valor, no la imagen base64
-                if (input.type !== 'file') {
-                    data[input.id] = input.value;
-                } else {
-                    data[input.id] = 'File uploaded (content not stored in localStorage)';
-                }
+            pendingRequests.forEach(request => {
+                const item = document.createElement('div');
+                item.className = 'request-item';
+                item.innerHTML = `
+                    <div>
+                        <strong>Tipo:</strong> ${request.type} <br>
+                        <strong>ID Solicitud:</strong> ${request.id} <br>
+                        <strong>Solicitante:</strong> ${request.data.nombreSolicitante || request.data.nombrePacienteSimilares || 'N/A'} <br>
+                        <strong>Email:</strong> ${request.data.emailSolicitante || request.data.emailSolicitanteLaboral || 'N/A'}
+                    </div>
+                    <div class="request-actions">
+                        <button class="btn-action btn-authorize" onclick="authorizeRequest('${request.id}')">Autorizar</button>
+                        <button class="btn-action btn-reject" onclick="rejectRequest('${request.id}')" style="background-color: #c0392b;">Rechazar</button>
+                        <button class="btn-action back-button" onclick="viewRequestData('${request.id}')" style="background-color: #34495e;">Ver Detalles</button>
+                    </div>
+                    <div id="details-${request.id}" style="display:none; width:100%; margin-top:10px; border-top: 1px solid #eee; padding-top: 10px;">
+                        <h4>Detalles de la Solicitud:</h4>
+                        <pre style="white-space: pre-wrap; word-break: break-all; font-size: 0.8em; background-color: #f7f7f7; padding: 10px; border-radius: 4px;">${JSON.stringify(request.data, null, 2)}</pre>
+                    </div>
+                `;
+                listContainer.appendChild(item);
             });
-            // Añadir marca de tiempo para el orden
-            data.timestamp = new Date().toISOString();
+        }
+
+        function viewRequestData(requestId) {
+            const detailsDiv = document.getElementById(`details-${requestId}`);
+            detailsDiv.style.display = detailsDiv.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function authorizeRequest(requestId) {
+            const pendingRequests = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            const approvedRequests = JSON.parse(localStorage.getItem(APPROVED_KEY) || '[]');
+            
+            const requestIndex = pendingRequests.findIndex(req => req.id === requestId);
+            
+            if (requestIndex !== -1) {
+                const [approvedRequest] = pendingRequests.splice(requestIndex, 1);
+                
+                // Marcar como autorizado
+                approvedRequest.authorized = true;
+                approvedRequest.approvalDate = new Date().toISOString();
+
+                // Generar el PDF y obtener el base64 si es posible
+                let pdfBase64 = null;
+                const type = approvedRequest.type.toLowerCase();
+                if (type.includes('carta laboral') || type.includes('carta personal') || type.includes('receta médica similares')) {
+                     pdfBase64 = generatePDF(type, approvedRequest.data, false); // No descargar, solo obtener base64
+                } else {
+                     // Para otros tipos, se simula un enlace o se indica que el documento está 'listo'
+                     pdfBase64 = btoa("Documento Autorizado, pendiente de generación de PDF específico."); 
+                }
+
+                approvedRequest.pdfBase64 = pdfBase64;
+                
+                approvedRequests.push(approvedRequest);
+
+                // Guardar cambios
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(pendingRequests));
+                localStorage.setItem(APPROVED_KEY, JSON.stringify(approvedRequests));
+                
+                loadPendingRequests(); // Recargar el dashboard
+                alert(`Solicitud ${requestId} autorizada y lista para descarga.`);
+            } else {
+                alert('Error: Solicitud no encontrada.');
+            }
+        }
+
+        function rejectRequest(requestId) {
+            if (!confirm(`¿Está seguro que desea rechazar la solicitud ${requestId}? Esto la eliminará.`)) {
+                return;
+            }
+
+            const pendingRequests = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            const requestIndex = pendingRequests.findIndex(req => req.id === requestId);
+
+            if (requestIndex !== -1) {
+                pendingRequests.splice(requestIndex, 1);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(pendingRequests));
+                loadPendingRequests(); // Recargar el dashboard
+                alert(`Solicitud ${requestId} rechazada y eliminada.`);
+            } else {
+                alert('Error: Solicitud no encontrada.');
+            }
+        }
+
+        // --- MANEJO DE SOLICITUDES DEL CLIENTE ---
+
+        function getFileBase64(type) {
+            const fileInputs = [];
+            
+            if (type === 'laboral') {
+                fileInputs.push({ key: 'logoBase64Laboral', id: 'logoInputLaboral' });
+                fileInputs.push({ key: 'firmaBase64Laboral', id: 'firmaInputLaboral' });
+            } else if (type === 'personal') {
+                fileInputs.push({ key: 'firmaBase64Personal', id: 'firmaInputPersonal' });
+            } else if (type === 'receta_similares') {
+                fileInputs.push({ key: 'logoBase64Similares', id: 'logoInputSimilares' });
+                fileInputs.push({ key: 'firmaBase64Similares', id: 'firmaInputSimilares' });
+            }
+            
+            const promises = fileInputs.map(input => {
+                const file = document.getElementById(input.id).files[0];
+                return new Promise((resolve, reject) => {
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                            resolve({ key: input.key, base64: reader.result });
+                        };
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                    } else {
+                        resolve({ key: input.key, base64: null });
+                    }
+                });
+            });
+
+            return promises;
+        }
+
+        function extractFormData(type) {
+            let data = {};
+            let missing = false;
+
+            if (type === 'laboral') {
+                data = {
+                    nombreSolicitante: document.getElementById('nombreSolicitanteLaboral').value,
+                    emailSolicitante: document.getElementById('emailSolicitanteLaboral').value,
+                    fechaEmision: document.getElementById('fechaEmisionLaboral').value,
+                    nombreEmpleado: document.getElementById('nombreEmpleadoLaboral').value,
+                    puestoDesempenado: document.getElementById('puestoDesempenadoLaboral').value,
+                    fechaInicio: document.getElementById('fechaInicioLaboral').value,
+                    fechaFin: document.getElementById('fechaFinLaboral').value,
+                    nombreEmpresa: document.getElementById('nombreEmpresaLaboral').value,
+                    cuerpoPersonalidad: document.getElementById('cuerpoPersonalidadLaboral').value,
+                    tareas: document.getElementById('tareasLaboral').value,
+                    cuerpoCierre: document.getElementById('cuerpoCierreLaboral').value,
+                    nombreFirmante: document.getElementById('nombreFirmanteLaboral').value,
+                    cargoFirmante: document.getElementById('cargoFirmanteLaboral').value,
+                    telefonoFirmante: document.getElementById('telefonoFirmanteLaboral').value,
+                };
+                if (!data.nombreSolicitante || !data.nombreEmpleado || !data.nombreFirmante) missing = true;
+
+            } else if (type === 'personal') {
+                 data = {
+                    nombreSolicitante: document.getElementById('nombreSolicitantePersonal').value,
+                    emailSolicitante: document.getElementById('emailSolicitantePersonal').value,
+                    fechaEmision: document.getElementById('fechaEmisionPersonal').value,
+                    nombreFirmante: document.getElementById('nombreFirmantePersonal').value,
+                    nombreRecomendado: document.getElementById('nombreRecomendadoPersonal').value,
+                    tiempoConocido: document.getElementById('tiempoConocidoPersonal').value,
+                    cuerpoPersonalidad: document.getElementById('cuerpoPersonalidadPersonal').value,
+                    cuerpoRecomendacion: document.getElementById('cuerpoRecomendacionPersonal').value,
+                };
+                if (!data.nombreSolicitante || !data.nombreRecomendado || !data.nombreFirmante) missing = true;
+                
+            } else if (type === 'receta_similares') {
+                data = {
+                    nombreSolicitante: document.getElementById('nombrePacienteSimilares').value + ' ' + document.getElementById('apellidoPSimilares').value,
+                    doctorNombre: document.getElementById('doctorNombreSimilares').value,
+                    cedula: document.getElementById('cedulaSimilares').value,
+                    direccion: document.getElementById('direccionSimilares').value,
+                    ciudad: document.getElementById('ciudadSimilares').value,
+                    fechaEmision: document.getElementById('fechaEmisionSimilares').value,
+                    nombrePaciente: document.getElementById('nombrePacienteSimilares').value,
+                    apellidoP: document.getElementById('apellidoPSimilares').value,
+                    apellidoM: document.getElementById('apellidoMSimilares').value,
+                    sexo: document.getElementById('sexoSimilares').value,
+                    edad: document.getElementById('edadSimilares').value,
+                    fechaNac: document.getElementById('fechaNacSimilares').value,
+                    alergias: document.getElementById('alergiasSimilares').value,
+                    spo2: document.getElementById('spo2Similares').value,
+                    fc: document.getElementById('fcSimilares').value,
+                    fr: document.getElementById('frSimilares').value,
+                    temp: document.getElementById('tempSimilares').value,
+                    peso: document.getElementById('pesoSimilares').value,
+                    talla: document.getElementById('tallaSimilares').value,
+                    dx: document.getElementById('dxSimilares').value,
+                    contenidoConsulta: document.getElementById('contenidoConsultaSimilares').value,
+                    tratamiento: document.getElementById('tratamientoSimilares').value,
+                    indicacionesGenerales: document.getElementById('indicacionesGeneralesSimilares').value,
+                    proximaCita: document.getElementById('proximaCitaSimilares').value,
+                };
+                if (!data.doctorNombre || !data.nombrePaciente || !data.tratamiento) missing = true;
+                
+            } else {
+                // Para forms pendientes, se usa el placeholder para al menos tener un ID rastreable
+                const placeholderId = `placeholder1_${type.split('_')[0]}`;
+                const emailInput = document.getElementById(placeholderId);
+                data.emailSolicitante = emailInput ? emailInput.value : `${type.split('_')[0]}@ejemplo.com`;
+                data.placeholder1 = emailInput ? emailInput.value : 'N/A';
+                data.nombreSolicitante = 'Cliente Pendiente';
+
+                // Si son formularios PENDIENTES, no se valida missing para no bloquear la funcionalidad
+                missing = false;
+            }
+
+            if (missing) {
+                alert('Por favor, complete al menos los campos principales marcados como obligatorios.');
+                return null;
+            }
+
             return data;
         }
 
-        // Función modificada para guardar solicitud
-        async function saveSolicitud(formId) {
-            const sessionUser = getSessionUser();
-            const cost = DOCUMENT_COSTS[formId] || 0;
-            const isExpress = isExpressPaymentMode();
-
-            if (!sessionUser || sessionUser.status !== 'authorized') {
-                alert('Debe iniciar sesión con una cuenta autorizada para realizar solicitudes.');
-                return;
-            }
-
-            const isDocumentService = cost > 0;
-            const sufficientCredits = isDocumentService && !isExpress && sessionUser.balance >= cost;
-            const isCreditModeAndAffordable = isDocumentService && !isExpress && sufficientCredits;
-            const formName = formId.toUpperCase().replace('_', ' ');
-
-
-            if (isCreditModeAndAffordable) {
-                // 1. Deducir créditos y realizar descarga inmediata
-                let users = getUsers();
-                const userIndex = users.findIndex(u => u.email === sessionUser.email);
-                
-                if (userIndex !== -1) {
-                    users[userIndex].balance -= cost;
-                    const newBalance = users[userIndex].balance;
-                    saveUsers(users);
-                    // Actualizar la sesión en el navegador
-                    localStorage.setItem(SESSION_KEY, users[userIndex].email); 
-                    
-                    // NUEVO: Log de actividad
-                    logActivity(`DESCARGA INMEDIATA (CRÉDITOS). -${cost} por ${formName}. Saldo: ${newBalance}`, sessionUser.email);
-                    
-                    updateBalanceDisplay();
-                    alert(`¡Créditos descontados! (-${cost}). Saldo restante: ${newBalance}. Generando PDF...`);
-                    
-                    // Ejecutar la función de generación de PDF directamente (simulada aquí con la función existente)
-                    const data = getFormData(formId);
-                    
-                    if (window[`generatePDF_${formId}`]) {
-                        // Aquí se llama a la función real de PDF (ej: generatePDF_laboral(data, true))
-                        const result = await window[`generatePDF_${formId}`](data, true); 
-                        if (result) {
-                            alert('¡Documento descargado exitosamente!');
-                        } else {
-                             alert('Error al generar el PDF. El documento se ha descargado de todas formas.');
-                        }
-                    } else {
-                        alert(`Descarga simulada. No hay función 'generatePDF_${formId}' real. Pero los créditos se descontaron.`);
-                    }
-
-                    showForm('menu'); // Vuelve al menú después de la descarga
-                    return;
-
-                } else {
-                    alert('Error interno: No se pudo encontrar al usuario para descontar créditos.');
-                    return;
-                }
-            }
-
-
-            // 2. Guardar como solicitud pendiente (Flujo Original/Express/Sin Créditos)
-            const formData = getFormData(formId);
-            const requestId = `req-${Date.now()}`;
-            
-            const newRequest = {
-                id: requestId,
-                formId: formId,
-                data: formData,
-                status: 'pending',
-                date: new Date().toLocaleDateString('es-ES'),
-                userEmail: sessionUser.email,
-                userName: sessionUser.name || 'N/A'
+        function getFriendlyName(type) {
+            const names = {
+                'laboral': 'Carta de Recomendación LABORAL',
+                'personal': 'Carta de Recomendación PERSONAL',
+                'incapacidad_imss': 'Incapacidad IMSS',
+                'receta_similares': 'Receta Médica SIMILARES',
+                'receta_ahorro': 'Receta Médica DEL AHORRO',
+                'receta_imss': 'Receta Médica IMSS',
+                'cert_primaria': 'Certificado de PRIMARIA',
+                'cert_secundaria': 'Certificado de SECUNDARIA',
+                'cert_prepa': 'Certificado de PREPARATORIA',
+                'metodo_shein': 'Metodo Shein',
+                'metodo_cinepolis': 'Metodo Cinépolis',
+                'metodo_temu': 'Metodo TEMU',
+                'cv_desde_cero': 'CV DESDE CERO',
+                'sellos_personales': 'SELLOS PERSONALES',
+                'formato_solicitud_pdf': 'FORMATO DE SOLICITUD EN PDF',
             };
-
-            // Guarda la solicitud en la lista pendiente global (simulando que va al administrador)
-            let pendingList = JSON.parse(localStorage.getItem(PENDING_REQUESTS_KEY) || '[]');
-            pendingList.push(newRequest);
-            localStorage.setItem(PENDING_REQUESTS_KEY, JSON.stringify(pendingList));
-
-            // Guarda la solicitud en el usuario actual para que pueda ver su estatus
-            let users = getUsers();
-            const userIndex = users.findIndex(u => u.email === sessionUser.email);
-            if (userIndex !== -1) {
-                 users[userIndex].requests.push(requestId);
-                 saveUsers(users);
-            }
-
-            // NUEVO: Log de actividad
-            logActivity(`SOLICITUD PENDIENTE de ${formName}. (ID: ${requestId})`, sessionUser.email);
-
-            // Redirige a la página de estatus
-            window.location.hash = `status?id=${requestId}`;
+            return names[type] || type.toUpperCase();
         }
-        
-        // Función para renderizar solicitudes pendientes en el Admin Dashboard (misma que antes, pero citando el email del usuario)
-        function renderPendingRequests() {
-            const list = document.getElementById('pending-requests-list');
-            const pendingList = JSON.parse(localStorage.getItem(PENDING_REQUESTS_KEY) || '[]');
-            list.innerHTML = '';
+
+        function saveSolicitud(type) {
+            // Generar un ID simple y único para la solicitud
+            const uniqueId = 'SOL-' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5).toUpperCase();
             
-            if (pendingList.length === 0) {
-                list.innerHTML = '<p id="no-requests-msg">No hay solicitudes pendientes de documentos.</p>';
+            const requestData = extractFormData(type);
+            
+            if (!requestData) {
+                // extractFormData mostrará el error si falta data crítica
                 return;
             }
 
-            pendingList.forEach(request => {
-                const item = document.createElement('div');
-                item.className = 'request-item';
-                const formName = request.formId.toUpperCase().replace('_', ' ');
+            // Obtener datos de archivos si existen
+            const filePromises = getFileBase64(type);
 
-                item.innerHTML = `
-                    <div>
-                        <strong>ID:</strong> ${request.id} (${request.date})<br>
-                        <strong>Documento:</strong> ${formName}<br>
-                        <strong>Usuario:</strong> ${request.userName || 'N/A'} (${request.userEmail})
-                    </div>
-                    <div class="request-actions">
-                        <button class="btn-authorize" onclick="authorizeRequest('${request.id}')">Autorizar</button>
-                        <button class="btn-reject" onclick="rejectRequest('${request.id}')">Rechazar</button>
-                    </div>
-                `;
-                list.appendChild(item);
-            });
+            Promise.all(filePromises)
+                .then(fileResults => {
+                    fileResults.forEach(result => {
+                        requestData[result.key] = result.base64;
+                    });
+
+                    const newRequest = {
+                        id: uniqueId,
+                        type: getFriendlyName(type),
+                        status: 'PENDIENTE',
+                        date: new Date().toISOString(),
+                        data: requestData
+                    };
+
+                    // Guardar en localStorage
+                    const existingRequests = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                    existingRequests.push(newRequest);
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(existingRequests));
+                    
+                    // Redirigir a la página de estatus
+                    showForm('status', true);
+                    window.location.hash = `status?id=${uniqueId}`;
+                })
+                .catch(error => {
+                    alert('Ocurrió un error al procesar las imágenes. Por favor, asegúrese de que no sean demasiado grandes.');
+                    console.error('Error processing files:', error);
+                });
         }
         
-        // Función para autorizar solicitud (misma que antes, con log)
-        function authorizeRequest(requestId) {
-            // 1. Mueve la solicitud de PENDING a APPROVED
-            let pendingList = JSON.parse(localStorage.getItem(PENDING_REQUESTS_KEY) || '[]');
-            let approvedList = JSON.parse(localStorage.getItem(APPROVED_KEY) || '[]');
-            
-            const index = pendingList.findIndex(req => req.id === requestId);
-            
-            if (index !== -1) {
-                const authorizedRequest = pendingList.splice(index, 1)[0];
-                authorizedRequest.status = 'approved';
-                
-                // Generar el PDF y guardarlo como Base64 en la solicitud aprobada
-                const data = authorizedRequest.data;
-                const formId = authorizedRequest.formId;
-                const formName = formId.toUpperCase().replace('_', ' ');
-                
-                if (window[`generatePDF_${formId}`]) {
-                    // La función debe retornar el Base64 (descargar=false)
-                    window[`generatePDF_${formId}`](data, false).then(pdfBase64 => {
-                         authorizedRequest.pdfBase64 = pdfBase64; 
-                         approvedList.push(authorizedRequest);
-                        
-                         localStorage.setItem(PENDING_REQUESTS_KEY, JSON.stringify(pendingList));
-                         localStorage.setItem(APPROVED_KEY, JSON.stringify(approvedList));
-                        
-                         // NUEVO: Log de actividad
-                         logActivity(`ADMIN AUTORIZÓ SOLICITUD ${formName}. (ID: ${requestId})`, ADMIN_USER, { target: authorizedRequest.userEmail, request: requestId });
+        // --- FUNCIÓN PARA VERIFICAR ESTATUS (IMPORTANTE PARA EL CLIENTE) ---
+        function checkStatus(requestId) {
+            const statusPage = document.getElementById('status-page');
+            const approvedRequests = JSON.parse(localStorage.getItem(APPROVED_KEY) || '[]');
+            const pendingRequests = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
 
-                         alert(`Solicitud ${requestId} autorizada y PDF generado.`);
-                         renderPendingRequests();
-                         renderActivityLog();
-                    }).catch(err => {
-                        console.error("Error al generar PDF durante la autorización:", err);
-                        authorizedRequest.pdfBase64 = "ERROR_GENERATING_PDF";
-                         approvedList.push(authorizedRequest);
-                        
-                         localStorage.setItem(PENDING_REQUESTS_KEY, JSON.stringify(pendingList));
-                         localStorage.setItem(APPROVED_KEY, JSON.stringify(approvedList));
+            const approvedRequest = approvedRequests.find(req => req.id === requestId);
+            const pendingRequest = pendingRequests.find(req => req.id === requestId);
 
-                         // NUEVO: Log de actividad (con error)
-                         logActivity(`ADMIN AUTORIZÓ SOLICITUD ${formName}, PERO PDF FALLÓ. (ID: ${requestId})`, ADMIN_USER, { target: authorizedRequest.userEmail, request: requestId });
-                        
-                         alert(`Solicitud ${requestId} autorizada, pero el PDF falló. Continúa sin Base64.`);
-                         renderPendingRequests();
-                         renderActivityLog();
-                    });
-                } else {
-                    alert(`Advertencia: No existe función de generación de PDF para ${formId}. Solo se autoriza la solicitud.`);
-                    authorizedRequest.pdfBase64 = "NO_PDF_FUNCTION";
-                    approvedList.push(authorizedRequest);
-                    
-                    localStorage.setItem(PENDING_REQUESTS_KEY, JSON.stringify(pendingList));
-                    localStorage.setItem(APPROVED_KEY, JSON.stringify(approvedList));
-
-                    // NUEVO: Log de actividad
-                    logActivity(`ADMIN AUTORIZÓ SOLICITUD ${formName}. (SIN FUNCIÓN PDF) (ID: ${requestId})`, ADMIN_USER, { target: authorizedRequest.userEmail, request: requestId });
-                    
-                    renderPendingRequests();
-                    renderActivityLog();
+            if (approvedRequest) {
+                statusPage.innerHTML = `
+                    <div class="disclaimer-notice">
+                        *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
+                    </div>
+                    <h2>✅ Solicitud Aprobada - ${approvedRequest.type}</h2>
+                    <p>Su documento ha sido revisado y autorizado. Ya puede descargarlo.</p>
+                    <button class="btn-action btn-download-now" onclick="downloadApprovedPDF('${requestId}')">
+                        <i class="fas fa-download"></i> DESCARGAR DOCUMENTO AHORA
+                    </button>
+                    <button class="back-button" onclick="showForm('menu')">← Volver al Menú Principal</button>
+                `;
+                if (statusCheckInterval) {
+                     clearInterval(statusCheckInterval);
+                }
+            } else if (pendingRequest) {
+                statusPage.innerHTML = `
+                    <div class="disclaimer-notice">
+                        *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
+                    </div>
+                    <h2>⏳ Solicitud Recibida - ${pendingRequest.type}</h2>
+                    <div class="spinner"></div>
+                    <p>Su solicitud <strong>${requestId}</strong> ha sido recibida y está en espera de ser autorizada por el administrador.</p>
+                    <p style="font-weight: bold; color: #e67e22;">Estado: PENDIENTE DE REVISIÓN</p>
+                    <button class="back-button" onclick="showForm('menu')">← Volver al Menú Principal</button>
+                `;
+                // El intervalo sigue corriendo para detectar la aprobación
+            } else {
+                statusPage.innerHTML = `
+                    <div class="disclaimer-notice">
+                        *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
+                    </div>
+                    <h2>❌ Solicitud No Encontrada</h2>
+                    <p>No pudimos encontrar el estatus para el ID de solicitud <strong>${requestId}</strong>. Podría haber sido rechazada o el ID es incorrecto.</p>
+                    <button class="back-button" onclick="showForm('menu')">← Volver al Menú Principal</button>
+                `;
+                if (statusCheckInterval) {
+                     clearInterval(statusCheckInterval);
                 }
             }
         }
-        
-        // Función para rechazar solicitud (misma que antes, con log)
-        function rejectRequest(requestId) {
-             if (!confirm(`¿Está seguro de que desea RECHAZAR y eliminar la solicitud ${requestId}? Esta acción es permanente en este navegador.`)) {
-                return;
-            }
 
-            let pendingList = JSON.parse(localStorage.getItem(PENDING_REQUESTS_KEY) || '[]');
-            const index = pendingList.findIndex(req => req.id === requestId);
-            
-            if (index !== -1) {
-                const rejectedRequest = pendingList.splice(index, 1)[0];
-                localStorage.setItem(PENDING_REQUESTS_KEY, JSON.stringify(pendingList));
-                // NUEVO: Log de actividad
-                logActivity(`ADMIN RECHAZÓ SOLICITUD ${rejectedRequest.formId.toUpperCase()}. (ID: ${requestId})`, ADMIN_USER, { target: rejectedRequest.userEmail, request: requestId });
-                
-                alert(`Solicitud ${requestId} rechazada y eliminada.`);
-                renderPendingRequests();
-                renderActivityLog();
-            }
-        }
-
-        // Función para chequear el estatus (misma que antes)
-        function checkStatus(requestId) { 
-            // 1. Buscar en solicitudes aprobadas 
-            const approvedList = JSON.parse(localStorage.getItem(APPROVED_KEY) || '[]'); 
-            const approvedRequest = approvedList.find(req => req.id === requestId); 
-            const statusPage = document.getElementById('status-page'); 
-            
-            if (approvedRequest) { 
-                statusPage.innerHTML = ` 
-                    <div class="disclaimer-notice">
-                        *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
-                    </div>
-                    <h2>✅ ¡Solicitud Aprobada!</h2> 
-                    <p>Su solicitud para <strong>${approvedRequest.formId.toUpperCase().replace('_', ' ')}</strong> ha sido autorizada.</p> 
-                    <p>Haga click en el botón para descargar su documento.</p> 
-                    <button class="btn-action btn-download-now" onclick="downloadApprovedPDF('${approvedRequest.id}')"> 
-                        <i class="fas fa-download"></i> Descargar Documento
-                    </button> 
-                    <button class="btn-action back-button" onclick="showForm('menu')" style="width: 50%; margin: 10px auto; background-color: #3498db;"> 
-                        Volver al Menú
-                    </button> 
-                `; 
-                return; 
-            } 
-
-            // 2. Buscar en solicitudes pendientes 
-            const pendingList = JSON.parse(localStorage.getItem(PENDING_REQUESTS_KEY) || '[]'); 
-            const pendingRequest = pendingList.find(req => req.id === requestId); 
-
-            if (pendingRequest) { 
-                statusPage.innerHTML = ` 
-                    <div class="disclaimer-notice">
-                        *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
-                    </div>
-                    <h2>⏳ Solicitud Pendiente de Aprobación</h2> 
-                    <p>Su solicitud para <strong>${pendingRequest.formId.toUpperCase().replace('_', ' ')}</strong> ha sido recibida.</p> 
-                    <div class="spinner"></div> 
-                    <p>Estamos procesando y revisando su pago. Por favor, mantenga esta página abierta. La página se actualizará automáticamente en breve.</p> 
-                    <p class="pending-notice">
-                        Si pagó por Express, envíe un mensaje a WhatsApp para agilizar la aprobación.
-                    </p>
-                    <button class="btn-action back-button" onclick="showForm('menu')" style="width: 50%; margin: 20px auto; background-color: #3498db;"> 
-                        Volver al Menú
-                    </button>
-                `; 
-                return; 
-            } 
-
-            // 3. Solicitud no encontrada 
-            statusPage.innerHTML = ` 
-                <div class="disclaimer-notice">
-                    *NO SE GARANTIZA NI SE RESPALDA EL DOCUMENTO, TODO ES BAJO SU PROPIA RESPONSABILIDAD*
-                </div>
-                <h2>❌ Solicitud No Encontrada</h2> 
-                <p>El ID de solicitud <strong>${requestId}</strong> no está registrado o ha sido rechazado/eliminado por el administrador.</p> 
-                 <button class="btn-action back-button" onclick="showForm('menu')" style="width: 50%; margin: 20px auto;"> 
-                    Volver al Menú
-                </button> 
-            `; 
-        }
-
-        // Función para descargar el PDF aprobado (misma que antes)
         function downloadApprovedPDF(requestId) {
-            const approvedList = JSON.parse(localStorage.getItem(APPROVED_KEY) || '[]'); 
-            const approvedRequest = approvedList.find(req => req.id === requestId);
-            
-            if (approvedRequest && approvedRequest.pdfBase64) {
+            const approvedRequests = JSON.parse(localStorage.getItem(APPROVED_KEY) || '[]');
+            const request = approvedRequests.find(req => req.id === requestId);
+
+            if (request && request.pdfBase64) {
+                
+                // Si ya existe el base64 del PDF generado en la autorización
                 const link = document.createElement('a');
-                link.href = 'data:application/pdf;base64,' + approvedRequest.pdfBase64;
-                link.download = `${approvedRequest.formId}_${new Date().toISOString().slice(0, 10)}.pdf`;
+                link.href = 'data:application/pdf;base64,' + request.pdfBase64;
+                link.download = `${request.type.replace(/[^a-z0-9]/gi, '_')}_${requestId}.pdf`;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-                // NUEVO: Log de actividad
-                logActivity(`DESCARGA DE DOCUMENTO APROBADO: ${approvedRequest.formId.toUpperCase()}.`, approvedRequest.userEmail);
+
+                // Si el PDFBase64 es solo la simulación, alertar al usuario
+                if (request.pdfBase64 === btoa("Documento Autorizado, pendiente de generación de PDF específico.")) {
+                    alert("El documento ha sido autorizado, pero la generación del PDF específico para este tipo de solicitud aún está pendiente. Se ha descargado un archivo de marcador. Por favor, contacte a soporte si requiere el archivo final.");
+                }
             } else {
-                alert('El documento no pudo ser encontrado o no se pudo generar el PDF. Contacte al administrador.');
+                alert('Error: El documento no ha sido generado o el ID no es válido.');
             }
         }
+        
+        
+        // --- FUNCIÓN DE GENERACIÓN DE PDF (Ejemplo para Cartas y Recetas) ---
+        function generatePDF(type, data, descargar = true) {
+            const doc = new jsPDF();
+            const margen = 15;
+            let y = margen;
+            let xCentro = doc.internal.pageSize.width / 2;
+            doc.setFont('times', 'normal');
 
-        // --- MANEJO DE ARCHIVOS Y GENERACIÓN DE PDF (Simuladas) ---
-        // Estas funciones deben estar completas en su archivo para que el sistema funcione.
-        // Se simula la generación de PDF y la lectura de archivos (logo/firma) por simplicidad.
-
-        async function generatePDF_laboral(data, descargar) {
-            return new Promise((resolve, reject) => {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
+            // --- CARTA LABORAL / PERSONAL ---
+            if (type.includes('carta')) {
+                const nombreSolicitante = type.includes('laboral') ? data.nombreSolicitante : data.nombreRecomendado;
                 
-                // Simulación de carga de archivos asíncrona (si no hay archivos, esto se salta)
-                setTimeout(() => {
-                    const nombreEmpleado = data.nombreEmpleadoLaboral;
-                    doc.setFontSize(16);
-                    doc.text("CARTA DE RECOMENDACIÓN LABORAL", 105, 30, { align: 'center' });
-                    
-                    doc.setFontSize(12);
-                    doc.text(`Por medio de la presente, certifico que ${nombreEmpleado} trabajó...`, 20, 50, { maxWidth: 170, align: 'justify' });
-                    doc.text("Generado en modo: " + (descargar ? "CRÉDITO" : "APROBACIÓN MANUAL"), 20, 70);
-                    
-                    if (descargar) {
-                        doc.save(`CartaLaboral_${nombreEmpleado.replace(/\s/g, '_')}.pdf`);
-                        resolve(true);
-                    } else {
-                        // Devuelve el base64 si no es para descarga inmediata
-                        resolve(doc.output('datauristring').split(',')[1]);
-                    }
-                }, 50); // Simula un pequeño retraso
-            });
-        }
+                // Header (Fecha y Encabezado)
+                doc.setFontSize(11);
+                doc.text(`Querétaro, Qro., a ${new Date(data.fechaEmision).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' })}.`, doc.internal.pageSize.width - margen, y, { align: 'right' });
+                y += 10;
+                
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'bold');
+                doc.text('A QUIEN CORRESPONDA:', margen, y);
+                y += 10;
+                
+                doc.setFont(undefined, 'normal');
+                doc.text('PRESENTE.', margen, y);
+                y += 15;
 
-        // **NOTA IMPORTANTE:** Se necesitan más funciones `generatePDF_formId` para todos los formularios.
-        // Por ejemplo: `generatePDF_personal`, `generatePDF_receta_similares`, etc.
-        // Dejaré solo la de laboral como ejemplo, asumiendo que el resto de sus funciones de PDF
-        // son añadidas aquí y funcionan de forma ASÍNCRONA como `generatePDF_laboral`.
-        
-        // Función de respaldo para formularios incompletos
-        for (const key in DOCUMENT_COSTS) {
-            if (!window[`generatePDF_${key}`]) {
-                window[`generatePDF_${key}`] = async function(data, descargar) {
-                    return new Promise(resolve => {
-                        const { jsPDF } = window.jspdf;
-                        const doc = new jsPDF();
-                        doc.text(`Documento Simulado: ${key.toUpperCase().replace('_', ' ')}.`, 10, 10);
-                        if (descargar) {
-                            doc.save(`Simulado_${key}.pdf`);
-                            resolve(true);
-                        } else {
-                            resolve(doc.output('datauristring').split(',')[1]);
-                        }
+                // Título
+                doc.setFontSize(14);
+                doc.setFont(undefined, 'bold');
+                doc.text(`ASUNTO: CARTA DE RECOMENDACIÓN ${type.includes('laboral') ? 'LABORAL' : 'PERSONAL'}`, xCentro, y, { align: 'center' });
+                y += 10;
+
+                // Contenido
+                doc.setFontSize(11);
+                doc.setFont(undefined, 'normal');
+                
+                // Párrafo de apertura
+                const introText = type.includes('laboral') ?
+                    `Por medio de la presente, me permito hacer constar que el C. ${data.nombreEmpleado.toUpperCase()} desempeñó sus funciones en nuestra empresa ${data.nombreEmpresa.toUpperCase()} durante el período comprendido del ${new Date(data.fechaInicio).toLocaleDateString('es-MX')} al ${new Date(data.fechaFin).toLocaleDateString('es-MX')} en el puesto de ${data.puestoDesempenado.toUpperCase()}.` :
+                    `Me permito recomendar al C. ${data.nombreRecomendado.toUpperCase()}, a quien conozco ${data.tiempoConocido} y puedo asegurar que es una persona de conducta intachable y probada honradez.`;
+                
+                const splitIntro = doc.splitTextToSize(introText, doc.internal.pageSize.width - (2 * margen));
+                doc.text(splitIntro, margen, y);
+                y += (splitIntro.length * 5) + 5;
+
+                // Párrafo de personalidad
+                const splitPersonalidad = doc.splitTextToSize(data.cuerpoPersonalidad.replace('[nombre]', nombreSolicitante), doc.internal.pageSize.width - (2 * margen));
+                doc.text(splitPersonalidad, margen, y);
+                y += (splitPersonalidad.length * 5) + 5;
+
+                // Tareas (solo Laboral)
+                if (type.includes('laboral') && data.tareas) {
+                    doc.setFont(undefined, 'bold');
+                    doc.text('Entre sus principales responsabilidades se encontraban:', margen, y);
+                    y += 5;
+                    doc.setFont(undefined, 'normal');
+                    const tareasArray = data.tareas.split('\n').filter(t => t.trim() !== '');
+                    tareasArray.forEach(tarea => {
+                        doc.text(`• ${tarea.trim()}`, margen + 5, y);
+                        y += 5;
                     });
-                };
+                    y += 5;
+                }
+
+                // Párrafo de Cierre y Recomendación
+                const cierreText = data.cuerpoCierre.replace('[nombre]', nombreSolicitante);
+                const splitCierre = doc.splitTextToSize(cierreText, doc.internal.pageSize.width - (2 * margen));
+                doc.text(splitCierre, margen, y);
+                y += (splitCierre.length * 5) + 10;
+
+                doc.setFont(undefined, 'bold');
+                doc.text('ATENTAMENTE', xCentro, y, { align: 'center' });
+                y += 20;
+
+                // Firma y datos del firmante
+                const nombreFirmante = type.includes('laboral') ? data.nombreFirmante : data.nombreFirmantePersonal;
+                const cargoFirmante = type.includes('laboral') ? data.cargoFirmante : 'RECOMENDADOR PARTICULAR';
+                
+                // Línea para la firma
+                doc.line(xCentro - 30, y, xCentro + 30, y);
+                y += 5;
+                
+                doc.setFontSize(11);
+                doc.setFont(undefined, 'bold');
+                doc.text(nombreFirmante.toUpperCase(), xCentro, y, { align: 'center' });
+                y += 5;
+                doc.setFont(undefined, 'normal');
+                doc.text(cargoFirmante.toUpperCase(), xCentro, y, { align: 'center' });
+                y += 5;
+                
+                if (type.includes('laboral') && data.telefonoFirmante) {
+                     doc.text(data.telefonoFirmante, xCentro, y, { align: 'center' });
+                     y += 5;
+                }
+                
+                // Manejo de imagen de Firma (si existe)
+                const firmaBase64 = type.includes('laboral') ? data.firmaBase64Laboral : data.firmaBase64Personal;
+                if (firmaBase64) {
+                    const imgWidth = 40; 
+                    const xFirma = xCentro - (imgWidth / 2);
+                    const yFirmaImage = y - 30;
+                    doc.addImage(firmaBase64, 'PNG', xFirma, yFirmaImage, imgWidth, 15);
+                }
+                
+                if (descargar) {
+                     doc.save(`Carta_${nombreSolicitante.replace(/\\s/g, '_')}_${type.includes('laboral') ? 'LABORAL' : 'PERSONAL'}.pdf`);
+                     return true;
+                } else {
+                     return doc.output('datauristring').split(',')[1];
+                }
+
+            // --- RECETA SIMILARES ---
+            } else if (type.includes('receta médica similares')) {
+                 const nombreDoc = data.doctorNombre;
+                 const cedula = data.cedula;
+                 const direccion = data.direccion;
+                 const ciudad = data.ciudad;
+                 const fechaEmision = new Date(data.fechaEmision).toLocaleDateString('es-MX');
+
+                 // Coordenadas fijas para la plantilla
+                 const xDoc = 110; // Inicio de los datos del doctor
+                 const xPat = 15; // Inicio de los datos del paciente
+                 const xCentro = doc.internal.pageSize.width / 2;
+                 const yBajo = 250; 
+                 
+                 // 1. Logo (si existe)
+                 const logoBase64 = data.logoBase64Similares;
+                 if (logoBase64) {
+                     doc.addImage(logoBase64, 'PNG', 15, margen, 40, 20);
+                 }
+                 
+                 // 2. Datos del Médico (Similares tiene un formato específico)
+                 doc.setFontSize(9);
+                 doc.setFont(undefined, 'bold');
+                 doc.text(nombreDoc.toUpperCase(), xDoc, margen + 2);
+                 doc.setFont(undefined, 'normal');
+                 doc.text(cedula.toUpperCase(), xDoc, margen + 7);
+                 doc.text(direccion.toUpperCase(), xDoc, margen + 12);
+                 doc.text(ciudad.toUpperCase(), xDoc, margen + 17);
+                 doc.text(`FECHA: ${fechaEmision}`, xDoc, margen + 22);
+
+                 // Línea divisoria
+                 doc.line(margen, 45, doc.internal.pageSize.width - margen, 45);
+                 
+                 // 3. Datos del Paciente (Fijos)
+                 let y_pat = 50;
+                 doc.setFontSize(10);
+                 doc.setFont(undefined, 'bold');
+                 doc.text('PACIENTE:', xPat, y_pat);
+                 doc.setFont(undefined, 'normal');
+                 doc.text(`${data.nombrePaciente.toUpperCase()} ${data.apellidoP.toUpperCase()} ${data.apellidoM.toUpperCase()}`, xPat + 20, y_pat);
+                 
+                 doc.setFont(undefined, 'bold');
+                 doc.text('SEXO:', xPat + 100, y_pat);
+                 doc.setFont(undefined, 'normal');
+                 doc.text(data.sexo.toUpperCase(), xPat + 110, y_pat);
+                 
+                 y_pat += 5;
+                 doc.setFont(undefined, 'bold');
+                 doc.text('EDAD:', xPat, y_pat);
+                 doc.setFont(undefined, 'normal');
+                 doc.text(data.edad.toUpperCase(), xPat + 12, y_pat);
+                 
+                 doc.setFont(undefined, 'bold');
+                 doc.text('F. NAC:', xPat + 40, y_pat);
+                 doc.setFont(undefined, 'normal');
+                 doc.text(new Date(data.fechaNac).toLocaleDateString('es-MX'), xPat + 55, y_pat);
+
+                 doc.setFont(undefined, 'bold');
+                 doc.text('ALERGIAS:', xPat + 100, y_pat);
+                 doc.setFont(undefined, 'normal');
+                 doc.text(data.alergias.toUpperCase(), xPat + 120, y_pat);
+                 
+                 y_pat += 5;
+                 doc.setFont(undefined, 'bold');
+                 doc.text('DX:', xPat, y_pat);
+                 doc.setFont(undefined, 'normal');
+                 doc.text(data.dx.toUpperCase(), xPat + 10, y_pat);
+
+                 // 4. Signos Vitales
+                 y_pat += 7;
+                 doc.setFont(undefined, 'bold');
+                 doc.text('SpO2:', xPat, y_pat);
+                 doc.setFont(undefined, 'normal');
+                 doc.text(data.spo2, xPat + 12, y_pat);
+
+                 doc.setFont(undefined, 'bold');
+                 doc.text('F.C.:', xPat + 40, y_pat);
+                 doc.setFont(undefined, 'normal');
+                 doc.text(data.fc, xPat + 50, y_pat);
+
+                 doc.setFont(undefined, 'bold');
+                 doc.text('F.R.:', xPat + 80, y_pat);
+                 doc.setFont(undefined, 'normal');
+                 doc.text(data.fr, xPat + 90, y_pat);
+
+                 doc.setFont(undefined, 'bold');
+                 doc.text('T:', xPat + 120, y_pat);
+                 doc.setFont(undefined, 'normal');
+                 doc.text(data.temp, xPat + 130, y_pat);
+
+                 doc.setFont(undefined, 'bold');
+                 doc.text('PESO:', xPat + 145, y_pat);
+                 doc.setFont(undefined, 'normal');
+                 doc.text(data.peso, xPat + 158, y_pat);
+
+                 doc.setFont(undefined, 'bold');
+                 doc.text('TALLA:', xPat + 175, y_pat);
+                 doc.setFont(undefined, 'normal');
+                 doc.text(data.talla, xPat + 190, y_pat);
+
+                 // Línea divisoria
+                 y_pat += 3;
+                 doc.line(margen, y_pat, doc.internal.pageSize.width - margen, y_pat);
+                 y_pat += 5;
+
+                 // 5. Contenido de la Consulta
+                 doc.setFont(undefined, 'bold');
+                 doc.text('CONTENIDO DE LA CONSULTA:', xPat, y_pat);
+                 y_pat += 5;
+                 doc.setFont(undefined, 'normal');
+                 const splitConsulta = doc.splitTextToSize(data.contenidoConsulta, doc.internal.pageSize.width - (2 * margen));
+                 doc.text(splitConsulta, xPat, y_pat);
+                 y_pat += (splitConsulta.length * 5) + 5;
+
+                 // 6. Tratamiento
+                 doc.setFont(undefined, 'bold');
+                 doc.text('TRATAMIENTO:', xPat, y_pat);
+                 y_pat += 5;
+                 doc.setFont(undefined, 'normal');
+                 const splitTratamiento = doc.splitTextToSize(data.tratamiento, doc.internal.pageSize.width - (2 * margen));
+                 doc.text(splitTratamiento, xPat, y_pat);
+                 y_pat += (splitTratamiento.length * 5) + 5;
+                 
+                 // 7. Indicaciones y Próxima Cita
+                 doc.setFont(undefined, 'bold');
+                 doc.text('INDICACIONES GENERALES:', xPat, y_pat);
+                 y_pat += 5;
+                 doc.setFont(undefined, 'normal');
+                 const splitIndicaciones = doc.splitTextToSize(data.indicacionesGenerales, doc.internal.pageSize.width - (2 * margen));
+                 doc.text(splitIndicaciones, xPat, y_pat);
+                 y_pat += (splitIndicaciones.length * 5) + 5;
+
+                 doc.setFont(undefined, 'bold');
+                 doc.text('PRÓXIMA CITA:', xPat, y_pat);
+                 doc.setFont(undefined, 'normal');
+                 doc.text(data.proximaCita, xPat + 30, y_pat);
+
+                 // 8. Firma
+                 const xFirmaBlock = 160; 
+                 const yFirmaLine = yBajo;
+                 const yFirmaImage = yFirmaLine - 15;
+                 
+                 // Línea para la firma
+                 doc.line(xFirmaBlock - 20, yFirmaLine, xFirmaBlock + 20, yFirmaLine);
+                 
+                 // Manejo de imagen de Firma (si existe)
+                 const firmaBase64 = data.firmaBase64Similares;
+                 if (firmaBase64) {
+                     const imgWidth = 40; 
+                     const xFirma = xFirmaBlock - (imgWidth / 2); // Centrar sobre la línea de firma
+                     doc.addImage(firmaBase64, 'PNG', xFirma, yFirmaImage, imgWidth, 15);
+                 }
+                 
+                 // Nombre del Doctor (debajo de la línea de firma)
+                 doc.setFontSize(9);
+                 doc.setFont(undefined, 'normal');
+                 doc.text(nombreDoc, xFirmaBlock, yFirmaLine + 4, { align: 'center' }); 
+                 
+                 // COPIA (Texto central y bajo)
+                 doc.setFontSize(16);
+                 doc.setFont(undefined, 'bold');
+                 doc.text("COPIA", xCentro, yBajo + 15, { align: 'center' }); 
+
+                 if (descargar) {
+                      doc.save(`Receta_${data.nombrePaciente.replace(/\\s/g, '_')}_SIMILARES.pdf`);
+                      return true;
+                 } else {
+                      return doc.output('datauristring').split(',')[1];
+                 }
             }
+            
+            // Retorno por defecto si no es uno de los documentos generados
+            return btoa("Documento de Solicitud Recibida.");
         }
 
+        // --- INICIALIZACIÓN ---
 
-        // --- INICIALIZACIÓN --- 
-        window.addEventListener('load', () => { 
-             // Asegura que el acceso de usuario es la vista inicial
-             checkURL();
-             // Asegurar que al cargar por primera vez el hash se limpia si está vacío o es #menu
+        window.addEventListener('load', () => {
+             // Reemplazar la entrada inicial del historial para que el "atrás" inicial vaya al menú.
              if (window.location.hash === '' || window.location.hash === '#menu') {
-                 history.replaceState({ viewId: 'user-access' }, '', getBaseUrl());
+                 history.replaceState({ viewId: 'menu' }, '', getBaseUrl());
              }
-        }); 
+             checkURL();
+        });
         
-        // Manejar el botón de "Atrás" del navegador 
-        window.addEventListener('popstate', (event) => { 
-            checkURL(event); 
-        }); 
+        // Manejar el botón de "atrás" del navegador
+        window.addEventListener('popstate', checkURL);
     </script>
 </body>
 </html>
