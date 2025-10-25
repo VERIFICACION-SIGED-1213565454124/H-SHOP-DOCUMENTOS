@@ -1306,50 +1306,50 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             const xInicio = 20;
             const xCentro = doc.internal.pageSize.getWidth() / 2;
             const yBajo = 280;
-            let yActual = 15;
+            let yActual = 10; // Inicio en el margen superior
 
-            // --- Logo (Imagen de arriba) ---
+            // --- 1. Logo (Imagen superior izquierda) ---
             const logoBase64 = data.logoFile ? await convertImageToBase64(data.logoFile) : null;
 
             if (logoBase64) {
-                const imgWidth = 70; // MODIFICACIÓN: Aumento de tamaño de 50 a 70
-                const imgHeight = 25; // MODIFICACIÓN: Aumento de altura de 15 a 25
-                const xLogo = xCentro; 
-                // MODIFICACIÓN: Cambiado de 'JPEG' a 'PNG' y uso de imgHeight
-                doc.addImage(logoBase64, 'PNG', xLogo - (imgWidth / 2), yActual, imgWidth, imgHeight); 
+                const imgWidth = 60; // Ancho ajustado
+                const imgHeight = 20; // Altura ajustada
+                const xLogo = 10; // Fijo a la izquierda
+                // Posición: 10 de margen izquierdo, 10 de margen superior.
+                doc.addImage(logoBase64, 'PNG', xLogo, yActual, imgWidth, imgHeight); 
             }
 
-            yActual = 45; // El contenido empieza después del logo
+            yActual = 40; // El contenido empieza después del área del logo (40 de altura para no interrumpir)
             doc.setFontSize(10);
             doc.setFont(undefined, 'bold');
 
-            // Recuadro del Doctor/Dirección
-            doc.setDrawColor(0);
-            doc.setLineWidth(0.5);
-            doc.rect(xInicio, yActual, 170, 25); 
-
-            doc.setFontSize(10);
+            // --- 2. Información del Médico (Membrete central) ---
+            // Simular el membrete sin recuadro para que sea similar al formato deseado.
+            doc.setFontSize(12);
             doc.setFont(undefined, 'bold');
-            doc.text(data.doctorNombre.toUpperCase(), xCentro, yActual + 5, { align: 'center' });
+            doc.text(data.doctorNombre.toUpperCase(), xCentro, yActual, { align: 'center' });
+            yActual += 5;
 
             doc.setFontSize(8);
             doc.setFont(undefined, 'normal');
-            doc.text(data.cedula, xCentro, yActual + 9, { align: 'center' });
+            doc.text(data.cedula, xCentro, yActual, { align: 'center' });
+            yActual += 4;
             
             const splitDir = doc.splitTextToSize(data.direccion, 160);
-            doc.text(splitDir, xCentro, yActual + 13, { align: 'center' });
+            doc.text(splitDir, xCentro, yActual, { align: 'center' });
+            yActual += splitDir.length * 4;
             
             doc.setFont(undefined, 'bold');
-            doc.text(data.ciudad.toUpperCase(), xCentro, yActual + 20, { align: 'center' });
+            doc.text(data.ciudad.toUpperCase(), xCentro, yActual, { align: 'center' });
+            yActual += 10;
             
-            // Fecha
+            // --- 3. Fecha (Derecha superior) ---
             doc.setFontSize(10);
             doc.setFont(undefined, 'normal');
             const fechaReceta = new Date(data.fechaEmision);
-            doc.text(`FECHA: ${fechaReceta.toLocaleDateString('es-MX', { day: 'numeric', month: 'numeric', year: 'numeric' })}`, 175, 75, { align: 'right' });
-            yActual += 30; // Posición después del recuadro
-
-            // Recuadro de Datos del Paciente
+            doc.text(`FECHA: ${fechaReceta.toLocaleDateString('es-MX', { day: 'numeric', month: 'numeric', year: 'numeric' })}`, 190, 45, { align: 'right' });
+            
+            // --- 4. Recuadro de Datos del Paciente ---
             doc.rect(xInicio, yActual, 170, 30); 
             doc.setFontSize(9);
             
@@ -1376,7 +1376,7 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             doc.text(`DIAGNÓSTICO: ${data.dx.toUpperCase()}`, xInicio + 5, yActual); 
             yActual += 10; 
 
-            // Recuadro de Signos Vitales
+            // --- 5. Recuadro de Signos Vitales ---
             doc.rect(xInicio, yActual, 170, 10); 
             doc.setFont(undefined, 'bold');
             doc.text("SIGNOS VITALES:", xInicio + 5, yActual + 3);
@@ -1391,7 +1391,7 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             doc.text(`Talla: ${data.talla}`, xInicio + 70, yActual + 7);
             yActual += 15;
 
-            // Recuadro de Contenido de la Consulta
+            // --- 6. Recuadro de Contenido de la Consulta ---
             doc.rect(xInicio, yActual, 170, 20); 
             doc.setFont(undefined, 'bold');
             doc.text("CONTENIDO DE LA CONSULTA:", xInicio + 5, yActual + 3);
@@ -1402,7 +1402,7 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             doc.text(splitConsulta, xInicio + 5, yActual + 7, { align: 'justify' });
             yActual += 25;
 
-            // Recuadro de Tratamiento
+            // --- 7. Recuadro de Tratamiento ---
             doc.rect(xInicio, yActual, 170, 80); 
             doc.setFontSize(10);
             doc.setFont(undefined, 'bold');
@@ -1414,7 +1414,7 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             doc.text(splitTratamiento, xInicio + 5, yActual + 7);
             yActual += 85;
 
-            // Recuadro de Indicaciones
+            // --- 8. Recuadro de Indicaciones ---
             doc.rect(xInicio, yActual, 170, 15); 
             doc.setFontSize(10);
             doc.setFont(undefined, 'bold');
@@ -1426,13 +1426,7 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             doc.text(splitIndicaciones, xInicio + 5, yActual + 7);
             yActual += 20;
 
-            // Pie de página (Cita)
-            doc.setFontSize(8);
-            doc.setFont(undefined, 'bold');
-            doc.text(`Próxima cita: ${data.proximaCita}`, xInicio, yBajo - 5);
-            doc.text(`Caducidad de receta: 30 días a partir de la fecha de emisión.`, xInicio + 80, yBajo - 5);
-
-            // Firma
+            // --- 9. Firma y Pie de página ---
             const xFirmaBlock = 150; 
             const yFirmaLine = 230; 
             const yFirmaImage = yFirmaLine - 18; 
@@ -1441,12 +1435,11 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             // Línea de Firma
             doc.line(xFirmaBlock - 20, yFirmaLine, xFirmaBlock + 20, yFirmaLine); 
 
-            // Insertar Firma (IMAGEN)
+            // Insertar Firma (IMAGEN PNG)
             const firmaBase64 = data.firmaFile ? await convertImageToBase64(data.firmaFile) : null;
             if (firmaBase64) {
                 const imgWidth = 40; 
-                const xFirma = xFirmaBlock - (imgWidth / 2); // Centrar sobre la línea de firma
-                // Ya estaba en PNG, se mantiene.
+                const xFirma = xFirmaBlock - (imgWidth / 2); 
                 doc.addImage(firmaBase64, 'PNG', xFirma, yFirmaImage, imgWidth, 15);
             }
             
@@ -1454,6 +1447,12 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             doc.setFontSize(9);
             doc.setFont(undefined, 'normal');
             doc.text(nombreDoc, xFirmaBlock, yFirmaLine + 4, { align: 'center' }); 
+            
+            // Pie de página (Cita y Caducidad)
+            doc.setFontSize(8);
+            doc.setFont(undefined, 'bold');
+            doc.text(`Próxima cita: ${data.proximaCita}`, xInicio, yBajo - 5);
+            doc.text(`Caducidad de receta: 30 días a partir de la fecha de emisión.`, xInicio + 80, yBajo - 5);
             
             // COPIA (Texto central y bajo)
             doc.setFontSize(16);
@@ -1471,7 +1470,7 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
         // --- INICIALIZACIÓN ---
 
         window.addEventListener('load', () => {
-             // Reemplazar la entrada inicial del historial para que el "atrás" inicial vaya al menú.
+             // Reemplazar la entrada inicial del historial para que el "atrás" inicial vaya al menú.\
              if (window.location.hash === '' || window.location.hash === '#menu') {
                  history.replaceState({ viewId: 'menu' }, '', getBaseUrl());
              }
