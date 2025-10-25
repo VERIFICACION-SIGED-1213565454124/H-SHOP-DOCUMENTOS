@@ -765,12 +765,23 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
         
         let statusCheckInterval = null;
 
-        // Función auxiliar para convertir File a Base64
-        async function convertImageToBase64(file) {
+        // **MODIFICACIÓN:** Función auxiliar para convertir File a Base64
+        async function fileToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
+                reader.onload = () => resolve(reader.result.split(',')[1]); // Solo devolver el Base64 puro
+                reader.onerror = error => reject(error);
+            });
+        }
+        
+        // Función auxiliar para convertir Base64 Data URI a Base64 puro (obsoleto, pero se mantiene la firma por si acaso)
+        async function convertImageToBase64(file) {
+            if (!file) return null;
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result.split(',')[1]); 
                 reader.onerror = error => reject(error);
             });
         }
@@ -851,7 +862,7 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             'metodo_temu': 'form-metodo_temu',
             'cv_desde_cero': 'form-cv_desde_cero',
             'sellos_personales': 'form-sellos_personales',
-            'formato_solicitud_pdf': 'formato_solicitud_pdf'
+            'formato_solicitud_pdf': 'form-formato_solicitud_pdf'
             // 'whatsapp_group': Special case handled in showForm, no corresponding div is needed.
         };
 
@@ -943,6 +954,7 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
                 authorizedRequest.status = 'approved';
                 
                 // Generar el PDF y obtener el base64
+                // **MODIFICACIÓN:** La función generatePDF ya es asíncrona, debe usarse 'await'.
                 generatePDF(authorizedRequest.type, authorizedRequest.data, false).then(pdfBase64 => {
                     authorizedRequest.pdfBase64 = pdfBase64;
                     approvedRequests.push(authorizedRequest);
@@ -974,8 +986,10 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
 
         // --- MANEJO DEL ESTATUS DEL CLIENTE ---
 
-        function saveSolicitud(type) {
-            const data = getFormData(type);
+        // **MODIFICACIÓN:** Función asíncrona para esperar la recolección de datos y Base64
+        async function saveSolicitud(type) {
+            // **MODIFICACIÓN:** Usar 'await'
+            const data = await getFormData(type); 
             if (!data) return;
 
             const newId = `SOL-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
@@ -1055,25 +1069,38 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
 
         // --- EXTRACCIÓN DE DATOS DE FORMULARIO ---
 
-        function getFormData(type) {
+        // **MODIFICACIÓN:** Función asíncrona para manejar la carga de archivos
+        async function getFormData(type) {
             const data = {};
             let prefix = '';
+            const fileLoaders = [];
             
             if (type === 'laboral') {
                 prefix = 'Laboral';
                 data.nombreSolicitante = document.getElementById('nombreSolicitanteLaboral').value;
                 data.emailSolicitante = document.getElementById('emailSolicitanteLaboral').value;
-                data.logoFile = document.getElementById('logoInputLaboral').files[0];
-                data.firmaFile = document.getElementById('firmaInputLaboral').files[0];
+                const logoFile = document.getElementById('logoInputLaboral').files[0];
+                const firmaFile = document.getElementById('firmaInputLaboral').files[0];
+
+                if (logoFile) fileLoaders.push(fileToBase64(logoFile).then(base64 => data.logoBase64 = base64));
+                if (firmaFile) fileLoaders.push(fileToBase64(firmaFile).then(base64 => data.firmaBase64 = base64));
+
             } else if (type === 'personal') {
                 prefix = 'Personal';
                 data.nombreSolicitante = document.getElementById('nombreSolicitantePersonal').value;
                 data.emailSolicitante = document.getElementById('emailSolicitantePersonal').value;
-                data.firmaFile = document.getElementById('firmaInputPersonal').files[0];
+                const firmaFile = document.getElementById('firmaInputPersonal').files[0];
+
+                if (firmaFile) fileLoaders.push(fileToBase64(firmaFile).then(base64 => data.firmaBase64 = base64));
+
             } else if (type === 'receta_similares') {
                 prefix = 'Similares';
-                data.logoFile = document.getElementById('logoInputSimilares').files[0];
-                data.firmaFile = document.getElementById('firmaInputSimilares').files[0];
+                const logoFile = document.getElementById('logoInputSimilares').files[0];
+                const firmaFile = document.getElementById('firmaInputSimilares').files[0];
+
+                if (logoFile) fileLoaders.push(fileToBase64(logoFile).then(base64 => data.logoBase64 = base64));
+                if (firmaFile) fileLoaders.push(fileToBase64(firmaFile).then(base64 => data.firmaBase64 = base64));
+
                 // No hay campos de solicitante genéricos, se usa el paciente
                 data.nombreSolicitante = document.getElementById('nombrePacienteSimilares').value; 
             } else {
@@ -1087,12 +1114,15 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             // Recoger todos los campos restantes usando el prefijo
             const inputs = document.querySelectorAll(`[id$="${prefix}"]`);
             inputs.forEach(input => {
-                // Excluir los files que ya se manejan
+                // Excluir los files que ya se manejan y otros campos de control
                 if (input.type !== 'file') {
                     const key = input.id.replace(prefix, '');
                     data[key] = input.value;
                 }
             });
+
+            // **MODIFICACIÓN:** Esperar a que todos los archivos se carguen
+            await Promise.all(fileLoaders);
 
             return data;
         }
@@ -1117,11 +1147,11 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             let yActual = 20;
 
             // --- Logo de la Empresa ---
-            const logoBase64 = data.logoFile ? await convertImageToBase64(data.logoFile) : null;
-            if (logoBase64) {
+            // Usar data.logoBase64 que ya contiene el string Base64 puro
+            if (data.logoBase64) { 
                 const imgWidth = 50; 
                 const xLogo = xCentro; 
-                doc.addImage(logoBase64, 'PNG', xLogo - (imgWidth / 2), yActual, imgWidth, 15);
+                doc.addImage(data.logoBase64, 'PNG', xLogo - (imgWidth / 2), yActual, imgWidth, 15, '', 'NONE', 0);
             }
             yActual += 20;
 
@@ -1192,12 +1222,11 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             doc.line(xFirmaBlock - 30, yFirmaLine, xFirmaBlock + 30, yFirmaLine); 
 
             // Insertar Firma (IMAGEN)
-            const firmaBase64 = data.firmaFile ? await convertImageToBase64(data.firmaFile) : null;
-            if (firmaBase64) {
+            // Usar data.firmaBase64 que ya contiene el string Base64 puro
+            if (data.firmaBase64) {
                 const imgWidth = 40; 
                 const xFirma = xFirmaBlock - (imgWidth / 2); // Centrar sobre la línea de firma
-                // MODIFICACIÓN: Cambiado de 'JPEG' a 'PNG' para soporte de transparencia.
-                doc.addImage(firmaBase64, 'PNG', xFirma, yFirmaImage, imgWidth, 15);
+                doc.addImage(data.firmaBase64, 'PNG', xFirma, yFirmaImage, imgWidth, 15, '', 'NONE', 0);
             }
             
             // Nombre y Cargo del Firmante (debajo de la línea de firma)
@@ -1279,12 +1308,11 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             doc.line(xFirmaBlock - 30, yFirmaLine, xFirmaBlock + 30, yFirmaLine); 
 
             // Insertar Firma (IMAGEN)
-            const firmaBase64 = data.firmaFile ? await convertImageToBase64(data.firmaFile) : null;
-            if (firmaBase64) {
+            // Usar data.firmaBase64 que ya contiene el string Base64 puro
+            if (data.firmaBase64) {
                 const imgWidth = 40; 
                 const xFirma = xFirmaBlock - (imgWidth / 2); // Centrar sobre la línea de firma
-                // MODIFICACIÓN: Cambiado de 'JPEG' a 'PNG' para soporte de transparencia.
-                doc.addImage(firmaBase64, 'PNG', xFirma, yFirmaImage, imgWidth, 15);
+                doc.addImage(data.firmaBase64, 'PNG', xFirma, yFirmaImage, imgWidth, 15, '', 'NONE', 0);
             }
             
             // Nombre del Firmante (debajo de la línea de firma)
@@ -1309,14 +1337,13 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             let yActual = 10; // Inicio en el margen superior
 
             // --- 1. Logo (Imagen superior izquierda) ---
-            const logoBase64 = data.logoFile ? await convertImageToBase64(data.logoFile) : null;
-
-            if (logoBase64) {
+            
+            if (data.logoBase64) {
                 const imgWidth = 60; // Ancho ajustado
                 const imgHeight = 20; // Altura ajustada
                 const xLogo = 10; // Fijo a la izquierda
                 // Posición: 10 de margen izquierdo, 10 de margen superior.
-                doc.addImage(logoBase64, 'PNG', xLogo, yActual, imgWidth, imgHeight); 
+                doc.addImage(data.logoBase64, 'PNG', xLogo, yActual, imgWidth, imgHeight, '', 'NONE', 0); 
             }
 
             yActual = 40; // El contenido empieza después del área del logo (40 de altura para no interrumpir)
@@ -1403,88 +1430,3 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             yActual += 25;
 
             // --- 7. Recuadro de Tratamiento ---
-            doc.rect(xInicio, yActual, 170, 80); 
-            doc.setFontSize(10);
-            doc.setFont(undefined, 'bold');
-            doc.text("TRATAMIENTO:", xInicio + 5, yActual + 3);
-
-            doc.setFontSize(9);
-            doc.setFont(undefined, 'normal');
-            const splitTratamiento = doc.splitTextToSize(data.tratamiento.toUpperCase(), 160);
-            doc.text(splitTratamiento, xInicio + 5, yActual + 7);
-            yActual += 85;
-
-            // --- 8. Recuadro de Indicaciones ---
-            doc.rect(xInicio, yActual, 170, 15); 
-            doc.setFontSize(10);
-            doc.setFont(undefined, 'bold');
-            doc.text("INDICACIONES GENERALES:", xInicio + 5, yActual + 3);
-
-            doc.setFontSize(9);
-            doc.setFont(undefined, 'normal');
-            const splitIndicaciones = doc.splitTextToSize(data.indicacionesGenerales, 160);
-            doc.text(splitIndicaciones, xInicio + 5, yActual + 7);
-            yActual += 20;
-
-            // --- 9. Firma y Pie de página ---
-            const xFirmaBlock = 150; 
-            const yFirmaLine = 230; 
-            const yFirmaImage = yFirmaLine - 18; 
-            const nombreDoc = data.doctorNombre.toUpperCase();
-            
-            // Línea de Firma
-            doc.line(xFirmaBlock - 20, yFirmaLine, xFirmaBlock + 20, yFirmaLine); 
-
-            // Insertar Firma (IMAGEN PNG)
-            const firmaBase64 = data.firmaFile ? await convertImageToBase64(data.firmaFile) : null;
-            if (firmaBase64) {
-                const imgWidth = 40; 
-                const xFirma = xFirmaBlock - (imgWidth / 2); 
-                doc.addImage(firmaBase64, 'PNG', xFirma, yFirmaImage, imgWidth, 15);
-            }
-            
-            // Nombre del Doctor (debajo de la línea de firma)
-            doc.setFontSize(9);
-            doc.setFont(undefined, 'normal');
-            doc.text(nombreDoc, xFirmaBlock, yFirmaLine + 4, { align: 'center' }); 
-            
-            // Pie de página (Cita y Caducidad)
-            doc.setFontSize(8);
-            doc.setFont(undefined, 'bold');
-            doc.text(`Próxima cita: ${data.proximaCita}`, xInicio, yBajo - 5);
-            doc.text(`Caducidad de receta: 30 días a partir de la fecha de emisión.`, xInicio + 80, yBajo - 5);
-            
-            // COPIA (Texto central y bajo)
-            doc.setFontSize(16);
-            doc.setFont(undefined, 'bold');
-            doc.text("COPIA", xCentro, yBajo + 15, { align: 'center' }); 
-
-            if (descargar) {
-                 doc.save(`Receta_${nombreP.replace(/\s/g, '_')}_SIMILARES.pdf`);
-                 return true;
-            } else {
-                 return doc.output('datauristring').split(',')[1];
-            }
-        }
-
-        // --- INICIALIZACIÓN ---
-
-        window.addEventListener('load', () => {
-             // Reemplazar la entrada inicial del historial para que el "atrás" inicial vaya al menú.\
-             if (window.location.hash === '' || window.location.hash === '#menu') {
-                 history.replaceState({ viewId: 'menu' }, '', getBaseUrl());
-             }
-             checkURL();
-        });
-        
-        // Manejar el botón de "atrás" del navegador
-        window.addEventListener('popstate', checkURL);
-        
-        // Asegurar que el menú se muestre al cargar por primera vez si no hay hash
-        if (window.location.hash === '') {
-             window.onload = () => showForm('menu', false);
-        }
-
-    </script>
-</body>
-</html>
