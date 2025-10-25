@@ -1430,3 +1430,87 @@ VIA DE ADMINISTRACION ORAL</textarea> <label for="indicacionesGeneralesSimilares
             yActual += 25;
 
             // --- 7. Recuadro de Tratamiento ---
+            doc.rect(xInicio, yActual, 170, 80); 
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'bold');
+            doc.text("TRATAMIENTO:", xInicio + 5, yActual + 3);
+
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'normal');
+            const splitTratamiento = doc.splitTextToSize(data.tratamiento.toUpperCase(), 160);
+            doc.text(splitTratamiento, xInicio + 5, yActual + 7);
+            yActual += 85;
+
+            // --- 8. Recuadro de Indicaciones ---
+            doc.rect(xInicio, yActual, 170, 15); 
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'bold');
+            doc.text("INDICACIONES GENERALES:", xInicio + 5, yActual + 3);
+
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'normal');
+            const splitIndicaciones = doc.splitTextToSize(data.indicacionesGenerales, 160);
+            doc.text(splitIndicaciones, xInicio + 5, yActual + 7);
+            yActual += 20;
+
+            // --- 9. Firma y Pie de página ---
+            const xFirmaBlock = 150; 
+            const yFirmaLine = 230; 
+            const yFirmaImage = yFirmaLine - 18; 
+            const nombreDoc = data.doctorNombre.toUpperCase();
+            
+            // Línea de Firma
+            doc.line(xFirmaBlock - 20, yFirmaLine, xFirmaBlock + 20, yFirmaLine); 
+
+            // Insertar Firma (IMAGEN PNG)
+            if (data.firmaBase64) {
+                const imgWidth = 40; 
+                const xFirma = xFirmaBlock - (imgWidth / 2); 
+                doc.addImage(data.firmaBase64, 'PNG', xFirma, yFirmaImage, imgWidth, 15, '', 'NONE', 0);
+            }
+            
+            // Nombre del Doctor (debajo de la línea de firma)
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'normal');
+            doc.text(nombreDoc, xFirmaBlock, yFirmaLine + 4, { align: 'center' }); 
+            
+            // Pie de página (Cita y Caducidad)
+            doc.setFontSize(8);
+            doc.setFont(undefined, 'bold');
+            doc.text(`Próxima cita: ${data.proximaCita}`, xInicio, yBajo - 5);
+            doc.text(`Caducidad de receta: 30 días a partir de la fecha de emisión.`, xInicio + 80, yBajo - 5);
+            
+            // COPIA (Texto central y bajo)
+            doc.setFontSize(16);
+            doc.setFont(undefined, 'bold');
+            doc.text("COPIA", xCentro, yBajo + 15, { align: 'center' }); 
+
+            if (descargar) {
+                 doc.save(`Receta_${nombreP.replace(/\s/g, '_')}_SIMILARES.pdf`);
+                 return true;
+            } else {
+                 return doc.output('datauristring').split(',')[1];
+            }
+        }
+
+        // --- INICIALIZACIÓN ---
+
+        window.addEventListener('load', () => {
+             // Reemplazar la entrada inicial del historial para que el "atrás" inicial vaya al menú.\
+             if (window.location.hash === '' || window.location.hash === '#menu') {
+                 history.replaceState({ viewId: 'menu' }, '', getBaseUrl());
+             }
+             checkURL();
+        });
+        
+        // Manejar el botón de "atrás" del navegador
+        window.addEventListener('popstate', checkURL);
+        
+        // Asegurar que el menú se muestre al cargar por primera vez si no hay hash
+        if (window.location.hash === '') {
+             window.onload = () => showForm('menu', false);
+        }
+
+    </script>
+</body>
+</html>
