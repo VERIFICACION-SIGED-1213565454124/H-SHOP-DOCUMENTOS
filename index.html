@@ -631,260 +631,260 @@
         );
 
         /* FUNCIÓN CORREGIDA: RECETA SIMILARES */
-        async function generarPDFRecetaSimilares(descargar = true) {
-            const doc = new jsPDF('p', 'mm', 'a4');
-            const pageWidth = doc.internal.pageSize.getWidth();
-            const margin = 10;
-            let y = 10;
-            const lineHeight = 5;
+async function generarPDFRecetaSimilares(descargar = true) {
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 10;
+    let y = 10;
+    const lineHeight = 5;
 
-            // Recuperar datos del formulario
-            const nombreDoc = (document.getElementById('doctorNombreSimilares').value || '').toUpperCase();
-            const cedula = (document.getElementById('cedulaSimilares').value || '').toUpperCase();
-            const direccion = (document.getElementById('direccionSimilares').value || '').toUpperCase();
-            const ciudad = (document.getElementById('ciudadSimilares').value || '').toUpperCase();
-            const fechaEmisionVal = document.getElementById('fechaEmisionSimilares').value;
-            
-            // Formato de fecha mejorado
-            const hoy = new Date();
-            const fechaHora = `${fechaEmisionVal ? new Date(fechaEmisionVal + 'T12:00:00').toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' }) : new Date().toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' })} ${hoy.getHours()}:${String(hoy.getMinutes()).padStart(2, '0')}`;
-            
-            const nombreP = (document.getElementById('nombrePacienteSimilares').value || '').toUpperCase();
-            const apellidoP = (document.getElementById('apellidoPSimilares').value || '').toUpperCase();
-            const apellidoM = (document.getElementById('apellidoMSimilares').value || '').toUpperCase();
-            const sexo = (document.getElementById('sexoSimilares').value || '').toUpperCase();
-            const edad = (document.getElementById('edadSimilares').value || '').toUpperCase();
-            const fechaNacVal = document.getElementById('fechaNacSimilares').value;
-            const fechaNac = fechaNacVal ? new Date(fechaNacVal + 'T12:00:00').toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
-            const alergias = (document.getElementById('alergiasSimilares').value || '').toUpperCase();
+    // Recuperar datos del formulario
+    const nombreDoc = (document.getElementById('doctorNombreSimilares').value || '').toUpperCase();
+    const cedula = (document.getElementById('cedulaSimilares').value || '').toUpperCase();
+    const direccion = (document.getElementById('direccionSimilares').value || '').toUpperCase();
+    const ciudad = (document.getElementById('ciudadSimilares').value || '').toUpperCase();
+    const fechaEmisionVal = document.getElementById('fechaEmisionSimilares').value;
+    
+    // Formato de fecha mejorado
+    const hoy = new Date();
+    const fechaHora = `${fechaEmisionVal ? new Date(fechaEmisionVal + 'T12:00:00').toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' }) : new Date().toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' })} ${hoy.getHours()}:${String(hoy.getMinutes()).padStart(2, '0')}`;
+    
+    const nombreP = (document.getElementById('nombrePacienteSimilares').value || '').toUpperCase();
+    const apellidoP = (document.getElementById('apellidoPSimilares').value || '').toUpperCase();
+    const apellidoM = (document.getElementById('apellidoMSimilares').value || '').toUpperCase();
+    const sexo = (document.getElementById('sexoSimilares').value || '').toUpperCase();
+    const edad = (document.getElementById('edadSimilares').value || '').toUpperCase();
+    const fechaNacVal = document.getElementById('fechaNacSimilares').value;
+    const fechaNac = fechaNacVal ? new Date(fechaNacVal + 'T12:00:00').toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+    const alergias = (document.getElementById('alergiasSimilares').value || '').toUpperCase();
 
-            const ta = (document.getElementById('spo2Similares').value || '').toUpperCase();
-            const temp = (document.getElementById('fcSimilares').value || '').toUpperCase();
-            const fc = (document.getElementById('frSimilares').value || '').toUpperCase();
-            const peso = (document.getElementById('tempSimilares').value || '').toUpperCase();
-            const fr = (document.getElementById('pesoSimilares').value || '').toUpperCase();
-            const talla = (document.getElementById('tallaSimilares').value || '').toUpperCase();
-            const dx = (document.getElementById('dxSimilares').value || '').toUpperCase();
+    const ta = (document.getElementById('spo2Similares').value || '').toUpperCase();
+    const temp = (document.getElementById('fcSimilares').value || '').toUpperCase();
+    const fc = (document.getElementById('frSimilares').value || '').toUpperCase();
+    const peso = (document.getElementById('tempSimilares').value || '').toUpperCase();
+    const fr = (document.getElementById('pesoSimilares').value || '').toUpperCase();
+    const talla = (document.getElementById('tallaSimilares').value || '').toUpperCase();
+    const dx = (document.getElementById('dxSimilares').value || '').toUpperCase();
 
-            const contenido = document.getElementById('contenidoConsultaSimilares').value || '';
-            const tratamiento = document.getElementById('tratamientoSimilares').value || '';
-            const indicaciones = document.getElementById('indicacionesGeneralesSimilares').value || '';
-            const proxima = document.getElementById('proximaCitaSimilares').value || '';
+    const contenido = document.getElementById('contenidoConsultaSimilares').value || '';
+    const tratamiento = document.getElementById('tratamientoSimilares').value || '';
+    const indicaciones = document.getElementById('indicacionesGeneralesSimilares').value || '';
+    const proxima = document.getElementById('proximaCitaSimilares').value || '';
 
-            // Cargar logo
-            const logoFile = document.getElementById('logoInputSimilares').files[0];
-            const logoBase64 = logoFile ? await fileToBase64(logoFile) : DEFAULT_LOGO_DATAURL;
+    // Cargar logo
+    const logoFile = document.getElementById('logoInputSimilares').files[0];
+    const logoBase64 = logoFile ? await fileToBase64(logoFile) : DEFAULT_LOGO_DATAURL;
 
-            // Generar número de expediente
-            const barcodeNumber = generarNumeroAleatorio();
+    // Generar número de expediente
+    const barcodeNumber = generarNumeroAleatorio();
 
-            // --- ENCABEZADO ---
-            // Logo a la izquierda
-            const logoW = 34;
-            const logoH = 20;
-            doc.addImage(logoBase64, 'PNG', margin, y, logoW, logoH);
+    // --- ENCABEZADO ---
+    // Logo a la izquierda
+    const logoW = 34;
+    const logoH = 20;
+    doc.addImage(logoBase64, 'PNG', margin, y, logoW, logoH);
 
-            // Información del médico centrada
-            doc.setFontSize(12);
-            doc.setFont(undefined, 'bold');
-            doc.text(nombreDoc, pageWidth/2, y + 8, { align: 'center' });
-            doc.setFontSize(10);
-            doc.setFont(undefined, 'normal');
-            doc.text(cedula, pageWidth/2, y + 13, { align: 'center' });
-            doc.text('UNIVERSIDAD NACIONAL AUTONOMA DE MEXICO', pageWidth/2, y + 18, { align: 'center' });
+    // Información del médico centrada
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'bold');
+    doc.text(nombreDoc, pageWidth/2, y + 8, { align: 'center' });
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.text(cedula, pageWidth/2, y + 13, { align: 'center' });
+    doc.text('UNIVERSIDAD NACIONAL AUTONOMA DE MEXICO', pageWidth/2, y + 18, { align: 'center' });
 
-            // Código de barras en la esquina superior derecha
-            const barcodeW = 70;
-            const barcodeH = 18;
-            const barcodeX = pageWidth - margin - barcodeW;
-            const barcodeY = y + 2;
-            drawBarcodeStyled(doc, barcodeX, barcodeY, barcodeW, barcodeH, barcodeNumber);
+    // Código de barras MÁS PEQUEÑO en la esquina superior derecha
+    const barcodeW = 45;  // Reducido de 70 a 45
+    const barcodeH = 12;  // Reducido de 18 a 12
+    const barcodeX = pageWidth - margin - barcodeW;
+    const barcodeY = y + 4;
+    drawBarcodeStyled(doc, barcodeX, barcodeY, barcodeW, barcodeH, barcodeNumber);
 
-            y += Math.max(logoH, 22) + 2;
+    y += Math.max(logoH, 22) + 2;
 
-            // Línea separadora
-            doc.setDrawColor(0);
-            doc.setLineWidth(0.4);
-            doc.line(margin, y, pageWidth - margin, y);
-            y += 6;
+    // Línea separadora
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.4);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 6;
 
-            // --- Dirección izquierda y Fecha derecha ---
-            doc.setFontSize(9);
-            doc.setFont(undefined, 'normal');
-            doc.text(direccion, margin, y);
-            doc.text(`FECHA Y HORA DE ELABORACION: ${fechaHora}`, pageWidth - margin, y, { align: 'right' });
-            y += 6;
+    // --- Dirección izquierda y Fecha derecha ---
+    doc.setFontSize(9);
+    doc.setFont(undefined, 'normal');
+    doc.text(direccion, margin, y);
+    doc.text(`FECHA Y HORA DE ELABORACION: ${fechaHora}`, pageWidth - margin, y, { align: 'right' });
+    y += 6;
 
-            // Línea separadora
-            doc.setLineWidth(0.3);
-            doc.line(margin, y, pageWidth - margin, y);
-            y += 6;
+    // Línea separadora
+    doc.setLineWidth(0.3);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 6;
 
-            // --- DATOS DEL PACIENTE ---
-            const colLeftX = margin;
-            const colRightX = pageWidth/2 + 10;
-            const fieldGapY = 5;
+    // --- DATOS DEL PACIENTE ---
+    const colLeftX = margin;
+    const colRightX = pageWidth/2 + 10;
+    const fieldGapY = 5;
 
-            doc.setFontSize(9);
-            doc.setFont(undefined, 'bold');
-            doc.text('NOMBRE:', colLeftX, y);
-            doc.setFont(undefined, 'normal');
-            doc.text(`${nombreP} ${apellidoP} ${apellidoM}`.trim(), colLeftX + 20, y);
+    doc.setFontSize(9);
+    doc.setFont(undefined, 'bold');
+    doc.text('NOMBRE:', colLeftX, y);
+    doc.setFont(undefined, 'normal');
+    doc.text(`${nombreP} ${apellidoP} ${apellidoM}`.trim(), colLeftX + 20, y);
 
-            doc.setFont(undefined, 'bold');
-            doc.text('NUMERO DE EXPEDIENTE:', colRightX, y);
-            doc.setFont(undefined, 'normal');
-            doc.text(barcodeNumber, colRightX + 48, y);
-            y += fieldGapY;
+    doc.setFont(undefined, 'bold');
+    doc.text('NUMERO DE EXPEDIENTE:', colRightX, y);
+    doc.setFont(undefined, 'normal');
+    doc.text(barcodeNumber, colRightX + 48, y);
+    y += fieldGapY;
 
-            doc.setFont(undefined, 'bold');
-            doc.text('SEXO:', colLeftX, y);
-            doc.setFont(undefined, 'normal');
-            doc.text(sexo, colLeftX + 14, y);
+    doc.setFont(undefined, 'bold');
+    doc.text('SEXO:', colLeftX, y);
+    doc.setFont(undefined, 'normal');
+    doc.text(sexo, colLeftX + 14, y);
 
-            doc.setFont(undefined, 'bold');
-            doc.text('EDAD:', colRightX, y);
-            doc.setFont(undefined, 'normal');
-            doc.text(edad, colRightX + 14, y);
-            y += fieldGapY;
+    doc.setFont(undefined, 'bold');
+    doc.text('EDAD:', colRightX, y);
+    doc.setFont(undefined, 'normal');
+    doc.text(edad, colRightX + 14, y);
+    y += fieldGapY;
 
-            doc.setFont(undefined, 'bold');
-            doc.text('FECHA DE NACIMIENTO:', colLeftX, y);
-            doc.setFont(undefined, 'normal');
-            doc.text(fechaNac, colLeftX + 42, y);
-            y += fieldGapY + 2;
+    doc.setFont(undefined, 'bold');
+    doc.text('FECHA DE NACIMIENTO:', colLeftX, y);
+    doc.setFont(undefined, 'normal');
+    doc.text(fechaNac, colLeftX + 42, y);
+    y += fieldGapY + 2;
 
-            // Línea separadora
-            doc.setLineWidth(0.3);
-            doc.line(margin, y, pageWidth - margin, y);
-            y += 6;
+    // Línea separadora
+    doc.setLineWidth(0.3);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 6;
 
-            // --- SIGNOS VITALES Y TRATAMIENTO (dos columnas) ---
-            const leftColW = (pageWidth - margin*2) * 0.45;
-            const rightColX2 = margin + leftColW + 10;
-            const rightColW = pageWidth - margin - rightColX2;
+    // --- SIGNOS VITALES Y TRATAMIENTO (dos columnas) ---
+    const leftColW = (pageWidth - margin*2) * 0.45;
+    const rightColX2 = margin + leftColW + 10;
+    const rightColW = pageWidth - margin - rightColX2;
 
-            let yLeft = y;
-            let yRight = y;
+    let yLeft = y;
+    let yRight = y;
 
-            // Columna Izquierda: Signos Vitales
-            doc.setFont(undefined, 'bold');
-            doc.text('T.A.', margin, yLeft);
-            doc.setFont(undefined, 'normal');
-            doc.text(ta, margin + 10, yLeft);
+    // Columna Izquierda: Signos Vitales
+    doc.setFont(undefined, 'bold');
+    doc.text('T.A.', margin, yLeft);
+    doc.setFont(undefined, 'normal');
+    doc.text(ta, margin + 10, yLeft);
 
-            doc.setFont(undefined, 'bold');
-            doc.text('TEMP:', margin + 42, yLeft);
-            doc.setFont(undefined, 'normal');
-            doc.text(temp, margin + 56, yLeft);
-            yLeft += lineHeight;
+    doc.setFont(undefined, 'bold');
+    doc.text('TEMP:', margin + 42, yLeft);
+    doc.setFont(undefined, 'normal');
+    doc.text(temp, margin + 56, yLeft);
+    yLeft += lineHeight;
 
-            doc.setFont(undefined, 'bold');
-            doc.text('F.C X MIN', margin, yLeft);
-            doc.setFont(undefined, 'normal');
-            doc.text(fc, margin + 21, yLeft);
+    doc.setFont(undefined, 'bold');
+    doc.text('F.C X MIN', margin, yLeft);
+    doc.setFont(undefined, 'normal');
+    doc.text(fc, margin + 21, yLeft);
 
-            doc.setFont(undefined, 'bold');
-            doc.text('PESO:', margin + 42, yLeft);
-            doc.setFont(undefined, 'normal');
-            doc.text(peso, margin + 54, yLeft);
-            yLeft += lineHeight;
+    doc.setFont(undefined, 'bold');
+    doc.text('PESO:', margin + 42, yLeft);
+    doc.setFont(undefined, 'normal');
+    doc.text(peso, margin + 54, yLeft);
+    yLeft += lineHeight;
 
-            doc.setFont(undefined, 'bold');
-            doc.text('F.R X MIN', margin, yLeft);
-            doc.setFont(undefined, 'normal');
-            doc.text(fr, margin + 21, yLeft);
+    doc.setFont(undefined, 'bold');
+    doc.text('F.R X MIN', margin, yLeft);
+    doc.setFont(undefined, 'normal');
+    doc.text(fr, margin + 21, yLeft);
 
-            doc.setFont(undefined, 'bold');
-            doc.text('TALLA:', margin + 42, yLeft);
-            doc.setFont(undefined, 'normal');
-            doc.text(talla, margin + 54, yLeft);
-            yLeft += lineHeight + 2;
+    doc.setFont(undefined, 'bold');
+    doc.text('TALLA:', margin + 42, yLeft);
+    doc.setFont(undefined, 'normal');
+    doc.text(talla, margin + 54, yLeft);
+    yLeft += lineHeight + 2;
 
-            // Diagnóstico (I.D)
-            doc.setFont(undefined, 'bold');
-            doc.text('I.D', margin, yLeft);
-            doc.setFont(undefined, 'normal');
-            doc.text(dx, margin + 8, yLeft);
-            yLeft += lineHeight + 4;
+    // Diagnóstico (I.D)
+    doc.setFont(undefined, 'bold');
+    doc.text('I.D', margin, yLeft);
+    doc.setFont(undefined, 'normal');
+    doc.text(dx, margin + 8, yLeft);
+    yLeft += lineHeight + 4;
 
-            // Columna Derecha: Tratamiento
-            doc.setFont(undefined, 'bold');
-            doc.text('TRATAMIENTO:', rightColX2, yRight);
+    // Columna Derecha: Tratamiento
+    doc.setFont(undefined, 'bold');
+    doc.text('TRATAMIENTO:', rightColX2, yRight);
+    yRight += lineHeight;
+    doc.setFont(undefined, 'normal');
+    
+    // Formatear tratamiento línea por línea
+    const tratamientoLineas = tratamiento.split('\n').filter(l => l.trim());
+    tratamientoLineas.forEach(linea => {
+        const wrapped = doc.splitTextToSize(linea, rightColW - 5);
+        wrapped.forEach(w => {
+            doc.text(w, rightColX2, yRight);
             yRight += lineHeight;
-            doc.setFont(undefined, 'normal');
-            
-            // Formatear tratamiento línea por línea
-            const tratamientoLineas = tratamiento.split('\n').filter(l => l.trim());
-            tratamientoLineas.forEach(linea => {
-                const wrapped = doc.splitTextToSize(linea, rightColW - 5);
-                wrapped.forEach(w => {
-                    doc.text(w, rightColX2, yRight);
-                    yRight += lineHeight;
-                });
-            });
+        });
+    });
 
-            // Determinar y máximo
-            y = Math.max(yLeft, yRight) + 4;
+    // Determinar y máximo
+    y = Math.max(yLeft, yRight) + 4;
 
-            // Línea separadora
-            doc.setLineWidth(0.3);
-            doc.line(margin, y, pageWidth - margin, y);
-            y += 6;
+    // Línea separadora
+    doc.setLineWidth(0.3);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 6;
 
-            // --- OBSERVACIONES ---
-            doc.setFont(undefined, 'bold');
-            doc.text('OBSERVACIONES', margin, y);
-            y += 5;
-            doc.setFont(undefined, 'normal');
-            y = drawJustifiedText(doc, contenido, margin, y, pageWidth - margin*2, lineHeight);
-            y += 4;
+    // --- OBSERVACIONES ---
+    doc.setFont(undefined, 'bold');
+    doc.text('OBSERVACIONES', margin, y);
+    y += 5;
+    doc.setFont(undefined, 'normal');
+    y = drawJustifiedText(doc, contenido, margin, y, pageWidth - margin*2, lineHeight);
+    y += 4;
 
-            // INDICACIONES
-            doc.setFont(undefined, 'normal');
-            y = drawJustifiedText(doc, 'Reposo mínimo de 2-3 días', margin, y, pageWidth - margin*2, lineHeight);
-            y += 8;
+    // INDICACIONES
+    doc.setFont(undefined, 'normal');
+    y = drawJustifiedText(doc, 'Reposo mínimo de 2-3 días', margin, y, pageWidth - margin*2, lineHeight);
+    y += 8;
 
-            // Próxima cita
-            doc.setFont(undefined, 'bold');
-            doc.text('PRÓXIMA CITA:', margin, y);
-            doc.setFont(undefined, 'normal');
-            doc.text(proxima, margin + 30, y);
-            y += 12;
+    // Próxima cita
+    doc.setFont(undefined, 'bold');
+    doc.text('PRÓXIMA CITA:', margin, y);
+    doc.setFont(undefined, 'normal');
+    doc.text(proxima, margin + 30, y);
+    y += 12;
 
-            // Línea para firma
-            const firmaX = pageWidth - margin - 60;
-            doc.setLineWidth(0.4);
-            doc.line(firmaX, y, firmaX + 50, y);
-            doc.setFont(undefined, 'normal');
-            doc.text('COPIA', firmaX - 30, y);
-            doc.setFont(undefined, 'bold');
-            doc.text('FIRMA:', firmaX, y + 4);
+    // Línea para firma
+    const firmaX = pageWidth - margin - 60;
+    doc.setLineWidth(0.4);
+    doc.line(firmaX, y, firmaX + 50, y);
+    doc.setFont(undefined, 'normal');
+    doc.text('COPIA', firmaX - 30, y);
+    doc.setFont(undefined, 'bold');
+    doc.text('FIRMA:', firmaX, y + 4);
 
-            y += 18;
+    y += 18;
 
-            // Línea punteada inferior
-            const dashY = doc.internal.pageSize.getHeight() - 28;
-            const dashStartX = margin;
-            const dashEndX = pageWidth - margin;
-            const dashLen = 3;
-            const gapLen = 3;
-            let cursor = dashStartX;
-            doc.setDrawColor(0);
-            doc.setLineWidth(0.4);
-            while (cursor < dashEndX) {
-                doc.line(cursor, dashY, Math.min(cursor + dashLen, dashEndX), dashY);
-                cursor += dashLen + gapLen;
-            }
+    // Línea punteada inferior
+    const dashY = doc.internal.pageSize.getHeight() - 28;
+    const dashStartX = margin;
+    const dashEndX = pageWidth - margin;
+    const dashLen = 3;
+    const gapLen = 3;
+    let cursor = dashStartX;
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.4);
+    while (cursor < dashEndX) {
+        doc.line(cursor, dashY, Math.min(cursor + dashLen, dashEndX), dashY);
+        cursor += dashLen + gapLen;
+    }
 
-            if (descargar) {
-                const safeName = (nombreP || 'PACIENTE').replace(/\s+/g, '_');
-                doc.save(`Receta_Similares_${safeName}.pdf`);
-                return true;
-            } else {
-                return doc.output('datauristring').split(',')[1];
-            }
-        }
+    if (descargar) {
+        const safeName = (nombreP || 'PACIENTE').replace(/\s+/g, '_');
+        doc.save(`Receta_Similares_${safeName}.pdf`);
+        return true;
+    } else {
+        return doc.output('datauristring').split(',')[1];
+    }
+}
 
         window.addEventListener('load', () => {
             checkURL();
