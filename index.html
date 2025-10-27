@@ -555,9 +555,29 @@
             }
         }
 
+        // --- CONFIRMACIÓN AL SALIR O VOLVER ATRÁS ---
         window.addEventListener('popstate', (e) => {
             const state = history.state;
-            if (!state) { showForm('auth_splash', false); return; }
+            // Solo preguntar si hay sesión activa y se intenta salir del menú o formularios
+            if (currentUser && (!state || !state.viewId || state.viewId === 'auth_splash')) {
+                const salir = confirm("⚠️ ¿Está seguro de que desea cerrar sesión y salir de los servicios?");
+                if (salir) {
+                    logOut();
+                } else {
+                    // Mantener la vista actual si cancela
+                    history.pushState({ viewId: 'menu' }, '', '#menu');
+                    showForm('menu', false);
+                }
+                return;
+            }
+
+            // Si no hay sesión activa, ir al acceso normal
+            if (!state) { 
+                showForm('auth_splash', false); 
+                return; 
+            }
+
+            // Si hay estado previo, mostrar esa vista
             showForm(state.viewId || 'auth_splash', false);
         });
 
